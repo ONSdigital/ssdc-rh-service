@@ -4,7 +4,8 @@ spring:
       pubsub:
         emulator-host: localhost:18538
         project-id: our-project
-
+      firestore:
+        project-id: our-project
 queueconfig:
   shared-pubsub-project: shared-project
   case-update-topic: event_case-update
