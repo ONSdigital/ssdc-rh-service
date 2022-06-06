@@ -16,9 +16,6 @@ public class CloudRetryListener extends RetryListenerSupport {
   public <T, E extends Throwable> void onError(
       RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
     Object operationName = context.getAttribute(RetryContext.NAME);
-    //        if (log.isDebugEnabled()) {
-    //            log.debug("{}: Retry failed", operationName);
-    //        }
     log.warn("Retry failed: " + operationName);
   }
 
@@ -30,16 +27,12 @@ public class CloudRetryListener extends RetryListenerSupport {
     if (context.getRetryCount() > 0) {
       Object operationName = context.getAttribute(RetryContext.NAME);
 
-      if (throwable == null) {
-        int numAttempts = context.getRetryCount() + 1; // Add 1 to count the initial attempt
-        //                log.info("{}: Transaction successful after {} attempts", operationName,
-        // numAttempts);
+      if (throwable != null) {
 
-      } else {
         // On failure the retryCount actually holds the number of attempts
         int numAttempts = context.getRetryCount();
-        //                log.warn("{}: Transaction failed after {} attempts", operationName,
-        // numAttempts);
+        log.warn(
+            String.format("%s Transaction failed after %s attempts", operationName, numAttempts));
       }
     }
   }

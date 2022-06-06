@@ -38,20 +38,9 @@ public class FirestoreDataStore {
     try {
       result.get();
     } catch (Exception e) {
-      //      log.error(
-      //          "Failed to create object in Firestore",
-      //          kv("schema", schema),
-      //          kv("key", key),
-      //          kv("exceptionChain", describeExceptionChain(e)),
-      //          e);
-
-      //      log.error("Failed to ")
+      log.error("Failed to store Object: " + e.getMessage());
 
       if (isRetryableFirestoreException(e)) {
-        // Firestore is overloaded. Use Spring exponential backoff to force a retry.
-        // This is intended to catch 'Too much contention' exceptions and any other
-        // Firestore exception where it is worth retrying.
-        //        log.info("Firestore contention detected", kv("schema", schema), kv("key", key));
         throw new DataStoreContentionException(
             "Firestore contention on schema '" + schema + "'", e);
       }
@@ -92,16 +81,8 @@ public class FirestoreDataStore {
             || failureCode == Status.UNAVAILABLE.getCode()) {
           retryable = true;
           break;
-        } else {
-          //          log.info(
-          //              "StatusRuntimeException found in exception heirarchy, but it's not a
-          // retryable code",
-          //              kv("Status", statusRuntimeException.getStatus()),
-          //              kv("StatusCode", failureCode),
-          //              kv("StatusDescription",
-          // statusRuntimeException.getStatus().getDescription()));
-          System.out.println("Retryyable Exception");
         }
+        // Else Retryable Exception
       }
 
       t = t.getCause();
@@ -122,18 +103,9 @@ public class FirestoreDataStore {
     Optional<T> result = null;
     if (documents.isEmpty()) {
       result = Optional.empty();
-      //      if (log.isDebugEnabled()) {
-      //        log.debug("Search didn't find any objects");
-      //      }
     } else if (documents.size() == 1) {
       result = Optional.of(documents.get(0));
-      //      log.info("Search found single result", kv("schema", schema), kv("key", key));
     } else {
-      //      log.error(
-      //          "Firestore found more than one result object",
-      //          kv("resultsSize", documents.size()),
-      //          kv("schema", schema),
-      //          kv("key", key));
       String failureMessage =
           "Firestore returned more than 1 result object. Returned "
               + documents.size()
@@ -148,16 +120,12 @@ public class FirestoreDataStore {
   }
 
   public <T> List<T> list(Class<T> target, String schema) throws RuntimeException {
-    //    log.debug("Listing all items in Firestore", kv("schema", schema), kv("target", target));
     try {
       ApiFuture<QuerySnapshot> query = provider.get().collection(schema).get();
       QuerySnapshot querySnapshot = query.get();
       List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
       return documents.stream().map(d -> d.toObject(target)).collect(toList());
     } catch (Exception e) {
-      //      log.error(
-      //          "Failed to list Firestore items {} {}", kv("target", target), kv("schema",
-      // schema), e);
       String failureMessage =
           "Failed to list Firestore items. Target class: '"
               + target
@@ -171,21 +139,10 @@ public class FirestoreDataStore {
   public <T> List<T> search(
       Class<T> target, final String schema, String[] fieldPathElements, String searchValue)
       throws RuntimeException {
-    //    if (log.isDebugEnabled()) {
-    //      log.debug(
-    //          "Searching Firestore",
-    //          kv("schema", schema),
-    //          kv("fieldPathElements", fieldPathElements),
-    //          kv("searchValue", searchValue),
-    //          kv("target", target));
-    //    }
 
     // Run a query for a custom search path
     FieldPath fieldPath = FieldPath.of(fieldPathElements);
     List<T> r = runSearch(target, schema, fieldPath, searchValue);
-    //    if (log.isDebugEnabled()) {
-    //      log.debug("Firestore search returning results", kv("resultSize", r.size()));
-    //    }
     return r;
   }
 
@@ -201,8 +158,6 @@ public class FirestoreDataStore {
     try {
       querySnapshot = query.get();
     } catch (Exception e) {
-      //      log.error("Failed to search schema", kv("schema", schema), kv("fieldPath", fieldPath),
-      // e);
       String failureMessage =
           "Failed to search schema '" + schema + "' by field '" + "'" + fieldPath;
       throw new RuntimeException(failureMessage);
@@ -214,8 +169,6 @@ public class FirestoreDataStore {
     try {
       results = documents.stream().map(d -> d.toObject(target)).collect(Collectors.toList());
     } catch (Exception e) {
-      //      log.error("Failed to convert Firestore result to Java object", kv("target", target),
-      // e);
       String failureMessage =
           "Failed to convert Firestore result to Java object. Target class '" + target + "'";
       throw new RuntimeException(failureMessage);
@@ -234,10 +187,7 @@ public class FirestoreDataStore {
     // Wait for delete to complete
     try {
       result.get();
-      //      log.info("Firestore delete completed", kv("schema", schema), kv("key", key));
     } catch (Exception e) {
-      //      log.error("Failed to delete object from Firestore", kv("schema", schema), kv("key",
-      // key), e);
       String failureMessage =
           "Failed to delete object from Firestore. Schema: " + schema + " with key " + key;
       throw new RuntimeException(failureMessage);

@@ -129,30 +129,30 @@
       </extension>
     </extensions>
     <plugins>
-<!--      <plugin>-->
-<!--        <groupId>org.apache.maven.plugins</groupId>-->
-<!--        <artifactId>maven-pmd-plugin</artifactId>-->
-<!--        <version>3.16.0</version>-->
-<!--        <configuration>-->
-<!--          <excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile>-->
-<!--          <failurePriority>3</failurePriority>-->
-<!--          <failOnViolation>true</failOnViolation>-->
-<!--          <verbose>true</verbose>-->
-<!--          <linkXRef>false</linkXRef>-->
-<!--          <rulesets>-->
-<!--            <ruleset>/category/java/bestpractices.xml</ruleset>-->
-<!--            <ruleset>/category/java/security.xml</ruleset>-->
-<!--          </rulesets>-->
-<!--        </configuration>-->
-<!--        <executions>-->
-<!--          <execution>-->
-<!--            <phase>compile</phase>-->
-<!--            <goals>-->
-<!--              <goal>check</goal>-->
-<!--            </goals>-->
-<!--          </execution>-->
-<!--        </executions>-->
-<!--      </plugin>-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.16.0</version>
+        <configuration>
+          <excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile>
+          <failurePriority>3</failurePriority>
+          <failOnViolation>true</failOnViolation>
+          <verbose>true</verbose>
+          <linkXRef>false</linkXRef>
+          <rulesets>
+            <ruleset>/category/java/bestpractices.xml</ruleset>
+            <ruleset>/category/java/security.xml</ruleset>
+          </rulesets>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
