@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
 import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
@@ -64,34 +61,5 @@ public class RetryableCloudDataStore {
 
   public Set<String> getCollectionNames() {
     return cloudDataStore.getCollectionNames();
-  }
-
-  /**
-   * We need another class for the retryable annotation, since calling a retryable annotated within
-   * the same class does not honour the annotations.
-   */
-  @Component
-  static class Retrier {
-
-    private FirestoreDataStore cloudDataStore;
-
-    public Retrier(FirestoreDataStore cloudDataStore) {
-      this.cloudDataStore = cloudDataStore;
-    }
-
-    @Retryable(
-        label = "storeObject",
-        include = DataStoreContentionException.class,
-        backoff =
-            @Backoff(
-                delayExpression = "${cloud-storage.backoff.initial}",
-                multiplierExpression = "${cloud-storage.backoff.multiplier}",
-                maxDelayExpression = "${cloud-storage.backoff.max}"),
-        maxAttemptsExpression = "${cloud-storage.backoff.max-attempts}",
-        listeners = "cloudRetryListener")
-    public void store(final String schema, final String key, final Object value)
-        throws RuntimeException, DataStoreContentionException {
-      cloudDataStore.storeObject(schema, key, value);
-    }
   }
 }
