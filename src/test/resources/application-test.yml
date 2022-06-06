@@ -1,6 +1,5 @@
 spring:
-#  datasource:
-#    url: jdbc:postgresql://localhost:16432/postgres
+
 
   cloud:
     gcp:
