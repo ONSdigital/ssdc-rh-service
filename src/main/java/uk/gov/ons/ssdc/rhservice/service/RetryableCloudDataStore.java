@@ -30,19 +30,13 @@ public class RetryableCloudDataStore {
       retrier.store(schema, key, value);
     } catch (DataStoreContentionException | RuntimeException e) {
       String identity = value.getClass().getSimpleName() + ": " + id;
-      System.out.println("Data store error");
-      System.out.println("Exception message: " + e.getMessage());
+
+      log.error(
+          String.format(
+              "Retries exhausted for storage. Key: %s, Schema: %s, identity: %s. Exception %s",
+              key, schema, identity, e.getMessage()));
 
       throw new RuntimeException("Failed to Store Object");
-
-      //      log.error(
-      //          "Retries exhausted for storage",
-      //          kv("key", key),
-      //          kv("schema", schema),
-      //          kv("indentity", identity),
-      //          e);
-      //      throw new CTPException(Fault.SYSTEM_ERROR, e, "Retries exhausted for storage of " +
-      // identity);
     }
   }
 

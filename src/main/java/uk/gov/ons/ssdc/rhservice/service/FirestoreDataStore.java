@@ -2,6 +2,8 @@ package uk.gov.ons.ssdc.rhservice.service;
 
 import static java.util.stream.Collectors.toList;
 
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.FieldPath;
@@ -22,12 +24,12 @@ import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 
 @Service
 public class FirestoreDataStore {
+  private static final Logger log = LoggerFactory.getLogger(FirestoreDataStore.class);
 
   @Autowired private FirestoreProvider provider;
 
   public void storeObject(final String schema, final String key, final Object value)
       throws RuntimeException, DataStoreContentionException {
-    //    log.info("Saving object to Firestore", kv("schema", schema), kv("key", key));
 
     // Store the object
     ApiFuture<WriteResult> result = provider.get().collection(schema).document(key).set(value);
@@ -35,7 +37,6 @@ public class FirestoreDataStore {
     // Wait for Firestore to complete
     try {
       result.get();
-      //      log.info("Firestore save completed", kv("schema", schema), kv("key", key));
     } catch (Exception e) {
       //      log.error(
       //          "Failed to create object in Firestore",
@@ -43,6 +44,8 @@ public class FirestoreDataStore {
       //          kv("key", key),
       //          kv("exceptionChain", describeExceptionChain(e)),
       //          e);
+
+      //      log.error("Failed to ")
 
       if (isRetryableFirestoreException(e)) {
         // Firestore is overloaded. Use Spring exponential backoff to force a retry.

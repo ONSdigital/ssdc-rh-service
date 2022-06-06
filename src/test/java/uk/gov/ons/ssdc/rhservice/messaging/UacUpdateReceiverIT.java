@@ -53,12 +53,8 @@ public class UacUpdateReceiverIT {
     pubsubHelper.sendMessageToSharedProject(uacUpdateTopic, event);
 
     // THEN
-
     Optional<UacUpdateDTO> uacOpt = fireStorePoller.getUacByHash(uacUpdateDTO.getUacHash());
-
     Assertions.assertTrue(uacOpt.isPresent());
-
-    System.out.println("FOUND UAC");
     assertThat(uacOpt.get()).isEqualTo(uacUpdateDTO);
   }
 }

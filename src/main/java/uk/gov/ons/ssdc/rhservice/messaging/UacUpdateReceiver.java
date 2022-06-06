@@ -24,13 +24,8 @@ public class UacUpdateReceiver {
 
   @ServiceActivator(inputChannel = "uacUpdateInputChannel", adviceChain = "retryAdvice")
   public void receiveMessage(Message<byte[]> message) throws CTPException {
-
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
-
     UacUpdateDTO uacUpdateDTO = event.getPayload().getUacUpdateDTO();
-
-    System.out.println("UAC UPDATE, ID: " + uacUpdateDTO.getUacHash());
-
     respondentUacRepo.writeUAC(uacUpdateDTO);
   }
 }

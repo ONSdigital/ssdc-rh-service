@@ -52,11 +52,9 @@ public class CaseUpdateReceiverIT {
     // WHEN
     pubsubHelper.sendMessageToSharedProject(caseUpdateTopic, event);
 
+    // THEN
     Optional<CaseUpdateDTO> cazeOpt = fireStorePoller.getCaseById(caseUpdateDTO.getCaseId());
-
     Assertions.assertTrue(cazeOpt.isPresent());
-
-    System.out.println("FOUND CASE");
     assertThat(cazeOpt.get()).isEqualTo(caseUpdateDTO);
   }
 }
