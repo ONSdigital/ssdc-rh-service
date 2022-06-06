@@ -1,10 +1,4 @@
 spring:
-#  task:
-#    scheduling:
-#      pool:
-#        size: 30
-
-
   cloud:
     gcp:
       pubsub:
@@ -18,8 +12,6 @@ spring:
 queueconfig:
   case-update-subscription: event_case-update_rh
   uac-update-subscription: event_uac-update_rh
-  survey-update-event-topic: event_survey-update_rh
-  collection-exercise-update-event-topic: event_collection-exercise-update_rh
   shared-pubsub-project: shared-project
 
 
@@ -54,19 +46,3 @@ logging:
     root: INFO
     com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter: ERROR
 
-caserefgeneratorkey: abc123
-
-scheduler:
-  frequency: 1000 #milliseconds
-  chunksize: 1000
-  leaderDeathTimeout: 120 #seconds
-
-uacservice:
-  connection:
-    scheme: http
-    host: localhost
-    port: 8164
-
-  uacqid-cache-min: 500
-  uacqid-fetch-count: 1000
-  uacqid-get-timeout: 60   #seconds
