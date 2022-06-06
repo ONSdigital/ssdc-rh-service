@@ -72,13 +72,11 @@ public class RetryableCloudDataStore {
    */
   @Component
   static class Retrier {
+
     private FirestoreDataStore cloudDataStore;
 
-    @Autowired
     public Retrier(FirestoreDataStore cloudDataStore) {
       this.cloudDataStore = cloudDataStore;
-      //      this.fireStoreRetryConfig = fireStoreRetryConfig;
-      //      log.info("CloudDataStore retry configuration: {}", this.fireStoreRetryConfig);
     }
 
     @Retryable(
@@ -86,10 +84,10 @@ public class RetryableCloudDataStore {
         include = DataStoreContentionException.class,
         backoff =
             @Backoff(
-                delayExpression = "100",
-                multiplierExpression = "1.2",
-                maxDelayExpression = "16000"),
-        maxAttemptsExpression = "30",
+                delayExpression = "${cloud-storage.backoff.initial}",
+                multiplierExpression = "${cloud-storage.backoff.multiplier}",
+                maxDelayExpression = "${cloud-storage.backoff.max}"),
+        maxAttemptsExpression = "${cloud-storage.backoff.max-attempts}",
         listeners = "cloudRetryListener")
     public void store(final String schema, final String key, final Object value)
         throws RuntimeException, DataStoreContentionException {
