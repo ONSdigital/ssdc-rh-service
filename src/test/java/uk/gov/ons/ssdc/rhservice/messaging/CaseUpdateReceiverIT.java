@@ -59,7 +59,7 @@ public class CaseUpdateReceiverIT {
 
       Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(caseUpdateDTO.getCaseId());
 
-      if(!cazeOpt.isPresent()) {
+      if (!cazeOpt.isPresent()) {
         Thread.sleep(1000);
         continue;
       }
