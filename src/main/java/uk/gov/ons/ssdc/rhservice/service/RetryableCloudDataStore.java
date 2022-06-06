@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
 import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 
 @Service
@@ -44,7 +43,7 @@ public class RetryableCloudDataStore {
     return cloudDataStore.retrieveObject(target, schema, key);
   }
 
-  public <T> List<T> list(Class<T> target, String schema) throws CTPException {
+  public <T> List<T> list(Class<T> target, String schema) {
     return cloudDataStore.list(target, schema);
   }
 

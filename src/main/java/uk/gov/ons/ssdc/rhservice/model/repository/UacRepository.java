@@ -5,7 +5,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.RetryableCloudDataStore;
 
@@ -33,24 +32,11 @@ public class UacRepository {
     this.retryableCloudDataStore = retryableCloudDataStore;
   }
 
-  /**
-   * Stores a UAC object into the cloud data store.
-   *
-   * @param uac - object to be stored in the cloud
-   * @throws CTPException - if a cloud exception was detected.
-   */
-  public void writeUAC(final UacUpdateDTO uac) throws CTPException {
+  public void writeUAC(final UacUpdateDTO uac) {
     retryableCloudDataStore.storeObject(uacSchema, uac.getUacHash(), uac, uac.getCaseId());
   }
 
-  /**
-   * Read a UAC object from cloud.
-   *
-   * @param universalAccessCodeHash - the hash of the unique id of the object stored
-   * @return - deserialised version of the stored object
-   * @throws CTPException - if a cloud exception was detected.
-   */
-  public Optional<UacUpdateDTO> readUAC(final String universalAccessCodeHash) throws CTPException {
+  public Optional<UacUpdateDTO> readUAC(final String universalAccessCodeHash) {
     return retryableCloudDataStore.retrieveObject(
         UacUpdateDTO.class, uacSchema, universalAccessCodeHash);
   }

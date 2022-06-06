@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
 import uk.gov.ons.ssdc.rhservice.exceptions.CaseNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
@@ -36,7 +35,7 @@ public class CaseUpdateReceiverIT {
   @Autowired private FireStorePoller fireStorePoller;
 
   @Test
-  public void testCaseUpdateReceived() throws CTPException, CaseNotFoundException {
+  public void testCaseUpdateReceived() throws CaseNotFoundException {
     // GIVEN
 
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();

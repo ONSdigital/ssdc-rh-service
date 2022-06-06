@@ -6,7 +6,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
 import uk.gov.ons.ssdc.rhservice.exceptions.CaseNotFoundException;
 import uk.gov.ons.ssdc.rhservice.exceptions.UacNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
@@ -24,8 +23,7 @@ public class FireStorePoller {
       value = {CaseNotFoundException.class},
       maxAttempts = 5,
       backoff = @Backoff(delay = 1000))
-  public Optional<CaseUpdateDTO> getCaseById(String caseId)
-      throws CaseNotFoundException, CTPException {
+  public Optional<CaseUpdateDTO> getCaseById(String caseId) throws CaseNotFoundException {
 
     Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(caseId);
 
@@ -40,8 +38,7 @@ public class FireStorePoller {
       value = {UacNotFoundException.class},
       maxAttempts = 5,
       backoff = @Backoff(delay = 1000))
-  public Optional<UacUpdateDTO> getUacByHash(String hash)
-      throws UacNotFoundException, CTPException {
+  public Optional<UacUpdateDTO> getUacByHash(String hash) throws UacNotFoundException {
 
     Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
 

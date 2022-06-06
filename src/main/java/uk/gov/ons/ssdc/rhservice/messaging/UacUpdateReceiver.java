@@ -5,7 +5,6 @@ import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.convertJsonBytesToEvent
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
-import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
@@ -23,7 +22,7 @@ public class UacUpdateReceiver {
   }
 
   @ServiceActivator(inputChannel = "uacUpdateInputChannel", adviceChain = "retryAdvice")
-  public void receiveMessage(Message<byte[]> message) throws CTPException {
+  public void receiveMessage(Message<byte[]> message) {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
     UacUpdateDTO uacUpdateDTO = event.getPayload().getUacUpdateDTO();
     respondentUacRepo.writeUAC(uacUpdateDTO);

@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
 import uk.gov.ons.ssdc.rhservice.exceptions.UacNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
@@ -34,7 +33,7 @@ public class UacUpdateReceiverIT {
   @Autowired private FireStorePoller fireStorePoller;
 
   @Test
-  public void testUacUpdateReceived() throws CTPException, UacNotFoundException {
+  public void testUacUpdateReceived() throws UacNotFoundException {
 
     // GIVEN
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
