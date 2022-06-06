@@ -1,5 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.messaging;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,10 +55,11 @@ public class CaseUpdateReceiverIT {
     pubsubHelper.sendMessageToSharedProject(caseUpdateTopic, event);
 
     for (int i = 0; i < 5; i++) {
-      Optional<CaseUpdateDTO> caze = caseRepository.readCaseUpdate(caseUpdateDTO.getCaseId());
+      Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(caseUpdateDTO.getCaseId());
 
-      if (caze.isPresent()) {
+      if (cazeOpt.isPresent()) {
         System.out.println("FOUND CASE");
+        assertThat(cazeOpt.get().getCaseId()).isEqualTo(caseUpdateDTO.getCaseId());
         break;
       }
 
