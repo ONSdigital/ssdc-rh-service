@@ -21,6 +21,8 @@ import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
+import uk.gov.ons.ssdc.rhservice.utils.CaseNotFoundException;
+import uk.gov.ons.ssdc.rhservice.utils.FireStorePoller;
 
 @ContextConfiguration
 @ActiveProfiles("test")
@@ -32,8 +34,8 @@ public class CaseUpdateReceiverIT {
   private String caseUpdateTopic;
 
   @Autowired private PubsubHelper pubsubHelper;
-  //  @Autowired private DeleteDataHelper deleteDataHelper;
-  //  @Autowired private JunkDataHelper junkDataHelper;
+
+  @Autowired private FireStorePoller fireStorePoller;
 
   @Autowired private CaseRepository caseRepository;
 
@@ -43,7 +45,7 @@ public class CaseUpdateReceiverIT {
   }
 
   @Test
-  public void testCaseUpdateReceived() throws InterruptedException, CTPException {
+  public void testCaseUpdateReceived() throws CTPException, CaseNotFoundException {
     // GIVEN
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
@@ -58,19 +60,11 @@ public class CaseUpdateReceiverIT {
     // WHEN
     pubsubHelper.sendMessageToSharedProject(caseUpdateTopic, event);
 
-    for (int i = 0; i < 5; i++) {
+    Optional<CaseUpdateDTO> cazeOpt = fireStorePoller.getCaseById(caseUpdateDTO.getCaseId());
 
-      Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(caseUpdateDTO.getCaseId());
+    Assertions.assertTrue(cazeOpt.isPresent());
 
-      if (!cazeOpt.isPresent()) {
-        Thread.sleep(1000);
-        continue;
-      }
-
-      Assertions.assertTrue(cazeOpt.isPresent());
-
-      System.out.println("FOUND CASE");
-      assertThat(cazeOpt.get()).isEqualTo(caseUpdateDTO);
-    }
+    System.out.println("FOUND CASE");
+    assertThat(cazeOpt.get()).isEqualTo(caseUpdateDTO);
   }
 }
