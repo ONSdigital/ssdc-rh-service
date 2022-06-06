@@ -7,6 +7,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
+import uk.gov.ons.ssdc.rhservice.exceptions.CaseNotFoundException;
+import uk.gov.ons.ssdc.rhservice.exceptions.UacNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;

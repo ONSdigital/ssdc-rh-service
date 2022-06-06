@@ -15,11 +15,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
+import uk.gov.ons.ssdc.rhservice.exceptions.CaseNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
 import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
-import uk.gov.ons.ssdc.rhservice.utils.CaseNotFoundException;
 import uk.gov.ons.ssdc.rhservice.utils.FireStorePoller;
 
 @ContextConfiguration
