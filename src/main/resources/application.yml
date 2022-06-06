@@ -39,7 +39,7 @@ cloud-storage:
 
 healthcheck:
   frequency: 15000 #milliseconds
-  filename: /tmp/case-processor-healthy
+  filename: /tmp/rh-service-healthy
 
 exceptionmanager:
   connection:

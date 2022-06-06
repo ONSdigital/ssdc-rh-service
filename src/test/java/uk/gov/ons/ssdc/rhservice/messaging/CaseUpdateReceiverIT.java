@@ -2,6 +2,7 @@ package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -46,6 +47,8 @@ public class CaseUpdateReceiverIT {
     // GIVEN
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
+    caseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
+    caseUpdateDTO.setSample(Map.of("Hello", "friends"));
     PayloadDTO payloadDTO = new PayloadDTO();
     payloadDTO.setCaseUpdateDTO(caseUpdateDTO);
 
@@ -67,7 +70,7 @@ public class CaseUpdateReceiverIT {
       Assertions.assertTrue(cazeOpt.isPresent());
 
       System.out.println("FOUND CASE");
-      assertThat(cazeOpt.get().getCaseId()).isEqualTo(caseUpdateDTO.getCaseId());
+      assertThat(cazeOpt.get()).isEqualTo(caseUpdateDTO);
     }
   }
 }

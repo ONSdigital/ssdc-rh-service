@@ -19,8 +19,7 @@ public class CaseUpdateReceiver {
   }
 
   @Transactional
-  //  @ServiceActivator(inputChannel = "caseUpdateInputChannel", adviceChain = "retryAdvice")
-  @ServiceActivator(inputChannel = "caseUpdateInputChannel")
+  @ServiceActivator(inputChannel = "caseUpdateInputChannel", adviceChain = "retryAdvice")
   public void receiveMessage(Message<byte[]> message) {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
 
