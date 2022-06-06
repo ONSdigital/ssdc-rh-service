@@ -8,9 +8,3 @@ curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/e
 
 curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/topics/event_case-update
 curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/event_case-update_rh -H 'Content-Type: application/json' -d '{"topic": "projects/shared-project/topics/event_case-update"}'
-
-curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/topics/event_survey-update
-curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/event_survey-update_rh -H 'Content-Type: application/json' -d '{"topic": "projects/shared-project/topics/event_survey-update}'
-
-curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/topics/event_collection-exercise-update
-curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/event_collection-exercise-update_rh -H 'Content-Type: application/json' -d '{"topic": "projects/shared-project/topics/event_collection-exercise-update"}'
