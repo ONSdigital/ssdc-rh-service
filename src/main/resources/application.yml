@@ -15,11 +15,9 @@ spring:
       firestore:
         project-id: our-project
 
-#  FIRESTORE_EMULATOR_HOST" value="localhost:8542"
-
 queueconfig:
   case-update-subscription: event_case-update_rh
-  uac-update-topic: event_uac-update_rh
+  uac-update-subscription: event_uac-update_rh
   survey-update-event-topic: event_survey-update_rh
   collection-exercise-update-event-topic: event_collection-exercise-update_rh
   shared-pubsub-project: shared-project
@@ -72,17 +70,3 @@ uacservice:
   uacqid-cache-min: 500
   uacqid-fetch-count: 1000
   uacqid-get-timeout: 60   #seconds
-
-ras-rm-party-service:
-  connection:
-    scheme: http
-    host: localhost
-    port: 8081
-    username: admin
-    password: secret
-
-ras-rm-case-service:
-  connection:
-    scheme: http
-    host: localhost
-    port: 8171

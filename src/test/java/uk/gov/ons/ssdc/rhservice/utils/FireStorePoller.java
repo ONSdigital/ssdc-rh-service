@@ -8,12 +8,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
+import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @Component
 @ActiveProfiles("test")
 public class FireStorePoller {
   @Autowired private CaseRepository caseRepository;
+  @Autowired private UacRepository uacRepository;
 
   @Retryable(
       value = {CaseNotFoundException.class},
@@ -28,6 +31,22 @@ public class FireStorePoller {
       return cazeOpt;
     } else {
       throw new CaseNotFoundException("Case Not found: " + caseId);
+    }
+  }
+
+  @Retryable(
+      value = {UacNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<UacUpdateDTO> getUacByHash(String hash)
+      throws UacNotFoundException, CTPException {
+
+    Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
+
+    if (uacUpdateOpt.isPresent()) {
+      return uacUpdateOpt;
+    } else {
+      throw new UacNotFoundException("Uac Not found: " + hash);
     }
   }
 }

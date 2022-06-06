@@ -2,7 +2,6 @@ package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -15,48 +14,51 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ssdc.rhservice.exceptions.CTPException;
-import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
-import uk.gov.ons.ssdc.rhservice.utils.CaseNotFoundException;
 import uk.gov.ons.ssdc.rhservice.utils.FireStorePoller;
+import uk.gov.ons.ssdc.rhservice.utils.UacNotFoundException;
 
 @ContextConfiguration
 @ActiveProfiles("test")
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-public class CaseUpdateReceiverIT {
-
-  @Value("${queueconfig.case-update-topic}")
-  private String caseUpdateTopic;
+public class UacUpdateReceiverIT {
+  @Value("${queueconfig.uac-update-topic}")
+  private String uacUpdateTopic;
 
   @Autowired private PubsubHelper pubsubHelper;
 
   @Autowired private FireStorePoller fireStorePoller;
 
   @Test
-  public void testCaseUpdateReceived() throws CTPException, CaseNotFoundException {
-    // GIVEN
+  public void testUacUpdateReceived() throws CTPException, UacNotFoundException {
 
-    CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
-    caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
-    caseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
-    caseUpdateDTO.setSample(Map.of("Hello", "friends"));
+    // GIVEN
+    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    uacUpdateDTO.setCaseId(UUID.randomUUID().toString());
+    uacUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
+    uacUpdateDTO.setQid("000000000001");
+    uacUpdateDTO.setUacHash("blah");
+
     PayloadDTO payloadDTO = new PayloadDTO();
-    payloadDTO.setCaseUpdateDTO(caseUpdateDTO);
+    payloadDTO.setUacUpdateDTO(uacUpdateDTO);
 
     EventDTO event = new EventDTO();
     event.setPayload(payloadDTO);
 
     // WHEN
-    pubsubHelper.sendMessageToSharedProject(caseUpdateTopic, event);
+    pubsubHelper.sendMessageToSharedProject(uacUpdateTopic, event);
 
-    Optional<CaseUpdateDTO> cazeOpt = fireStorePoller.getCaseById(caseUpdateDTO.getCaseId());
+    // THEN
 
-    Assertions.assertTrue(cazeOpt.isPresent());
+    Optional<UacUpdateDTO> uacOpt = fireStorePoller.getUacByHash(uacUpdateDTO.getUacHash());
 
-    System.out.println("FOUND CASE");
-    assertThat(cazeOpt.get()).isEqualTo(caseUpdateDTO);
+    Assertions.assertTrue(uacOpt.isPresent());
+
+    System.out.println("FOUND UAC");
+    assertThat(uacOpt.get()).isEqualTo(uacUpdateDTO);
   }
 }

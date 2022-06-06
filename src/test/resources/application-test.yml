@@ -24,3 +24,4 @@ caserefgeneratorkey: rPr3qsjlU42hsDX5npfuCzlyF4UYfDTO
 queueconfig:
   shared-pubsub-project: shared-project
   case-update-topic: event_case-update
+  uac-update-topic: event_uac-update

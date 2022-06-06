@@ -8,4 +8,5 @@ import lombok.Data;
 @JsonInclude(Include.NON_NULL)
 public class PayloadDTO {
   private CaseUpdateDTO caseUpdateDTO;
+  private UacUpdateDTO uacUpdateDTO;
 }
