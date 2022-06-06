@@ -1,0 +1,10 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 65%
+        threshold: null
+        base: auto
+
+ignore:
+- "src/tests/"
