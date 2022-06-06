@@ -1,10 +1,10 @@
 version: '2.1'
 services:
   firestore-emulator-rh:
-    container_name: firestore-emulator-rh
+    container_name: firestore-emulator-rh-it
     image: europe-west2-docker.pkg.dev/ssdc-rm-ci/docker/gcloud-firestore-emulator:latest
     ports:
-      - "8542:8540"
+      - "18542:8540"
 
   pubsub-emulator-rh-it:
     container_name: pubsub-emulator-rh-it

@@ -1,6 +1,5 @@
-
 install:
-	mvn clean install
+	FIRESTORE_EMULATOR_HOST="localhost:18542" mvn clean install
 
 build: install docker-build
 
@@ -23,4 +22,3 @@ test:
 
 docker-build:
 	docker build . -t europe-west2-docker.pkg.dev/ssdc-rm-ci/docker/ssdc-rh-service:latest
-

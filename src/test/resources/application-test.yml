@@ -1,25 +1,9 @@
 spring:
-
-
   cloud:
     gcp:
       pubsub:
         emulator-host: localhost:18538
         project-id: our-project
-
-#      firestore:
-#        #        TODO: rename, here there, everywhere
-#        project-id: rh-testcontainers
-
-uacservice:
-  connection:
-    port: 18164
-
-  uacqid-cache-min: 5
-  uacqid-fetch-count: 10
-  uacqid-get-timeout: 1   #seconds
-
-caserefgeneratorkey: rPr3qsjlU42hsDX5npfuCzlyF4UYfDTO
 
 queueconfig:
   shared-pubsub-project: shared-project

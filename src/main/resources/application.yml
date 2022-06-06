@@ -6,8 +6,6 @@ spring:
           flow-control:
             max-outstanding-element-count: 100
 
-      firestore:
-        project-id: our-project
 
 queueconfig:
   case-update-subscription: event_case-update_rh
@@ -18,9 +16,6 @@ queueconfig:
 cloud-storage:
   case-schema-name: case
   uac-schema-name: uac
-  survey-schema-name: survey
-  collection-exercise-schema-name: collection_exercise
-  event-backup-schema-name: event-backup
   backoff:
     initial: 100
     multiplier: 1.2
