@@ -46,23 +46,8 @@ public class FirestoreDataStore {
       }
 
       throw new RuntimeException(
-          "Failed to create object in Firestore. Schema: " + schema + " with key " + key);
+          "Failed to create object in Firestore. Schema: " + schema + " with key " + key, e);
     }
-  }
-
-  // This method supports logging which aims to protect against future unexpected changes in
-  // how google throw exceptions for retryable operations. If Google change Firestore behaviour
-  // and we don't detect a retryable operation then we want our logging to be good enough to
-  // allow a code fix.
-  private String describeExceptionChain(Throwable e) {
-    StringBuilder builder = new StringBuilder();
-
-    while (e != null) {
-      builder.append("caused by " + e.getClass().getName() + " ");
-      e = e.getCause();
-    }
-
-    return builder.toString().trim();
   }
 
   private boolean isRetryableFirestoreException(Exception e) {
@@ -100,7 +85,8 @@ public class FirestoreDataStore {
     List<T> documents = runSearch(target, schema, fieldPathForId, key);
 
     // Squash results down to single document
-    Optional<T> result = null;
+    Optional<T> result;
+
     if (documents.isEmpty()) {
       result = Optional.empty();
     } else if (documents.size() == 1) {
@@ -132,7 +118,7 @@ public class FirestoreDataStore {
               + "', schema: '"
               + schema
               + "'";
-      throw new RuntimeException(failureMessage);
+      throw new RuntimeException(failureMessage, e);
     }
   }
 
@@ -160,7 +146,7 @@ public class FirestoreDataStore {
     } catch (Exception e) {
       String failureMessage =
           "Failed to search schema '" + schema + "' by field '" + "'" + fieldPath;
-      throw new RuntimeException(failureMessage);
+      throw new RuntimeException(failureMessage, e);
     }
     List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
 
@@ -171,7 +157,7 @@ public class FirestoreDataStore {
     } catch (Exception e) {
       String failureMessage =
           "Failed to convert Firestore result to Java object. Target class '" + target + "'";
-      throw new RuntimeException(failureMessage);
+      throw new RuntimeException(failureMessage, e);
     }
 
     return results;
@@ -190,7 +176,7 @@ public class FirestoreDataStore {
     } catch (Exception e) {
       String failureMessage =
           "Failed to delete object from Firestore. Schema: " + schema + " with key " + key;
-      throw new RuntimeException(failureMessage);
+      throw new RuntimeException(failureMessage, e);
     }
   }
 

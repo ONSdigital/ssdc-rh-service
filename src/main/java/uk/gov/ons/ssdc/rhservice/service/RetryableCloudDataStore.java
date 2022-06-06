@@ -36,7 +36,7 @@ public class RetryableCloudDataStore {
               "Retries exhausted for storage. Key: %s, Schema: %s, identity: %s. Exception %s",
               key, schema, identity, e.getMessage()));
 
-      throw new RuntimeException("Failed to Store Object");
+      throw new RuntimeException("Failed to Store Object", e);
     }
   }
 
