@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +42,7 @@ public class CaseUpdateReceiverIT {
   }
 
   @Test
-  public void testDeactivateUacReceiver() throws InterruptedException, CTPException {
+  public void testCaseUpdateReceived() throws InterruptedException, CTPException {
     // GIVEN
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
@@ -55,30 +56,18 @@ public class CaseUpdateReceiverIT {
     pubsubHelper.sendMessageToSharedProject(caseUpdateTopic, event);
 
     for (int i = 0; i < 5; i++) {
+
       Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(caseUpdateDTO.getCaseId());
 
-      if (cazeOpt.isPresent()) {
-        System.out.println("FOUND CASE");
-        assertThat(cazeOpt.get().getCaseId()).isEqualTo(caseUpdateDTO.getCaseId());
-        break;
+      if(!cazeOpt.isPresent()) {
+        Thread.sleep(1000);
+        continue;
       }
 
-      System.out.println("WAITING: ... " + i);
-      Thread.sleep(1000);
-    }
+      Assertions.assertTrue(cazeOpt.isPresent());
 
-    // THEN
-    //      EventDTO actualEvent = uacRhQueue.checkExpectedMessageReceived();
-    //
-    //      UacUpdateDTO uac = actualEvent.getPayload().getUacUpdate();
-    //      assertThat(uac.getQid()).isEqualTo(TEST_QID);
-    //      assertThat(uac.isActive()).isFalse();
-    //
-    //      UacQidLink sentUacQidLinkUpdated = uacQidLinkRepository.findByQid(TEST_QID).get();
-    //
-    //      assertThat(sentUacQidLinkUpdated.isActive()).isFalse();
-    //
-    //      Event databaseEvent = eventRepository.findAll().get(0);
-    //      assertThat(databaseEvent.getType()).isEqualTo(EventType.DEACTIVATE_UAC);
+      System.out.println("FOUND CASE");
+      assertThat(cazeOpt.get().getCaseId()).isEqualTo(caseUpdateDTO.getCaseId());
+    }
   }
 }
