@@ -1,33 +1,9 @@
 spring:
-  task:
-    scheduling:
-      pool:
-        size: 30
+#  task:
+#    scheduling:
+#      pool:
+#        size: 30
 
-#  datasource:
-#    url: jdbc:postgresql://localhost:6432/postgres
-#    username: postgres
-#    password: postgres
-#    driverClassName: org.postgresql.Driver
-#    hikari:
-#      maximumPoolSize: 50
-#
-#  sql:
-#    init:
-#      mode: always
-#
-#  jpa:
-#    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
-#    hibernate:
-#      ddl-auto: validate
-#    properties:
-#      hibernate:
-#        default_schema: casev3
-#        jdbc:
-#          batch_size: 1000
-#          order_inserts: true
-#          lob:
-#            non_contextual_creation: true
 
   cloud:
     gcp:
@@ -37,8 +13,9 @@ spring:
             max-outstanding-element-count: 100
 
       firestore:
-          project-id: our-project
+        project-id: our-project
 
+#  FIRESTORE_EMULATOR_HOST" value="localhost:8542"
 
 queueconfig:
   case-update-subscription: event_case-update_rh
