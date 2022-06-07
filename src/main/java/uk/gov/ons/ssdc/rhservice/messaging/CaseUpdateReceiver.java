@@ -22,7 +22,7 @@ public class CaseUpdateReceiver {
   @ServiceActivator(inputChannel = "caseUpdateInputChannel", adviceChain = "retryAdvice")
   public void receiveMessage(Message<byte[]> message) {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
-    CaseUpdateDTO caseUpdate = event.getPayload().getCaseUpdateDTO();
+    CaseUpdateDTO caseUpdate = event.getPayload().getCaseUpdate();
     respondentCaseRepo.writeCaseUpdate(caseUpdate);
   }
 }

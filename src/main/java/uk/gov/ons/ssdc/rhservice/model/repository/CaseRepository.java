@@ -1,7 +1,6 @@
 package uk.gov.ons.ssdc.rhservice.model.repository;
 
 import java.util.Optional;
-import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,18 +12,8 @@ import uk.gov.ons.ssdc.rhservice.service.RetryableCloudDataStore;
 public class CaseRepository {
   private RetryableCloudDataStore retryableCloudDataStore;
 
-  @Value("${spring.cloud.gcp.firestore.project-id}")
-  private String gcpProject;
-
   @Value("${cloud-storage.case-schema-name}")
   private String caseSchemaName;
-
-  String caseSchema;
-
-  @PostConstruct
-  public void init() {
-    caseSchema = gcpProject + "-" + caseSchemaName.toLowerCase();
-  }
 
   @Autowired
   public CaseRepository(RetryableCloudDataStore retryableCloudDataStore) {
@@ -33,10 +22,10 @@ public class CaseRepository {
 
   public void writeCaseUpdate(final CaseUpdateDTO caseUpdate) {
     String id = caseUpdate.getCaseId();
-    retryableCloudDataStore.storeObject(caseSchema, id, caseUpdate, id);
+    retryableCloudDataStore.storeObject(caseSchemaName, id, caseUpdate, id);
   }
 
   public Optional<CaseUpdateDTO> readCaseUpdate(final String caseId) {
-    return retryableCloudDataStore.retrieveObject(CaseUpdateDTO.class, caseSchema, caseId);
+    return retryableCloudDataStore.retrieveObject(CaseUpdateDTO.class, caseSchemaName, caseId);
   }
 }

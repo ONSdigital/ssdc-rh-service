@@ -24,7 +24,7 @@ public class UacUpdateReceiver {
   @ServiceActivator(inputChannel = "uacUpdateInputChannel", adviceChain = "retryAdvice")
   public void receiveMessage(Message<byte[]> message) {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
-    UacUpdateDTO uacUpdateDTO = event.getPayload().getUacUpdateDTO();
+    UacUpdateDTO uacUpdateDTO = event.getPayload().getUacUpdate();
     respondentUacRepo.writeUAC(uacUpdateDTO);
   }
 }

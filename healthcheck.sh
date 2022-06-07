@@ -1,1 +1,0 @@
-find /tmp/rh-service-healthy -mmin -1 | egrep '.*'

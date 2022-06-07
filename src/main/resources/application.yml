@@ -25,10 +25,6 @@ cloud-storage:
     max: 16000
     max-attempts: 30
 
-healthcheck:
-  frequency: 15000 #milliseconds
-  filename: /tmp/rh-service-healthy
-
 exceptionmanager:
   connection:
     scheme: http

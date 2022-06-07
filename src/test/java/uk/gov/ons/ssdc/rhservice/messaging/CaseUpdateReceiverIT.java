@@ -43,7 +43,7 @@ public class CaseUpdateReceiverIT {
     caseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
     caseUpdateDTO.setSample(Map.of("Hello", "friends"));
     PayloadDTO payloadDTO = new PayloadDTO();
-    payloadDTO.setCaseUpdateDTO(caseUpdateDTO);
+    payloadDTO.setCaseUpdate(caseUpdateDTO);
 
     EventDTO event = new EventDTO();
     event.setPayload(payloadDTO);

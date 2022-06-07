@@ -43,7 +43,7 @@ public class UacUpdateReceiverIT {
     uacUpdateDTO.setUacHash("blah");
 
     PayloadDTO payloadDTO = new PayloadDTO();
-    payloadDTO.setUacUpdateDTO(uacUpdateDTO);
+    payloadDTO.setUacUpdate(uacUpdateDTO);
 
     EventDTO event = new EventDTO();
     event.setPayload(payloadDTO);
