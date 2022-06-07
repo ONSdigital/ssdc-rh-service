@@ -15,7 +15,6 @@ public class FirestoreProvider {
 
   @PostConstruct
   public void create() {
-    //    log.info("Connecting to Firestore project {}", gcpProject);
     firestore = FirestoreOptions.newBuilder().setProjectId(gcpProject).build().getService();
   }
 

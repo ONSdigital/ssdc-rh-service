@@ -8,10 +8,10 @@ import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 @Component
 public class Retrier {
 
-  private FirestoreDataStore cloudDataStore;
+  private FirestoreDataStore firestoreDataStore;
 
   public Retrier(FirestoreDataStore cloudDataStore) {
-    this.cloudDataStore = cloudDataStore;
+    this.firestoreDataStore = cloudDataStore;
   }
 
   @Retryable(
@@ -26,6 +26,6 @@ public class Retrier {
       listeners = "cloudRetryListener")
   public void store(final String schema, final String key, final Object value)
       throws RuntimeException, DataStoreContentionException {
-    cloudDataStore.storeObject(schema, key, value);
+    firestoreDataStore.storeObject(schema, key, value);
   }
 }

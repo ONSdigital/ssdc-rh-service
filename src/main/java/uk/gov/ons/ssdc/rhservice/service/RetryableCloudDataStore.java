@@ -5,7 +5,7 @@ import com.godaddy.logging.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 
@@ -13,12 +13,11 @@ import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 public class RetryableCloudDataStore {
   private static final Logger log = LoggerFactory.getLogger(RetryableCloudDataStore.class);
 
-  private FirestoreDataStore cloudDataStore;
+  private FirestoreDataStore firestoreDataStore;
   private Retrier retrier;
 
-  @Autowired
-  public RetryableCloudDataStore(FirestoreDataStore cloudDataStore, Retrier retrier) {
-    this.cloudDataStore = cloudDataStore;
+  public RetryableCloudDataStore(FirestoreDataStore firestoreDataStore, Retrier retrier) {
+    this.firestoreDataStore = firestoreDataStore;
     this.retrier = retrier;
   }
 
@@ -40,19 +39,19 @@ public class RetryableCloudDataStore {
   }
 
   public <T> Optional<T> retrieveObject(Class<T> target, final String schema, final String key) {
-    return cloudDataStore.retrieveObject(target, schema, key);
+    return firestoreDataStore.retrieveObject(target, schema, key);
   }
 
   public <T> List<T> list(Class<T> target, String schema) {
-    return cloudDataStore.list(target, schema);
+    return firestoreDataStore.list(target, schema);
   }
 
   public <T> List<T> search(
       Class<T> target, final String schema, String[] fieldPathElements, String searchValue) {
-    return cloudDataStore.search(target, schema, fieldPathElements, searchValue);
+    return firestoreDataStore.search(target, schema, fieldPathElements, searchValue);
   }
 
   public Set<String> getCollectionNames() {
-    return cloudDataStore.getCollectionNames();
+    return firestoreDataStore.getCollectionNames();
   }
 }

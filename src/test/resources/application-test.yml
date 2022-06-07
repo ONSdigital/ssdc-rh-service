@@ -6,7 +6,17 @@ spring:
         project-id: our-project
       firestore:
         project-id: our-project
+
 queueconfig:
   shared-pubsub-project: shared-project
   case-update-topic: event_case-update
   uac-update-topic: event_uac-update
+
+cloud-storage:
+  case-schema-name: case
+  uac-schema-name: uac
+  backoff:
+    initial: 100
+    multiplier: 1.0
+    max: 1000
+    max-attempts: 5
