@@ -1,66 +1,70 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+import com.google.cloud.firestore.Firestore;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 
-import java.util.Map;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
+@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
 @ContextConfiguration
 @ActiveProfiles("test")
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 public class RetryableCloudDataStoreIT {
 
-    /*
-     Why are we IT testing at this level? because we need to check the retry functionality,
-     this is difficult or impossible to do without mocking out the actual firestore
-     */
+  /*
+  Why are we IT testing at this level? because we need to check the retry functionality,
+  this is difficult or impossible to do without mocking out the actual firestore
+  */
 
-    @MockBean
-    FirestoreProvider firestoreProvider;
+  @MockBean FirestoreProvider firestoreProvider;
 
-    @Autowired
-    private RetryableCloudDataStore retryableCloudDataStore;
+  @MockBean Firestore firestore;
 
-    @Value("${cloud-storage.case-schema-name}")
-    private String caseSchemaName;
+  @Autowired private RetryableCloudDataStore retryableCloudDataStore;
 
-    @Test
-    public void testRetryTimesOut() throws DataStoreContentionException {
-        CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
-        caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
-        caseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
-        caseUpdateDTO.setSample(Map.of("Hello", "friends"));
+  @Value("${cloud-storage.case-schema-name}")
+  private String caseSchemaName;
 
-        StatusRuntimeException statusRuntimeException = new StatusRuntimeException(Status.UNAVAILABLE);
+  @Test
+  public void testRetryTimesOut() {
+    CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
+    caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
+    caseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
+    caseUpdateDTO.setSample(Map.of("Hello", "friends"));
 
-        when(firestoreProvider.get()).thenThrow(statusRuntimeException);
+    StatusRuntimeException statusRuntimeException = new StatusRuntimeException(Status.UNAVAILABLE);
 
-        RuntimeException thrown =
-                assertThrows(RuntimeException.class,
-                        () -> retryableCloudDataStore.storeObject(caseSchemaName, caseUpdateDTO.getCaseId(),
-                                caseUpdateDTO, caseUpdateDTO.getCaseId()));
+    when(firestoreProvider.get()).thenThrow(statusRuntimeException);
 
-        assertThat(thrown.getMessage())
-                .isEqualTo("Failed to Store Object");
+    RuntimeException thrown =
+        assertThrows(
+            RuntimeException.class,
+            () ->
+                retryableCloudDataStore.storeObject(
+                    caseSchemaName,
+                    caseUpdateDTO.getCaseId(),
+                    caseUpdateDTO,
+                    caseUpdateDTO.getCaseId()));
 
-        verify(firestoreProvider, times(5)).get();
-    }
+    assertThat(thrown.getMessage()).isEqualTo("Failed to Store Object");
 
+    verify(firestoreProvider, times(5)).get();
+  }
 }
