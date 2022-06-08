@@ -56,12 +56,16 @@ class FirestoreDataStoreTest {
         verify(documentReference).set("Object");
     }
 
-
     @Test
-    public void test_RESOURCE_EXHAUSTED() {
+    public void test_retry_exceptions() {
+        testRetryableException(Status.RESOURCE_EXHAUSTED);
+        testRetryableException(Status.ABORTED);
+        testRetryableException(Status.DEADLINE_EXCEEDED);
+        testRetryableException(Status.UNAVAILABLE);
+    }
 
-        StatusRuntimeException statusRuntimeException = new StatusRuntimeException(Status.RESOURCE_EXHAUSTED);
-
+    private void testRetryableException(Status status) {
+        StatusRuntimeException statusRuntimeException = new StatusRuntimeException(status);
         when(firestoreProvider.get()).thenThrow(statusRuntimeException);
 
         DataStoreContentionException thrown =
@@ -69,7 +73,8 @@ class FirestoreDataStoreTest {
                         DataStoreContentionException.class,
                         () -> underTest.storeObject("blah", "blah", "blah"));
 
-        assertThat(thrown.getCause().getLocalizedMessage()).isEqualTo("RESOURCE_EXHAUSTED");
+        assertThat(thrown.getCause().getLocalizedMessage()).isEqualTo(status.getCode().toString());
+
     }
 
 }
