@@ -15,13 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 
-@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+// @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
 @ContextConfiguration
 @ActiveProfiles("test")
 @SpringBootTest
