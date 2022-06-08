@@ -56,25 +56,25 @@ class FirestoreDataStoreTest {
         verify(documentReference).set("Object");
     }
 
-    @Test
-    public void test_retry_exceptions() {
-        testRetryableException(Status.RESOURCE_EXHAUSTED);
-        testRetryableException(Status.ABORTED);
-        testRetryableException(Status.DEADLINE_EXCEEDED);
-        testRetryableException(Status.UNAVAILABLE);
-    }
-
-    private void testRetryableException(Status status) {
-        StatusRuntimeException statusRuntimeException = new StatusRuntimeException(status);
-        when(firestoreProvider.get()).thenThrow(statusRuntimeException);
-
-        DataStoreContentionException thrown =
-                assertThrows(
-                        DataStoreContentionException.class,
-                        () -> underTest.storeObject("blah", "blah", "blah"));
-
-        assertThat(thrown.getCause().getLocalizedMessage()).isEqualTo(status.getCode().toString());
-
-    }
+//    @Test
+//    public void test_retry_exceptions() {
+//        testRetryableException(Status.RESOURCE_EXHAUSTED);
+//        testRetryableException(Status.ABORTED);
+//        testRetryableException(Status.DEADLINE_EXCEEDED);
+//        testRetryableException(Status.UNAVAILABLE);
+//    }
+//
+//    private void testRetryableException(Status status) {
+//        StatusRuntimeException statusRuntimeException = new StatusRuntimeException(status);
+//        when(firestoreProvider.get()).thenThrow(statusRuntimeException);
+//
+//        DataStoreContentionException thrown =
+//                assertThrows(
+//                        DataStoreContentionException.class,
+//                        () -> underTest.storeObject("blah", "blah", "blah"));
+//
+//        assertThat(thrown.getCause().getLocalizedMessage()).isEqualTo(status.getCode().toString());
+//
+//    }
 
 }
