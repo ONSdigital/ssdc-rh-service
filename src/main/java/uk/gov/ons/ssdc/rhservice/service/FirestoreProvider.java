@@ -8,14 +8,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FirestoreProvider {
-  @Value("${spring.cloud.gcp.firestore.project-id}")
+  @Value("${firestore.project-id}")
   private String gcpProject;
+
+  @Value("${firestore.emulator-host}")
+  private String emulatorHost;
 
   private Firestore firestore;
 
   @PostConstruct
   public void create() {
-    firestore = FirestoreOptions.newBuilder().setProjectId(gcpProject).build().getService();
+    var firestoreBuilder = FirestoreOptions.newBuilder().setProjectId(gcpProject);
+    if (emulatorHost != null) {
+      firestoreBuilder.setEmulatorHost(emulatorHost);
+    }
+    firestore = firestoreBuilder.build().getService();
   }
 
   public Firestore get() {
