@@ -2,14 +2,16 @@ server:
   port: 8071
 
 spring:
+  task:
+    scheduling:
+      pool:
+        size: 30
   cloud:
     gcp:
       pubsub:
         subscriber:
           flow-control:
             max-outstanding-element-count: 100
-
-
 queueconfig:
   case-update-subscription: event_case-update_rh
   uac-update-subscription: event_uac-update_rh
@@ -37,6 +39,9 @@ management:
   endpoint:
     health:
       enabled: true
+  health:
+    pubsub:
+      enabled: false
 
 messagelogging:
   logstacktraces: false
