@@ -54,4 +54,5 @@ class CaseRepositoryTest {
     assertThat(actualCaseOpt).isPresent();
     assertThat(actualCaseOpt.get()).isEqualTo(caseUpdateDTO);
   }
+
 }

@@ -4,8 +4,10 @@ spring:
       pubsub:
         emulator-host: localhost:18538
         project-id: our-project
-      firestore:
-        project-id: our-project
+
+firestore:
+  project-id: our-project
+  emulator-host: localhost:18542
 
 queueconfig:
   shared-pubsub-project: shared-project

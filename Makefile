@@ -1,5 +1,5 @@
 install:
-	FIRESTORE_EMULATOR_HOST="localhost:18542" mvn clean install
+	mvn clean install
 
 build: install docker-build
 
