@@ -1,6 +1,5 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
-
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
 import com.google.api.core.ApiFuture;
@@ -60,12 +59,11 @@ public class FirestoreDataStore {
             || failureCode == Status.ABORTED.getCode()
             || failureCode == Status.DEADLINE_EXCEEDED.getCode()
             || failureCode == Status.UNAVAILABLE.getCode()) {
-          retryable = true;
-          break;
+          return true;
         }
-        // Else Retryable Exception
       }
 
+      //  Get the next level of exception
       t = t.getCause();
     }
 
