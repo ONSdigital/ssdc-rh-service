@@ -1,6 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.model.repository;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +17,8 @@ import uk.gov.ons.ssdc.rhservice.service.RetryableCloudDataStore;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.Mockito.verify;
+
 
 @ExtendWith(MockitoExtension.class)
 class CaseRepositoryTest {
@@ -27,7 +30,7 @@ class CaseRepositoryTest {
     @InjectMocks
     CaseRepository caseRepository;
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() {
         ReflectionTestUtils.setField(caseRepository, "caseSchemaName", TEST_CASE_SCHEMA);
     }
@@ -38,25 +41,7 @@ class CaseRepositoryTest {
         caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
 
         caseRepository.writeCaseUpdate(caseUpdateDTO);
+        verify(retryableCloudDataStore).storeObject(TEST_CASE_SCHEMA, caseUpdateDTO.getCaseId(), caseUpdateDTO, caseUpdateDTO.getCaseId());
     }
-
-//
-//
-//    @Value("${cloud-storage.case-schema-name}")
-//    private String caseSchemaName;
-//
-
-//
-//    public void writeCaseUpdate(final CaseUpdateDTO caseUpdate) {
-//        String id = caseUpdate.getCaseId();
-//        retryableCloudDataStore.storeObject(caseSchemaName, id, caseUpdate, id);
-//    }
-//
-//    public Optional<CaseUpdateDTO> readCaseUpdate(final String caseId) {
-//        return retryableCloudDataStore.retrieveObject(CaseUpdateDTO.class, caseSchemaName, caseId);
-//    }
-
-
-
 
 }
