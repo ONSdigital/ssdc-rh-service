@@ -11,7 +11,7 @@ public class FirestoreProvider {
   @Value("${firestore.project-id}")
   private String gcpProject;
 
-  @Value("${firestore.emulator-host}")
+  @Value("${firestore.emulator-host:}")
   private String emulatorHost;
 
   private Firestore firestore;
@@ -19,7 +19,7 @@ public class FirestoreProvider {
   @PostConstruct
   public void create() {
     var firestoreBuilder = FirestoreOptions.newBuilder().setProjectId(gcpProject);
-    if (emulatorHost != null) {
+    if (emulatorHost != null && !emulatorHost.isEmpty()) {
       firestoreBuilder.setEmulatorHost(emulatorHost);
     }
     firestore = firestoreBuilder.build().getService();
