@@ -72,50 +72,37 @@ public class FirestoreDataStore {
 
   public <T> Optional<T> retrieveObject(Class<T> target, final String schema, final String key)
       throws RuntimeException {
-    //    log.info("Fetching object from Firestore", kv("schema", schema), kv("key", key));
 
-    // Submit read request to firestore
-    FieldPath fieldPathForId = FieldPath.documentId();
-    List<T> documents = runSearch(target, schema, fieldPathForId, key);
-
-    // Squash results down to single document
-    Optional<T> result;
+    List<T> documents = runSearch(target, schema, FieldPath.documentId(), key);
 
     if (documents.isEmpty()) {
-      result = Optional.empty();
+      return Optional.empty();
     } else if (documents.size() == 1) {
-      result = Optional.of(documents.get(0));
+      return Optional.of(documents.get(0));
     } else {
-      String failureMessage =
-          "Firestore returned more than 1 result object. Returned "
-              + documents.size()
-              + " objects for Schema '"
-              + schema
-              + "' with key '"
-              + key
-              + "'";
-      throw new RuntimeException(failureMessage);
+      throw new RuntimeException(
+          String.format(
+              "Firestore returned more than 1 result object. Returned: %s objects for Schema: %s with key: %s",
+              documents.size(), schema, key));
     }
-    return result;
   }
 
   private <T> List<T> runSearch(
-      Class<T> targetClass, final String schema, FieldPath fieldPath, String searchValue)
+      Class<T> targetClass, final String schema, FieldPath fieldPathForId, String searchValue)
       throws RuntimeException {
-    // Run a query
-    ApiFuture<QuerySnapshot> query =
-        firestoreProvider.get().collection(schema).whereEqualTo(fieldPath, searchValue).get();
 
-    // Wait for query to complete and get results
-    QuerySnapshot querySnapshot;
+    ApiFuture<QuerySnapshot> query =
+        firestoreProvider.get().collection(schema).whereEqualTo(fieldPathForId, searchValue).get();
+
+    List<QueryDocumentSnapshot> documents;
+
     try {
-      querySnapshot = query.get();
+      documents = query.get().getDocuments();
     } catch (Exception e) {
       String failureMessage =
-          "Failed to search schema '" + schema + "' by field '" + "'" + fieldPath;
+          "Failed to search schema '" + schema + "' by field '" + "'" + fieldPathForId;
       throw new RuntimeException(failureMessage, e);
     }
-    List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
 
     return convertToObjects(targetClass, documents);
   }

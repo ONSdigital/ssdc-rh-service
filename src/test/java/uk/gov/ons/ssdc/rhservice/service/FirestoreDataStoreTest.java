@@ -9,6 +9,8 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -25,6 +27,11 @@ import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 class FirestoreDataStoreTest {
 
   @Mock FirestoreProvider firestoreProvider;
+  @Mock Firestore firestore;
+  @Mock CollectionReference collectionReference;
+  @Mock ApiFuture<QuerySnapshot> querySnapshotApiFuture;
+  @Mock Query query;
+
   @InjectMocks FirestoreDataStore underTest;
 
   @Test
@@ -33,9 +40,7 @@ class FirestoreDataStoreTest {
 
     // only used in this test
     ApiFuture<WriteResult> apiFuture = Mockito.mock(ApiFuture.class);
-    Firestore firestore = Mockito.mock(Firestore.class);
     DocumentReference documentReference = Mockito.mock(DocumentReference.class);
-    CollectionReference collectionReference = Mockito.mock(CollectionReference.class);
 
     when(collectionReference.document("ID")).thenReturn(documentReference);
     when(firestore.collection("Schema")).thenReturn(collectionReference);
@@ -83,6 +88,20 @@ class FirestoreDataStoreTest {
 
     assertThat(thrown.getCause().getLocalizedMessage()).isEqualTo("UNAUTHENTICATED");
   }
+
+  //  @Test
+  //  public void testRetrieveSuccess() {
+  //
+  //    //    firestoreProvider.get().collection(schema).whereEqualTo(fieldPath, searchValue).get();
+  //    FieldPath fieldPathForId = FieldPath.documentId();
+  //    when(query.get()).thenReturn(querySnapshotApiFuture);
+  //    when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);
+  //    when(firestore.collection(any())).thenReturn(collectionReference);
+  //    when(firestoreProvider.get()).thenReturn(firestore);
+  //
+  //    Optional<CaseUpdateDTO> caseOpt = underTest.retrieveObject(CaseUpdateDTO.class, "CASE",
+  // "ID");
+  //  }
 
   private void testRetryableException(Status status) {
     StatusRuntimeException statusRuntimeException = new StatusRuntimeException(status);
