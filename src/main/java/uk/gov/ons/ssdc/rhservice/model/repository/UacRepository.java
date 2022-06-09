@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.RHFirestoreClient;
 
-/** A Repository implementation for CRUD operations on UAC data entities */
 @Service
 public class UacRepository {
 

@@ -13,17 +13,17 @@ import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 @Component
 public class RHFirestoreClient {
   private final RHFirestoreProvider RHFirestoreProvider;
-  private final RHFirestoreSaveObject rhFirestoreSaveObject;
+  private final RHFirestoreDataPersist rhFirestoreDataPersist;
 
   public RHFirestoreClient(
-      RHFirestoreProvider RHFirestoreProvider, RHFirestoreSaveObject rhFirestoreSaveObject) {
+      RHFirestoreProvider RHFirestoreProvider, RHFirestoreDataPersist rhFirestoreDataPersist) {
     this.RHFirestoreProvider = RHFirestoreProvider;
-    this.rhFirestoreSaveObject = rhFirestoreSaveObject;
+    this.rhFirestoreDataPersist = rhFirestoreDataPersist;
   }
 
   public void storeObject(final String schema, final String key, final Object value) {
     try {
-      rhFirestoreSaveObject.storeObjectRetryable(schema, key, value);
+      rhFirestoreDataPersist.storeObjectRetryable(schema, key, value);
     } catch (DataStoreContentionException e) {
       throw new RuntimeException("Data Contention Error", e);
     }

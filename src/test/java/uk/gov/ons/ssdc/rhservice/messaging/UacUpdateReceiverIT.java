@@ -17,8 +17,8 @@ import uk.gov.ons.ssdc.rhservice.exceptions.UacNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.testutils.FireStorePoller;
 import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
-import uk.gov.ons.ssdc.rhservice.utils.FireStorePoller;
 
 @ContextConfiguration
 @ActiveProfiles("test")

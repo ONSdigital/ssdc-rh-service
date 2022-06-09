@@ -22,12 +22,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 
 @ExtendWith(MockitoExtension.class)
-class RHFirestoreSaveObjectTest {
+class RHFirestoreDataPersistTest {
   @Mock RHFirestoreProvider RHFirestoreProvider;
   @Mock Firestore firestore;
   @Mock CollectionReference collectionReference;
 
-  @InjectMocks RHFirestoreSaveObject underTest;
+  @InjectMocks RHFirestoreDataPersist underTest;
 
   @Test
   public void testStoreSuccess()

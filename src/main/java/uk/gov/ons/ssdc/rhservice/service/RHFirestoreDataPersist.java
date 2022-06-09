@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 
 @Component
-public class RHFirestoreSaveObject {
+public class RHFirestoreDataPersist {
 
   private final RHFirestoreProvider rhFirestoreProvider;
 
-  public RHFirestoreSaveObject(RHFirestoreProvider rhFirestoreProvider) {
+  public RHFirestoreDataPersist(RHFirestoreProvider rhFirestoreProvider) {
     this.rhFirestoreProvider = rhFirestoreProvider;
   }
 

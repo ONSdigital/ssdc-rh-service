@@ -9,10 +9,6 @@ import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
-/**
- * Service implementation responsible for receipt of UAC Events. See Spring Integration flow for
- * details of in bound queue.
- */
 @MessageEndpoint
 public class UacUpdateReceiver {
   private UacRepository respondentUacRepo;

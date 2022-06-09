@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.RHFirestoreClient;
 
-/** A Repository implementation for CRUD operations on Case data entities */
 @Service
 public class CaseRepository {
   private RHFirestoreClient rhFirestoreClient;

@@ -1,4 +1,4 @@
-package uk.gov.ons.ssdc.rhservice.utils;
+package uk.gov.ons.ssdc.rhservice.testutils;
 
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
