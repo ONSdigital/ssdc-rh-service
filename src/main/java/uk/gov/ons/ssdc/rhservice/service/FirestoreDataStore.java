@@ -100,7 +100,7 @@ public class FirestoreDataStore {
   }
 
   private <T> List<T> runSearch(
-      Class<T> target, final String schema, FieldPath fieldPath, String searchValue)
+      Class<T> targetClass, final String schema, FieldPath fieldPath, String searchValue)
       throws RuntimeException {
     // Run a query
     ApiFuture<QuerySnapshot> query =
@@ -118,15 +118,18 @@ public class FirestoreDataStore {
     List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
 
     // Convert the results to Java objects
+
+    return convertToObjects(targetClass, documents);
+  }
+
+  private <T> List<T> convertToObjects(Class<T> target, List<QueryDocumentSnapshot> documents) {
     List<T> results;
     try {
-      results = documents.stream().map(d -> d.toObject(target)).collect(Collectors.toList());
+      return documents.stream().map(d -> d.toObject(target)).collect(Collectors.toList());
     } catch (Exception e) {
       String failureMessage =
           "Failed to convert Firestore result to Java object. Target class '" + target + "'";
       throw new RuntimeException(failureMessage, e);
     }
-
-    return results;
   }
 }
