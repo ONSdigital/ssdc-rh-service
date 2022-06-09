@@ -1,93 +1,32 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.FieldPath;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.WriteResult;
-import io.grpc.Status;
-import io.grpc.Status.Code;
-import io.grpc.StatusRuntimeException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 
-@Service
+@Component
 public class RHFirestoreClient {
-  private static final Logger log = LoggerFactory.getLogger(RHFirestoreClient.class);
   private final RHFirestoreProvider RHFirestoreProvider;
+  private final RHFirestoreSaveObject rhFirestoreSaveObject;
 
-  public RHFirestoreClient(RHFirestoreProvider RHFirestoreProvider) {
+  public RHFirestoreClient(
+      RHFirestoreProvider RHFirestoreProvider, RHFirestoreSaveObject rhFirestoreSaveObject) {
     this.RHFirestoreProvider = RHFirestoreProvider;
+    this.rhFirestoreSaveObject = rhFirestoreSaveObject;
   }
 
   public void storeObject(final String schema, final String key, final Object value) {
     try {
-      storeObjectRetryable(schema, key, value);
+      rhFirestoreSaveObject.storeObjectRetryable(schema, key, value);
     } catch (DataStoreContentionException e) {
       throw new RuntimeException("Data Contention Error", e);
     }
-  }
-
-  @Retryable(
-      label = "storeObject",
-      include = DataStoreContentionException.class,
-      backoff =
-          @Backoff(
-              delayExpression = "${cloud-storage.backoff.initial}",
-              multiplierExpression = "${cloud-storage.backoff.multiplier}",
-              maxDelayExpression = "${cloud-storage.backoff.max}"),
-      maxAttemptsExpression = "${cloud-storage.backoff.max-attempts}",
-      listeners = "cloudRetryListener")
-  private void storeObjectRetryable(final String schema, final String key, final Object value)
-      throws RuntimeException, DataStoreContentionException {
-
-    try {
-      ApiFuture<WriteResult> result =
-          RHFirestoreProvider.get().collection(schema).document(key).set(value);
-      result.get();
-    } catch (Exception e) {
-      log.error("Failed to store Object: " + e.getMessage());
-
-      if (isRetryableFirestoreException(e)) {
-        throw new DataStoreContentionException(
-            "Firestore contention on schema '" + schema + "'", e);
-      }
-
-      throw new RuntimeException(
-          "Failed to create object in Firestore. Schema: " + schema + " with key " + key, e);
-    }
-  }
-
-  private boolean isRetryableFirestoreException(Exception e) {
-    boolean retryable = false;
-
-    // Traverse the exception chain looking for a StatusRuntimeException
-    Throwable t = e;
-    while (t != null) {
-      if (t instanceof StatusRuntimeException) {
-        StatusRuntimeException statusRuntimeException = (StatusRuntimeException) t;
-        Code failureCode = statusRuntimeException.getStatus().getCode();
-
-        if (failureCode == Status.RESOURCE_EXHAUSTED.getCode()
-            || failureCode == Status.ABORTED.getCode()
-            || failureCode == Status.DEADLINE_EXCEEDED.getCode()
-            || failureCode == Status.UNAVAILABLE.getCode()) {
-          return true;
-        }
-      }
-
-      //  Get the next level of exception
-      t = t.getCause();
-    }
-
-    return retryable;
   }
 
   public <T> Optional<T> retrieveObject(Class<T> target, final String schema, final String key)
