@@ -101,7 +101,7 @@ class FirestoreDataStoreTest {
   }
 
   @Test
-  public void testRetrieveSuccess() throws ExecutionException, InterruptedException {
+  public void testRetrieveSuccess1Document() throws ExecutionException, InterruptedException {
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
 
@@ -127,13 +127,58 @@ class FirestoreDataStoreTest {
   }
 
   @Test
+  public void noDocuments() throws ExecutionException, InterruptedException {
+    List<QueryDocumentSnapshot> queryDocumentSnapshotList = new ArrayList<>();
+
+    when(querySnapshotApiFuture.get()).thenReturn(querySnapshot);
+    when(querySnapshot.getDocuments()).thenReturn(queryDocumentSnapshotList);
+
+    //    firestoreProvider.get().collection(schema).whereEqualTo(fieldPath, searchValue).get();
+    FieldPath fieldPathForId = FieldPath.documentId();
+    when(query.get()).thenReturn(querySnapshotApiFuture);
+    when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);
+    when(firestore.collection(any())).thenReturn(collectionReference);
+    when(firestoreProvider.get()).thenReturn(firestore);
+
+    Optional<CaseUpdateDTO> caseOpt = underTest.retrieveObject(CaseUpdateDTO.class, "CASE", "ID");
+
+    assertThat(caseOpt).isEmpty();
+  }
+
+  @Test
+  public void moreThan1DocumentFailure() throws ExecutionException, InterruptedException {
+    CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
+    caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
+
+    List<QueryDocumentSnapshot> queryDocumentSnapshotList = new ArrayList<>();
+    QueryDocumentSnapshot queryDocumentSnapshot = Mockito.mock(QueryDocumentSnapshot.class);
+    when(queryDocumentSnapshot.toObject(eq(CaseUpdateDTO.class))).thenReturn(caseUpdateDTO);
+    queryDocumentSnapshotList.add(queryDocumentSnapshot);
+    queryDocumentSnapshotList.add(queryDocumentSnapshot);
+
+    when(querySnapshotApiFuture.get()).thenReturn(querySnapshot);
+    when(querySnapshot.getDocuments()).thenReturn(queryDocumentSnapshotList);
+
+    //    firestoreProvider.get().collection(schema).whereEqualTo(fieldPath, searchValue).get();
+    FieldPath fieldPathForId = FieldPath.documentId();
+    when(query.get()).thenReturn(querySnapshotApiFuture);
+    when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);
+    when(firestore.collection(any())).thenReturn(collectionReference);
+    when(firestoreProvider.get()).thenReturn(firestore);
+
+    RuntimeException thrown =
+        assertThrows(
+            RuntimeException.class,
+            () -> underTest.retrieveObject(CaseUpdateDTO.class, "CASE", "ID"));
+
+    assertThat(thrown.getMessage())
+        .isEqualTo(
+            "Firestore returned more than 1 result object. Returned: 2 objects for Schema: CASE with key: ID");
+  }
+
+  @Test
   public void testRetrieveDocumentMappingException()
       throws ExecutionException, InterruptedException {
-
-    //        List<QueryDocumentSnapshot> queryDocumentSnapshotList = new ArrayList<>();
-    //        QueryDocumentSnapshot doc1 = Mockito.mock(QueryDocumentSnapshot.class);
-    //        when(doc1.toObject(eq(CaseUpdateDTO.class))).thenReturn(caseUpdateDTO);
-    //        queryDocumentSnapshotList.add(doc1);
 
     when(queryDocumentSnapshotList.stream()).thenThrow(new RuntimeException("TEST exception"));
 
