@@ -117,13 +117,10 @@ public class FirestoreDataStore {
     }
     List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
 
-    // Convert the results to Java objects
-
     return convertToObjects(targetClass, documents);
   }
 
   private <T> List<T> convertToObjects(Class<T> target, List<QueryDocumentSnapshot> documents) {
-    List<T> results;
     try {
       return documents.stream().map(d -> d.toObject(target)).collect(Collectors.toList());
     } catch (Exception e) {
