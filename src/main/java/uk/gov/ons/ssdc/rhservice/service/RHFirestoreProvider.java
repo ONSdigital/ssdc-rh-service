@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FirestoreProvider {
+public class RHFirestoreProvider {
   @Value("${firestore.project-id}")
   private String gcpProject;
 

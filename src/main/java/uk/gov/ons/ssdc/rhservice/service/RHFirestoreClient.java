@@ -13,24 +13,44 @@ import io.grpc.StatusRuntimeException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 
 @Service
-public class FirestoreDataStore {
-  private static final Logger log = LoggerFactory.getLogger(FirestoreDataStore.class);
-  private final FirestoreProvider firestoreProvider;
+public class RHFirestoreClient {
+  private static final Logger log = LoggerFactory.getLogger(RHFirestoreClient.class);
+  private final RHFirestoreProvider RHFirestoreProvider;
 
-  public FirestoreDataStore(FirestoreProvider firestoreProvider) {
-    this.firestoreProvider = firestoreProvider;
+  public RHFirestoreClient(RHFirestoreProvider RHFirestoreProvider) {
+    this.RHFirestoreProvider = RHFirestoreProvider;
   }
 
-  public void storeObject(final String schema, final String key, final Object value)
+  public void storeObject(final String schema, final String key, final Object value) {
+    try {
+      storeObjectRetryable(schema, key, value);
+    } catch (DataStoreContentionException e) {
+      throw new RuntimeException("Data Contention Error", e);
+    }
+  }
+
+  @Retryable(
+      label = "storeObject",
+      include = DataStoreContentionException.class,
+      backoff =
+          @Backoff(
+              delayExpression = "${cloud-storage.backoff.initial}",
+              multiplierExpression = "${cloud-storage.backoff.multiplier}",
+              maxDelayExpression = "${cloud-storage.backoff.max}"),
+      maxAttemptsExpression = "${cloud-storage.backoff.max-attempts}",
+      listeners = "cloudRetryListener")
+  private void storeObjectRetryable(final String schema, final String key, final Object value)
       throws RuntimeException, DataStoreContentionException {
 
     try {
       ApiFuture<WriteResult> result =
-          firestoreProvider.get().collection(schema).document(key).set(value);
+          RHFirestoreProvider.get().collection(schema).document(key).set(value);
       result.get();
     } catch (Exception e) {
       log.error("Failed to store Object: " + e.getMessage());
@@ -92,7 +112,10 @@ public class FirestoreDataStore {
       throws RuntimeException {
 
     ApiFuture<QuerySnapshot> querySnapshotApiFuture =
-        firestoreProvider.get().collection(schema).whereEqualTo(fieldPathForId, searchValue).get();
+        RHFirestoreProvider.get()
+            .collection(schema)
+            .whereEqualTo(fieldPathForId, searchValue)
+            .get();
 
     List<QueryDocumentSnapshot> documents;
 

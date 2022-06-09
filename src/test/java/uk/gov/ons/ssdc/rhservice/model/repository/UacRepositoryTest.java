@@ -14,13 +14,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.service.RetryableCloudDataStore;
+import uk.gov.ons.ssdc.rhservice.service.RHFirestoreClient;
 
 @ExtendWith(MockitoExtension.class)
 class UacRepositoryTest {
   public static final String TEST_UAC_SCHEMA = "testUACchema";
 
-  @Mock RetryableCloudDataStore retryableCloudDataStore;
+  @Mock RHFirestoreClient rhFirestoreClient;
 
   @InjectMocks UacRepository uacRepository;
 
@@ -28,15 +28,6 @@ class UacRepositoryTest {
   public void setUp() {
     ReflectionTestUtils.setField(uacRepository, "uacSchemaName", TEST_UAC_SCHEMA);
   }
-  //
-  //    public void writeUAC(final UacUpdateDTO uac) {
-  //        retryableCloudDataStore.storeObject(uacSchemaName, uac.getUacHash(), uac,
-  // uac.getCaseId());
-  //    }
-  //
-  //    public Optional<UacUpdateDTO> readUAC(final String universalAccessCodeHash) {
-  //        return retryableCloudDataStore.retrieveObject(
-  //                UacUpdateDTO.class, uacSchemaName, universalAccessCodeHash);
 
   @Test
   public void testWriteUACUpdate() {
@@ -47,9 +38,7 @@ class UacRepositoryTest {
     uacUpdateDTO.setUacHash("blah");
 
     uacRepository.writeUAC(uacUpdateDTO);
-    verify(retryableCloudDataStore)
-        .storeObject(
-            TEST_UAC_SCHEMA, uacUpdateDTO.getUacHash(), uacUpdateDTO, uacUpdateDTO.getCaseId());
+    verify(rhFirestoreClient).storeObject(TEST_UAC_SCHEMA, uacUpdateDTO.getUacHash(), uacUpdateDTO);
   }
 
   @Test
@@ -60,7 +49,7 @@ class UacRepositoryTest {
     uacUpdateDTO.setQid("000000000001");
     uacUpdateDTO.setUacHash("blah");
 
-    when(retryableCloudDataStore.retrieveObject(
+    when(rhFirestoreClient.retrieveObject(
             UacUpdateDTO.class, TEST_UAC_SCHEMA, uacUpdateDTO.getUacHash()))
         .thenReturn(Optional.of(uacUpdateDTO));
 

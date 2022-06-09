@@ -33,9 +33,9 @@ import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 
 @ExtendWith(MockitoExtension.class)
-class FirestoreDataStoreTest {
+class RHFirestoreClientTest {
 
-  @Mock FirestoreProvider firestoreProvider;
+  @Mock RHFirestoreProvider RHFirestoreProvider;
   @Mock Firestore firestore;
   @Mock CollectionReference collectionReference;
   @Mock ApiFuture<QuerySnapshot> querySnapshotApiFuture;
@@ -43,7 +43,7 @@ class FirestoreDataStoreTest {
   @Mock QuerySnapshot querySnapshot;
   @Mock List<QueryDocumentSnapshot> queryDocumentSnapshotList;
 
-  @InjectMocks FirestoreDataStore underTest;
+  @InjectMocks RHFirestoreClient underTest;
 
   @Test
   public void testStoreSuccess()
@@ -56,7 +56,7 @@ class FirestoreDataStoreTest {
     when(collectionReference.document("ID")).thenReturn(documentReference);
     when(firestore.collection("Schema")).thenReturn(collectionReference);
     when(documentReference.set("Object")).thenReturn(apiFuture);
-    when(firestoreProvider.get()).thenReturn(firestore);
+    when(RHFirestoreProvider.get()).thenReturn(firestore);
 
     when(apiFuture.get()).thenReturn(null);
 
@@ -64,7 +64,7 @@ class FirestoreDataStoreTest {
 
     // Not throwing an exception is a success here
     verify(apiFuture).get();
-    verify(firestoreProvider).get();
+    verify(RHFirestoreProvider).get();
     verify(documentReference).set("Object");
   }
 
@@ -89,10 +89,10 @@ class FirestoreDataStoreTest {
   }
 
   @Test
-  public void testNonRetryablRxception() {
+  public void testNonRetryableException() {
     StatusRuntimeException statusRuntimeException =
         new StatusRuntimeException(Status.UNAUTHENTICATED);
-    when(firestoreProvider.get()).thenThrow(statusRuntimeException);
+    when(RHFirestoreProvider.get()).thenThrow(statusRuntimeException);
 
     RuntimeException thrown =
         assertThrows(RuntimeException.class, () -> underTest.storeObject("blah", "blah", "blah"));
@@ -118,7 +118,7 @@ class FirestoreDataStoreTest {
     when(query.get()).thenReturn(querySnapshotApiFuture);
     when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);
     when(firestore.collection(any())).thenReturn(collectionReference);
-    when(firestoreProvider.get()).thenReturn(firestore);
+    when(RHFirestoreProvider.get()).thenReturn(firestore);
 
     Optional<CaseUpdateDTO> caseOpt = underTest.retrieveObject(CaseUpdateDTO.class, "CASE", "ID");
 
@@ -138,7 +138,7 @@ class FirestoreDataStoreTest {
     when(query.get()).thenReturn(querySnapshotApiFuture);
     when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);
     when(firestore.collection(any())).thenReturn(collectionReference);
-    when(firestoreProvider.get()).thenReturn(firestore);
+    when(RHFirestoreProvider.get()).thenReturn(firestore);
 
     Optional<CaseUpdateDTO> caseOpt = underTest.retrieveObject(CaseUpdateDTO.class, "CASE", "ID");
 
@@ -164,7 +164,7 @@ class FirestoreDataStoreTest {
     when(query.get()).thenReturn(querySnapshotApiFuture);
     when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);
     when(firestore.collection(any())).thenReturn(collectionReference);
-    when(firestoreProvider.get()).thenReturn(firestore);
+    when(RHFirestoreProvider.get()).thenReturn(firestore);
 
     RuntimeException thrown =
         assertThrows(
@@ -190,7 +190,7 @@ class FirestoreDataStoreTest {
     when(query.get()).thenReturn(querySnapshotApiFuture);
     when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);
     when(firestore.collection(any())).thenReturn(collectionReference);
-    when(firestoreProvider.get()).thenReturn(firestore);
+    when(RHFirestoreProvider.get()).thenReturn(firestore);
 
     RuntimeException thrown =
         assertThrows(
@@ -204,13 +204,12 @@ class FirestoreDataStoreTest {
 
   private void testRetryableException(Status status) {
     StatusRuntimeException statusRuntimeException = new StatusRuntimeException(status);
-    when(firestoreProvider.get()).thenThrow(statusRuntimeException);
+    when(RHFirestoreProvider.get()).thenThrow(statusRuntimeException);
 
-    DataStoreContentionException thrown =
-        assertThrows(
-            DataStoreContentionException.class,
-            () -> underTest.storeObject("blah", "blah", "blah"));
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> underTest.storeObject("blah", "blah", "blah"));
 
-    assertThat(thrown.getCause().getLocalizedMessage()).isEqualTo(status.getCode().toString());
+    assertThat(thrown.getCause().getLocalizedMessage())
+        .isEqualTo("Firestore contention on schema 'blah'");
   }
 }

@@ -5,28 +5,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.service.RetryableCloudDataStore;
+import uk.gov.ons.ssdc.rhservice.service.RHFirestoreClient;
 
 /** A Repository implementation for CRUD operations on UAC data entities */
 @Service
 public class UacRepository {
 
-  private RetryableCloudDataStore retryableCloudDataStore;
+  private RHFirestoreClient rhFirestoreClient;
 
   @Value("${cloud-storage.uac-schema-name}")
   private String uacSchemaName;
 
   @Autowired
-  public UacRepository(RetryableCloudDataStore retryableCloudDataStore) {
-    this.retryableCloudDataStore = retryableCloudDataStore;
+  public UacRepository(RHFirestoreClient rhFirestoreClient) {
+    this.rhFirestoreClient = rhFirestoreClient;
   }
 
   public void writeUAC(final UacUpdateDTO uac) {
-    retryableCloudDataStore.storeObject(uacSchemaName, uac.getUacHash(), uac, uac.getCaseId());
+    rhFirestoreClient.storeObject(uacSchemaName, uac.getUacHash(), uac);
   }
 
   public Optional<UacUpdateDTO> readUAC(final String universalAccessCodeHash) {
-    return retryableCloudDataStore.retrieveObject(
+    return rhFirestoreClient.retrieveObject(
         UacUpdateDTO.class, uacSchemaName, universalAccessCodeHash);
   }
 }
