@@ -11,6 +11,7 @@ public class FirestoreProvider {
   @Value("${firestore.project-id}")
   private String gcpProject;
 
+  //  TODO: This shouldn't be in production code, feels dirty
   @Value("${firestore.emulator-host:}")
   private String emulatorHost;
 

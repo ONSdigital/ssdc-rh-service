@@ -91,13 +91,13 @@ public class FirestoreDataStore {
       Class<T> targetClass, final String schema, FieldPath fieldPathForId, String searchValue)
       throws RuntimeException {
 
-    ApiFuture<QuerySnapshot> query =
+    ApiFuture<QuerySnapshot> querySnapshotApiFuture =
         firestoreProvider.get().collection(schema).whereEqualTo(fieldPathForId, searchValue).get();
 
     List<QueryDocumentSnapshot> documents;
 
     try {
-      documents = query.get().getDocuments();
+      documents = querySnapshotApiFuture.get().getDocuments();
     } catch (Exception e) {
       String failureMessage =
           "Failed to search schema '" + schema + "' by field '" + "'" + fieldPathForId;
