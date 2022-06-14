@@ -97,7 +97,6 @@ class RHFirestoreClientTest {
     when(querySnapshotApiFuture.get()).thenReturn(querySnapshot);
     when(querySnapshot.getDocuments()).thenReturn(queryDocumentSnapshotList);
 
-    //    firestoreProvider.get().collection(schema).whereEqualTo(fieldPath, searchValue).get();
     FieldPath fieldPathForId = FieldPath.documentId();
     when(query.get()).thenReturn(querySnapshotApiFuture);
     when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);
@@ -123,7 +122,6 @@ class RHFirestoreClientTest {
     when(querySnapshotApiFuture.get()).thenReturn(querySnapshot);
     when(querySnapshot.getDocuments()).thenReturn(queryDocumentSnapshotList);
 
-    //    firestoreProvider.get().collection(schema).whereEqualTo(fieldPath, searchValue).get();
     FieldPath fieldPathForId = FieldPath.documentId();
     when(query.get()).thenReturn(querySnapshotApiFuture);
     when(collectionReference.whereEqualTo(eq(fieldPathForId), any())).thenReturn(query);

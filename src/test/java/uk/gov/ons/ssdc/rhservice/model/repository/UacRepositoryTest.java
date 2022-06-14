@@ -30,7 +30,7 @@ class UacRepositoryTest {
   }
 
   @Test
-  public void testWriteUACUpdate() {
+  void testWriteUACUpdate() {
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
     uacUpdateDTO.setCaseId(UUID.randomUUID().toString());
     uacUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
@@ -42,7 +42,7 @@ class UacRepositoryTest {
   }
 
   @Test
-  public void testRetrieve() {
+  void testRetrieve() {
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
     uacUpdateDTO.setCaseId(UUID.randomUUID().toString());
     uacUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());

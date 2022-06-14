@@ -24,7 +24,7 @@ import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 @ActiveProfiles("test")
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-public class RetryableFireStoreStorageIT {
+class RetryableFireStoreStorageIT {
 
   /*
   Why are we IT testing at this level? because we need to check the retry functionality,
@@ -41,7 +41,7 @@ public class RetryableFireStoreStorageIT {
   private String caseSchemaName;
 
   @Test
-  public void testRetryTimesOut() {
+  void testRetryTimesOut() {
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
     caseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());

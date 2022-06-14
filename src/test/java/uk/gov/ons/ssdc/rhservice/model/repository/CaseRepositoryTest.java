@@ -30,7 +30,7 @@ class CaseRepositoryTest {
   }
 
   @Test
-  public void testWriteCaseUpdate() {
+  void testWriteCaseUpdate() {
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
 
@@ -40,7 +40,7 @@ class CaseRepositoryTest {
   }
 
   @Test
-  public void testRetrieve() {
+  void testRetrieve() {
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
 

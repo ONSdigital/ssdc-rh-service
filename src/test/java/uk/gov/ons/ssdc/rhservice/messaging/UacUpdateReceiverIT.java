@@ -24,7 +24,7 @@ import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
 @ActiveProfiles("test")
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-public class UacUpdateReceiverIT {
+class UacUpdateReceiverIT {
   @Value("${queueconfig.uac-update-topic}")
   private String uacUpdateTopic;
 
@@ -33,7 +33,7 @@ public class UacUpdateReceiverIT {
   @Autowired private FireStorePoller fireStorePoller;
 
   @Test
-  public void testUacUpdateReceived() throws UacNotFoundException {
+  void testUacUpdateReceived() throws UacNotFoundException {
 
     // GIVEN
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();

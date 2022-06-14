@@ -30,7 +30,7 @@ class RHFirestoreDataPersistTest {
   @InjectMocks RHFirestoreDataPersist underTest;
 
   @Test
-  public void testStoreSuccess()
+  void testStoreSuccess()
       throws DataStoreContentionException, ExecutionException, InterruptedException {
 
     // only used in this test
@@ -53,27 +53,27 @@ class RHFirestoreDataPersistTest {
   }
 
   @Test
-  public void testRESOURCE_EXHAUSTED() {
+  void testRESOURCE_EXHAUSTED() {
     testRetryableException(Status.RESOURCE_EXHAUSTED);
   }
 
   @Test
-  public void testABORTED() {
+  void testABORTED() {
     testRetryableException(Status.ABORTED);
   }
 
   @Test
-  public void testDEADLINE_EXCEEDED() {
+  void testDEADLINE_EXCEEDED() {
     testRetryableException(Status.DEADLINE_EXCEEDED);
   }
 
   @Test
-  public void testUNAVAILABLE() {
+  void testUNAVAILABLE() {
     testRetryableException(Status.UNAVAILABLE);
   }
 
   @Test
-  public void testNonRetryableException() {
+  void testNonRetryableException() {
     StatusRuntimeException statusRuntimeException =
         new StatusRuntimeException(Status.UNAUTHENTICATED);
     when(RHFirestoreProvider.get()).thenThrow(statusRuntimeException);

@@ -36,7 +36,7 @@ class ManagedMessageRecovererTest {
   @InjectMocks private ManagedMessageRecoverer underTest;
 
   @Test
-  public void testRecover() {
+  void testRecover() {
     // Given
     ExceptionReportResponse exceptionReportResponse = new ExceptionReportResponse();
     RetryContext retryContext = testSetupTestRecover(exceptionReportResponse);
@@ -60,7 +60,7 @@ class ManagedMessageRecovererTest {
   }
 
   @Test
-  public void testRecoverLogIt() {
+  void testRecoverLogIt() {
     // Given
     ExceptionReportResponse exceptionReportResponse = new ExceptionReportResponse();
     exceptionReportResponse.setLogIt(true);
@@ -86,7 +86,7 @@ class ManagedMessageRecovererTest {
   }
 
   @Test
-  public void testRecoverSkip() {
+  void testRecoverSkip() {
     // Given
     ExceptionReportResponse exceptionReportResponse = new ExceptionReportResponse();
     exceptionReportResponse.setSkipIt(true);
@@ -118,7 +118,7 @@ class ManagedMessageRecovererTest {
   }
 
   @Test
-  public void testRecoverSkipFailureDoesNotAck() {
+  void testRecoverSkipFailureDoesNotAck() {
     // Given
     ExceptionReportResponse exceptionReportResponse = new ExceptionReportResponse();
     exceptionReportResponse.setSkipIt(true);
@@ -148,7 +148,7 @@ class ManagedMessageRecovererTest {
   }
 
   @Test
-  public void testRecoverPeek() {
+  void testRecoverPeek() {
     // Given
     ExceptionReportResponse exceptionReportResponse = new ExceptionReportResponse();
     exceptionReportResponse.setPeek(true);

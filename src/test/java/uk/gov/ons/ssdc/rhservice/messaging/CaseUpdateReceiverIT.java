@@ -25,7 +25,7 @@ import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
 @ActiveProfiles("test")
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-public class CaseUpdateReceiverIT {
+class CaseUpdateReceiverIT {
 
   @Value("${queueconfig.case-update-topic}")
   private String caseUpdateTopic;
@@ -35,7 +35,7 @@ public class CaseUpdateReceiverIT {
   @Autowired private FireStorePoller fireStorePoller;
 
   @Test
-  public void testCaseUpdateReceived() throws CaseNotFoundException {
+  void testCaseUpdateReceived() throws CaseNotFoundException {
     // GIVEN
 
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
