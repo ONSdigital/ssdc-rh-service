@@ -1,0 +1,54 @@
+server:
+  port: 8071
+
+spring:
+  task:
+    scheduling:
+      pool:
+        size: 30
+  cloud:
+    gcp:
+      pubsub:
+        subscriber:
+          flow-control:
+            max-outstanding-element-count: 100
+queueconfig:
+  case-update-subscription: event_case-update_rh
+  uac-update-subscription: event_uac-update_rh
+  shared-pubsub-project: shared-project
+
+
+cloud-storage:
+  case-schema-name: case
+  uac-schema-name: uac
+  backoff:
+    initial: 100
+    multiplier: 1.2
+    max: 16000
+    max-attempts: 30
+
+exceptionmanager:
+  connection:
+    scheme: http
+    host: localhost
+    port: 8666
+
+management:
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
+  health:
+    pubsub:
+      enabled: false
+
+messagelogging:
+  logstacktraces: false
+
+logging:
+  profile: DEV
+  level:
+    root: INFO
+    com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter: ERROR
+

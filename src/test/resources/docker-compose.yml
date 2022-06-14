@@ -1,0 +1,29 @@
+version: '2.1'
+services:
+  firestore-emulator-rh:
+    container_name: firestore-emulator-rh-it
+    image: europe-west2-docker.pkg.dev/ssdc-rm-ci/docker/gcloud-firestore-emulator:latest
+    ports:
+      - "18542:8540"
+
+  pubsub-emulator-rh-it:
+    container_name: pubsub-emulator-rh-it
+    image: europe-west2-docker.pkg.dev/ssdc-rm-ci/docker/gcloud-pubsub-emulator:latest
+    ports:
+      - "18538:8538"
+
+  setup-pubsub-emulator-rh-it:
+    container_name: setup-pubsub-emulator-rh-it
+    image: europe-west2-docker.pkg.dev/ssdc-rm-ci/docker/gcloud-pubsub-emulator:latest
+    environment:
+      - PUBSUB_SETUP_HOST=pubsub-emulator-rh-it:8538
+    volumes:
+      - ./setup_pubsub.sh:/setup_pubsub.sh
+    depends_on:
+      - pubsub-emulator-rh-it
+    entrypoint: sh -c "/setup_pubsub.sh"
+
+networks:
+  default:
+    external:
+      name: ssdcrmdockerdev_default
