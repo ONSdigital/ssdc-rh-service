@@ -32,19 +32,21 @@ make format
 The easiest way to run the RH service is dockerised, with our full stack services locally by following the README
 in [ssdc-rm-docker-dev](#TODO).
 
-If you need to run the service locally in the IDE or from the command line (e.g. with local code changes or to debug), use docker-dev to start the RM services, and
+If you need to run the service locally in the IDE or from the command line (e.g. with local code changes or to debug),
+use docker-dev to start the RM services, and
 then remove the `rh-service` container (so it does not conflict) with `docker rm -f rh-service`.
 
 Some environment configuration is required to point the RH service at the docker-dev backing services.
 
 ### In Intellij IDEA
 
-A [run configuration](.run/Run%20Application%20(docker-dev).run.xml) is provided for Intellij, simply select this run
-configuration and you should be able to run/debug the service within Intellij.
+A [run configuration file](.run/Run%20Application%20(docker-dev).run.xml) is provided for Intellij to configure it to
+use the docker-dev dependencies, simply select this run configuration named `Run Application (docker-dev)`, and you
+should be able to run or debug the service within Intellij.
 
 ### Anywhere Else
 
-Set these variables in your run environment
+Manually set these variables in your run environment to point the service at the docker-dev dependencies
 
 ```shell
 EXCEPTIONMANAGER_CONNECTION_HOST=localhost
