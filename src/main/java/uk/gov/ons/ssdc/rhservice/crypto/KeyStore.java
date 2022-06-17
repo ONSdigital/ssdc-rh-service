@@ -27,7 +27,7 @@ public class KeyStore {
       keys = mapper.readValue(cryptoKeys, Keys.class);
     } catch (Exception e) {
       System.out.println("Failed to read cryptographic keys");
-      throw new RuntimeException("Failed to read cryptographic keys");
+      throw new RuntimeException("Failed to read cryptographic keys", e);
     }
     keys.getKeys()
         .forEach(

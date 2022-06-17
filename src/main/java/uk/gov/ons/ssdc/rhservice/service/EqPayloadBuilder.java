@@ -24,7 +24,7 @@ public class EqPayloadBuilder {
         this.jweEncryptor = new JweEncryptor(keyStore, "authentication");
     }
 
-    public String getEqLaunchJwe(EqLaunchData launchData) {
+    public String buildPayLoadAndGetEqLaunchJwe(EqLaunchData launchData) {
         EqLaunchCoreData coreLaunchData = launchData.coreCopy();
 
         Map<String, Object> payload =

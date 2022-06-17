@@ -1,22 +1,12 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.ons.ssdc.rhservice.crypto.JweEncryptor;
-import uk.gov.ons.ssdc.rhservice.crypto.KeyStore;
 import uk.gov.ons.ssdc.rhservice.model.EqLaunchRequestDTO;
 import uk.gov.ons.ssdc.rhservice.model.LaunchDataDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunch;
-import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchCoreData;
 import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchData;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
@@ -68,7 +58,7 @@ public class EqLaunchService {
     eqLaunchData.setAccountServiceLogoutUrl(eqLaunchedDTO.getAccountServiceLogoutUrl());
     eqLaunchData.setSalt(responseIdSale);
 
-    return eqPayloadBuilder.getEqLaunchJwe(eqLaunchData);
+    return eqPayloadBuilder.buildPayLoadAndGetEqLaunchJwe(eqLaunchData);
   }
 
   private LaunchDataDTO gatherLaunchData(String uacHash) {
