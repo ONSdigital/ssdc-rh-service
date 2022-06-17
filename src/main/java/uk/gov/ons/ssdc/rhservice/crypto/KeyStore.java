@@ -22,7 +22,6 @@ public class KeyStore {
   @PostConstruct
   public void setUpKeys() {
     ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
     try {
       keys = mapper.readValue(cryptoKeys, Keys.class);
     } catch (Exception e) {

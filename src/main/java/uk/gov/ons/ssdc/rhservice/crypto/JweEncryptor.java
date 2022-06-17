@@ -9,7 +9,7 @@ public class JweEncryptor {
   private final static String KEYTYPE_PRIVATE = "private";
 
   private JWSHelper.EncodeJws encodeJws;
-  private JWEHelper.EncryptJwe encryptJwe;
+  private  EncryptJwe encryptJwe;
   private Key privateKey;
   private Key publicKey;
 
@@ -29,7 +29,7 @@ public class JweEncryptor {
     }
 
     this.encodeJws = new JWSHelper.EncodeJws(this.privateKey);
-    this.encryptJwe = new JWEHelper.EncryptJwe(this.publicKey);
+    this.encryptJwe = new EncryptJwe(this.publicKey);
   }
 
   public String encrypt(Map<String, Object> payload) {
