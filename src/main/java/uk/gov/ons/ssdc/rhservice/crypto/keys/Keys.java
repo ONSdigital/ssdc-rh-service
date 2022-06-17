@@ -1,4 +1,4 @@
-package uk.gov.ons.ssdc.rhservice.crypto;
+package uk.gov.ons.ssdc.rhservice.crypto.keys;
 
 import java.util.Map;
 import lombok.Data;

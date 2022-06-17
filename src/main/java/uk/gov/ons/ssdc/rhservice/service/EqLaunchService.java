@@ -1,113 +1,58 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.ons.ssdc.rhservice.crypto.JwtEncryptor;
+import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
 import uk.gov.ons.ssdc.rhservice.model.EqLaunchRequestDTO;
-import uk.gov.ons.ssdc.rhservice.model.LaunchDataDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunch;
-import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchData;
-import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
-import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
+
+import java.util.Map;
 
 @Service
 public class EqLaunchService {
-  private static final String ROLE_FLUSHER = "flusher";
+    private final EqPayloadBuilder eqPayloadBuilder;
 
-  @Value("${eq.response-id-salt")
-  private String responseIdSale;
+    private final JwtEncryptor jwtEncryptor;
 
-  private final EqPayloadBuilder eqPayloadBuilder;
-  private final UacRepository uacRepository;
-  private final CaseRepository caseRepository;
 
-  public EqLaunchService(
-      EqPayloadBuilder eqPayloadBuilder, UacRepository uacRepository, CaseRepository caseRepository) {
-    this.eqPayloadBuilder = eqPayloadBuilder;
-    this.uacRepository = uacRepository;
-    this.caseRepository = caseRepository;
-  }
-
-  public String generateEqLaunchToken(String uacHash, EqLaunchRequestDTO eqLaunchedDTO) {
-
-    // Build launch URL
-    LaunchDataDTO launchData = gatherLaunchData(uacHash);
-    String eqLaunchToken = createLaunchToken(launchData, eqLaunchedDTO);
-
-    // Publish the launch event
-    EqLaunch eqLaunch = new EqLaunch();
-    eqLaunch.setQid(launchData.getUacUpdateDTO().getQid());
-
-    // TODO: IMPLEMENT this the SRM way
-    // eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, Channel.RH, eqLaunch);
-
-    return eqLaunchToken;
-  }
-
-  String createLaunchToken(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO) {
-    EqLaunchData eqLaunchData = new EqLaunchData();
-    eqLaunchData.setLanguage(eqLaunchedDTO.getLanguageCode());
-    eqLaunchData.setSource("RESPONDENT_HOME");
-    eqLaunchData.setChannel("RH");
-    eqLaunchData.setUacUpdateDTO(launchData.getUacUpdateDTO());
-    eqLaunchData.setCaseUpdate(launchData.getCaseUpdateDTO());
-    eqLaunchData.setUserId("RH");
-    eqLaunchData.setAccountServiceUrl(eqLaunchedDTO.getAccountServiceUrl());
-    eqLaunchData.setAccountServiceLogoutUrl(eqLaunchedDTO.getAccountServiceLogoutUrl());
-    eqLaunchData.setSalt(responseIdSale);
-
-    return eqPayloadBuilder.buildPayLoadAndGetEqLaunchJwe(eqLaunchData);
-  }
-
-  private LaunchDataDTO gatherLaunchData(String uacHash) {
-    UacUpdateDTO uacUpdateDTO =
-        uacRepository
-            .readUAC(uacHash)
-            .orElseThrow(() -> new RuntimeException("Failed to retrieve UAC"));
-
-    String caseId = uacUpdateDTO.getCaseId();
-
-    if (StringUtils.isEmpty(caseId)) {
-      throw new RuntimeException("UAC has no caseId");
+    public EqLaunchService(EqPayloadBuilder eqPayloadBuilder, KeyStore keyStore) {
+        this.eqPayloadBuilder = eqPayloadBuilder;
+        this.jwtEncryptor = new JwtEncryptor(keyStore, "authentication");
     }
 
-    CaseUpdateDTO caseUpdateDTO =
-        caseRepository
-            .readCaseUpdate(caseId)
-            .orElseThrow(() -> new RuntimeException("Case Not Found"));
+    public String generateEqLaunchToken(String uacHash, EqLaunchRequestDTO eqLaunchedDTO) {
+        Map<String, Object> payload = eqPayloadBuilder.buildEqPayloadMap(uacHash, eqLaunchedDTO);
 
-    LaunchDataDTO launchData = new LaunchDataDTO();
-    launchData.setCaseUpdateDTO(caseUpdateDTO);
-    launchData.setUacUpdateDTO(uacUpdateDTO);
-
-    return launchData;
-  }
-
-  // TODO, make this all work, not urgent yet - but needs completing for ticket.
-  //    private void sendUacAuthenticationEvent(String caseId, String qid) {
-  //
-  //        log.info(
-  //                "Generating UacAuthentication event for caseId",
-  //                kv("caseId", caseId),
-  //                kv("questionnaireId", qid));
-  //
-  //        UacAuthentication uacAuthentication = UacAuthentication.builder().qid(qid).build();
-  //
-  //        UUID messageId =
-  //                eventPublisher.sendEvent(
-  //                        TopicType.UAC_AUTHENTICATION, Source.RESPONDENT_HOME, Channel.RH,
-  // uacAuthentication);
-  //
-  //        log.debug(
-  //                "UacAuthentication event published for qid: "
-  //                        + uacAuthentication.getQid()
-  //                        + ", messageId: "
-  //                        + messageId);
-  //    }
+        return jwtEncryptor.encrypt(payload);
 
 
+        // TODO: IMPLEMENT this the SRM way
+//    EqLaunch eqLaunch = new EqLaunch();
+//    eqLaunch.setQid(launchData.getUacUpdateDTO().getQid());
+        // eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, Channel.RH, eqLaunch);
+    }
+
+
+    // TODO, make this all work, not urgent yet - but needs completing for ticket.
+    //    private void sendUacAuthenticationEvent(String caseId, String qid) {
+    //
+    //        log.info(
+    //                "Generating UacAuthentication event for caseId",
+    //                kv("caseId", caseId),
+    //                kv("questionnaireId", qid));
+    //
+    //        UacAuthentication uacAuthentication = UacAuthentication.builder().qid(qid).build();
+    //
+    //        UUID messageId =
+    //                eventPublisher.sendEvent(
+    //                        TopicType.UAC_AUTHENTICATION, Source.RESPONDENT_HOME, Channel.RH,
+    // uacAuthentication);
+    //
+    //        log.debug(
+    //                "UacAuthentication event published for qid: "
+    //                        + uacAuthentication.getQid()
+    //                        + ", messageId: "
+    //                        + messageId);
+    //    }
 
 
 }

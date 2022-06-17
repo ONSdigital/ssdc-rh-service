@@ -4,42 +4,90 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.ons.ssdc.rhservice.crypto.JweEncryptor;
-import uk.gov.ons.ssdc.rhservice.crypto.KeyStore;
+import uk.gov.ons.ssdc.rhservice.model.EqLaunchRequestDTO;
+import uk.gov.ons.ssdc.rhservice.model.LaunchDataDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchCoreData;
 import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchData;
+import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
+import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @Service
 public class EqPayloadBuilder {
-    private final JweEncryptor jweEncryptor;
+    @Value("${eq.response-id-salt")
+    private String responseIdSale;
 
-    public EqPayloadBuilder(KeyStore keyStore) {
-        this.jweEncryptor = new JweEncryptor(keyStore, "authentication");
+    private final UacRepository uacRepository;
+    private final CaseRepository caseRepository;
+
+    public EqPayloadBuilder(UacRepository uacRepository,
+                            CaseRepository caseRepository) {
+        this.uacRepository = uacRepository;
+        this.caseRepository = caseRepository;
     }
 
-    public String buildPayLoadAndGetEqLaunchJwe(EqLaunchData launchData) {
-        EqLaunchCoreData coreLaunchData = launchData.coreCopy();
+    public Map<String, Object> buildEqPayloadMap(String uacHash, EqLaunchRequestDTO eqLaunchedDTO) {
+        LaunchDataDTO launchData = gatherLaunchData(uacHash);
+        EqLaunchData eqLaunchData = getEqLaunchData(launchData, eqLaunchedDTO);
 
-        Map<String, Object> payload =
-                createPayloadMap(
-                        coreLaunchData,
-                        launchData.getCaseUpdate(),
-                        launchData.getUserId(),
-                        null,
-                        launchData.getAccountServiceUrl(),
-                        launchData.getAccountServiceLogoutUrl());
-
-        return jweEncryptor.encrypt(payload);
+        return createPayloadMap(
+                // Is the Core copy required???
+                eqLaunchData.coreCopy(),
+                eqLaunchData.getCaseUpdate(),
+                eqLaunchData.getUserId(),
+                null,
+                eqLaunchData.getAccountServiceUrl(),
+                eqLaunchData.getAccountServiceLogoutUrl());
     }
 
-    Map<String, Object> createPayloadMap(
+    private EqLaunchData getEqLaunchData(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO) {
+        EqLaunchData eqLaunchData = new EqLaunchData();
+        eqLaunchData.setLanguage(eqLaunchedDTO.getLanguageCode());
+        eqLaunchData.setSource("RESPONDENT_HOME");
+        eqLaunchData.setChannel("RH");
+        eqLaunchData.setUacUpdateDTO(launchData.getUacUpdateDTO());
+        eqLaunchData.setCaseUpdate(launchData.getCaseUpdateDTO());
+        eqLaunchData.setUserId("RH");
+        eqLaunchData.setAccountServiceUrl(eqLaunchedDTO.getAccountServiceUrl());
+        eqLaunchData.setAccountServiceLogoutUrl(eqLaunchedDTO.getAccountServiceLogoutUrl());
+        eqLaunchData.setSalt(responseIdSale);
+
+        return eqLaunchData;
+    }
+
+    private LaunchDataDTO gatherLaunchData(String uacHash) {
+        UacUpdateDTO uacUpdateDTO =
+                uacRepository
+                        .readUAC(uacHash)
+                        .orElseThrow(() -> new RuntimeException("Failed to retrieve UAC"));
+
+        String caseId = uacUpdateDTO.getCaseId();
+
+        if (StringUtils.isEmpty(caseId)) {
+            throw new RuntimeException("UAC has no caseId");
+        }
+
+        CaseUpdateDTO caseUpdateDTO =
+                caseRepository
+                        .readCaseUpdate(caseId)
+                        .orElseThrow(() -> new RuntimeException("Case Not Found"));
+
+        LaunchDataDTO launchData = new LaunchDataDTO();
+        launchData.setCaseUpdateDTO(caseUpdateDTO);
+        launchData.setUacUpdateDTO(uacUpdateDTO);
+
+        return launchData;
+    }
+
+
+    private Map<String, Object> createPayloadMap(
             EqLaunchCoreData eqLaunchCoreData,
             CaseUpdateDTO caseUpdate,
             String userId,
@@ -96,7 +144,6 @@ public class EqPayloadBuilder {
         }
     }
 
-    // Creates encrypted response id from SALT and questionnaireId
     private String encryptResponseId(String questionnaireId, String salt) {
         StringBuilder responseId = new StringBuilder(questionnaireId);
         try {

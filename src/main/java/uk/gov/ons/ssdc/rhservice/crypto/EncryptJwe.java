@@ -9,6 +9,7 @@ import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSAEncrypter;
 import com.nimbusds.jose.jwk.RSAKey;
+import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
 
 public class EncryptJwe {
     private final JWEHeader jweHeader;

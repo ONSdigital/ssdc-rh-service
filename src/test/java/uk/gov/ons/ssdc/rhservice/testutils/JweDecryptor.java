@@ -1,17 +1,16 @@
 package uk.gov.ons.ssdc.rhservice.testutils;
 
 import com.nimbusds.jose.JWSObject;
+import uk.gov.ons.ssdc.rhservice.crypto.JWEHelper;
 import uk.gov.ons.ssdc.rhservice.crypto.JWSHelper;
-import uk.gov.ons.ssdc.rhservice.crypto.Key;
-import uk.gov.ons.ssdc.rhservice.crypto.KeyStore;
+import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
+import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
 
 import java.util.Optional;
 
-import static uk.gov.ons.ssdc.rhservice.crypto.JWEHelper.getKid;
-
 public class JweDecryptor {
 
-  private final JWSHelper.DecodeJws jwsHelper = new JWSHelper.DecodeJws();
+  private final DecryptJwe.DecodeJws jwsHelper = new DecryptJwe.DecodeJws();
   private final DecryptJwe jweHelper = new DecryptJwe();
   private final KeyStore keyStore;
 
@@ -21,7 +20,7 @@ public class JweDecryptor {
 
   public String decrypt(String encryptedValue) {
 
-    Optional<Key> publicKey = keyStore.getKeyById(getKid(encryptedValue));
+    Optional<Key> publicKey = keyStore.getKeyById(JWEHelper.getKid(encryptedValue));
     JWSObject jws;
 
     Optional<Key> key = keyStore.getKeyById("0d6ba9ff8cd6b9dd4514d9a87c50b27d1dd6c5b5");
@@ -31,7 +30,7 @@ public class JweDecryptor {
       throw new RuntimeException("Failed to decrypt JWE");
     }
 
-    Optional<Key> privateKey = keyStore.getKeyById(jwsHelper.getKid(jws));
+    Optional<Key> privateKey = keyStore.getKeyById(JWSHelper.getKid(jws));
     if (privateKey.isPresent()) {
       return jwsHelper.decode(jws, privateKey.get());
     } else {
