@@ -57,9 +57,6 @@ public class EqLaunchService {
   }
 
   String createLaunchToken(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO) {
-
-    String encryptedToken = "";
-
     EqLaunchData eqLaunchData = new EqLaunchData();
     eqLaunchData.setLanguage(eqLaunchedDTO.getLanguageCode());
     eqLaunchData.setSource("RESPONDENT_HOME");
@@ -71,9 +68,7 @@ public class EqLaunchService {
     eqLaunchData.setAccountServiceLogoutUrl(eqLaunchedDTO.getAccountServiceLogoutUrl());
     eqLaunchData.setSalt(responseIdSale);
 
-    encryptedToken = eqPayloadBuilder.getEqLaunchJwe(eqLaunchData);
-
-    return encryptedToken;
+    return eqPayloadBuilder.getEqLaunchJwe(eqLaunchData);
   }
 
   private LaunchDataDTO gatherLaunchData(String uacHash) {

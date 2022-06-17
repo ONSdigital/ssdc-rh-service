@@ -71,7 +71,7 @@ class EqLaunchEndpointIT {
             "eyJraWQiOiI3NWRjMmNlYjZhMDIyNDZiMjkwOWY2YjdmNzcxNmU0MDkzMjE1NDlkIiwiZW5jIjoiQTI1NkdDTSIsImFsZyI6IlJTQS1PQUVQIn0");
 
     // TODO: Can we decrypt for 'nicer' test?
-//    assertThat(decryptToken(response.getBody())).isEqualTo("blah");
+    assertThat(decryptToken(response.getBody())).isEqualTo("blah");
 
     // TODO: Check if the authenicated message sent ot PubSub
   }
