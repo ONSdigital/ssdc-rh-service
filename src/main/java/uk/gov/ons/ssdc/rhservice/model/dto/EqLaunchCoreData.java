@@ -13,7 +13,6 @@ import uk.gov.ons.ssdc.rhservice.utils.Language;
 @Data
 public class EqLaunchCoreData {
   private Language language;
-  private UacUpdateDTO uacUpdateDTO;
   private String salt;
   private String source;
   private String channel;

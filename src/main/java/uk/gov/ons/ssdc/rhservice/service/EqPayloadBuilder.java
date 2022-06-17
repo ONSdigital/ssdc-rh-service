@@ -1,28 +1,26 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.encoders.Hex;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import uk.gov.ons.ssdc.rhservice.model.EqLaunchRequestDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
+import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
+import uk.gov.ons.ssdc.rhservice.utils.Language;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Hex;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import uk.gov.ons.ssdc.rhservice.model.EqLaunchRequestDTO;
-import uk.gov.ons.ssdc.rhservice.model.LaunchDataDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchCoreData;
-import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchData;
-import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
-import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
-
 @Service
 public class EqPayloadBuilder {
     @Value("${eq.response-id-salt")
-    private String responseIdSale;
+    private String responseIdSalt;
 
     private final UacRepository uacRepository;
     private final CaseRepository caseRepository;
@@ -34,69 +32,41 @@ public class EqPayloadBuilder {
     }
 
     public Map<String, Object> buildEqPayloadMap(String uacHash, EqLaunchRequestDTO eqLaunchedDTO) {
-        LaunchDataDTO launchData = gatherLaunchData(uacHash);
-        EqLaunchData eqLaunchData = getEqLaunchData(launchData, eqLaunchedDTO);
+        UacUpdateDTO uacUpdateDTO = getUacFromHash(uacHash);
+        CaseUpdateDTO caseUpdateDTO = getCaseFromUac(uacUpdateDTO.getCaseId());
 
         return createPayloadMap(
-                // Is the Core copy required???
-                eqLaunchData.coreCopy(),
-                eqLaunchData.getCaseUpdate(),
-                eqLaunchData.getUserId(),
-                null,
-                eqLaunchData.getAccountServiceUrl(),
-                eqLaunchData.getAccountServiceLogoutUrl());
+                uacUpdateDTO, caseUpdateDTO, eqLaunchedDTO.getAccountServiceUrl(),
+                eqLaunchedDTO.getAccountServiceLogoutUrl(), eqLaunchedDTO.getLanguageCode()
+        );
     }
 
-    private EqLaunchData getEqLaunchData(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO) {
-        EqLaunchData eqLaunchData = new EqLaunchData();
-        eqLaunchData.setLanguage(eqLaunchedDTO.getLanguageCode());
-        eqLaunchData.setSource("RESPONDENT_HOME");
-        eqLaunchData.setChannel("RH");
-        eqLaunchData.setUacUpdateDTO(launchData.getUacUpdateDTO());
-        eqLaunchData.setCaseUpdate(launchData.getCaseUpdateDTO());
-        eqLaunchData.setUserId("RH");
-        eqLaunchData.setAccountServiceUrl(eqLaunchedDTO.getAccountServiceUrl());
-        eqLaunchData.setAccountServiceLogoutUrl(eqLaunchedDTO.getAccountServiceLogoutUrl());
-        eqLaunchData.setSalt(responseIdSale);
-
-        return eqLaunchData;
-    }
-
-    private LaunchDataDTO gatherLaunchData(String uacHash) {
-        UacUpdateDTO uacUpdateDTO =
-                uacRepository
-                        .readUAC(uacHash)
-                        .orElseThrow(() -> new RuntimeException("Failed to retrieve UAC"));
-
-        String caseId = uacUpdateDTO.getCaseId();
-
+    private CaseUpdateDTO getCaseFromUac(String caseId) {
         if (StringUtils.isEmpty(caseId)) {
             throw new RuntimeException("UAC has no caseId");
         }
 
-        CaseUpdateDTO caseUpdateDTO =
-                caseRepository
-                        .readCaseUpdate(caseId)
-                        .orElseThrow(() -> new RuntimeException("Case Not Found"));
+        return caseRepository
+                .readCaseUpdate(caseId)
+                .orElseThrow(() -> new RuntimeException("Case Not Found"));
+    }
 
-        LaunchDataDTO launchData = new LaunchDataDTO();
-        launchData.setCaseUpdateDTO(caseUpdateDTO);
-        launchData.setUacUpdateDTO(uacUpdateDTO);
-
-        return launchData;
+    private UacUpdateDTO getUacFromHash(String uacHash) {
+        UacUpdateDTO uacUpdateDTO =
+                uacRepository
+                        .readUAC(uacHash)
+                        .orElseThrow(() -> new RuntimeException("Failed to retrieve UAC"));
+        
+        return uacUpdateDTO;
     }
 
 
-    private Map<String, Object> createPayloadMap(
-            EqLaunchCoreData eqLaunchCoreData,
-            CaseUpdateDTO caseUpdate,
-            String userId,
-            String role,
-            String accountServiceUrl,
-            String accountServiceLogoutUrl) {
+    private Map<String, Object> createPayloadMap(UacUpdateDTO uacUpdateDTO, CaseUpdateDTO caseUpdateDTO,
+                                                 String accountServiceUrl, String accountServiceLogoutUrl,
+                                                 Language languageCode) {
 
-        UUID caseId = UUID.fromString(caseUpdate.getCaseId());
-        String questionnaireId = eqLaunchCoreData.getUacUpdateDTO().getQid();
+        UUID caseId = UUID.fromString(caseUpdateDTO.getCaseId());
+        String questionnaireId = uacUpdateDTO.getQid();
 
         long currentTimeInSeconds = System.currentTimeMillis() / 1000;
 
@@ -107,27 +77,27 @@ public class EqPayloadBuilder {
         payload.computeIfAbsent("iat", (k) -> currentTimeInSeconds);
         payload.computeIfAbsent("exp", (k) -> currentTimeInSeconds + (5 * 60));
         payload.computeIfAbsent("collection_exercise_sid",
-                (k) -> caseUpdate.getCollectionExerciseId());
+                (k) -> caseUpdateDTO.getCollectionExerciseId());
 
-        verifyNotNull(caseUpdate.getCollectionExerciseId(), "collection id", caseId);
+        verifyNotNull(caseUpdateDTO.getCollectionExerciseId(), "collection id", caseId);
         verifyNotNull(questionnaireId, "questionnaireId", caseId);
 
         payload.computeIfAbsent("ru_ref", (k) -> questionnaireId);
-        payload.computeIfAbsent("user_id", (k) -> userId);
-        String caseIdStr = caseUpdate.getCaseId();
+        payload.computeIfAbsent("user_id", (k) -> "RH");
+        String caseIdStr = caseUpdateDTO.getCaseId();
         payload.computeIfAbsent("case_id", (k) -> caseIdStr);
         payload.computeIfAbsent(
-                "language_code", (k) -> eqLaunchCoreData.getLanguage().getIsoLikeCode());
+                "language_code", (k) -> languageCode.getIsoLikeCode());
         payload.computeIfAbsent("eq_id", (k) -> "9999");
-        payload.computeIfAbsent("period_id", (k) -> caseUpdate.getCollectionExerciseId());
+        payload.computeIfAbsent("period_id", (k) -> caseUpdateDTO.getCollectionExerciseId());
         payload.computeIfAbsent("form_type", (k) -> "zzz");
         payload.computeIfAbsent("schema_name", (k) -> "zzz_9999");
         payload.computeIfAbsent(
-                "survey_url", (k) -> eqLaunchCoreData.getUacUpdateDTO().getCollectionInstrumentUrl());
-        payload.computeIfAbsent("case_ref", (k) -> caseUpdate.getCaseRef());
+                "survey_url", (k) -> uacUpdateDTO.getCollectionInstrumentUrl());
+        payload.computeIfAbsent("case_ref", (k) -> caseUpdateDTO.getCaseRef());
         payload.computeIfAbsent("ru_name", (k) -> "West Efford Cottage, y y y ??");
 
-        String responseId = encryptResponseId(questionnaireId, eqLaunchCoreData.getSalt());
+        String responseId = encryptResponseId(questionnaireId, responseIdSalt);
         payload.computeIfAbsent("response_id", (k) -> responseId);
         payload.computeIfAbsent("account_service_url", (k) -> accountServiceUrl);
         payload.computeIfAbsent("account_service_log_out_url", (k) -> accountServiceLogoutUrl);
