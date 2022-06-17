@@ -1,5 +1,8 @@
 package uk.gov.ons.ssdc.rhservice.endpoints;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -12,14 +15,13 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.ons.ssdc.rhservice.crypto.JweDecryptor;
+import uk.gov.ons.ssdc.rhservice.crypto.KeyStore;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.OK;
 
 @ContextConfiguration
 @ActiveProfiles("test")
@@ -37,6 +39,8 @@ class EqLaunchEndpointIT {
   @Autowired private CaseRepository caseRepository;
 
   @Autowired private UacRepository uacRepository;
+
+  @Autowired private KeyStore keyStore;
 
   @Test
   void testEqLaunchUrlSuccessfullyReturned() throws UnirestException {
@@ -62,15 +66,22 @@ class EqLaunchEndpointIT {
             .asString();
 
     assertThat(response.getStatus()).isEqualTo(OK.value());
-    assertThat(response.getBody()).startsWith("eyJraWQiOiI3NWRjMmNlYjZhMDIyNDZiMjkwOWY2YjdmNzcxNmU0MDkzMjE1NDlkIiwiZW5jIjoiQTI1NkdDTSIsImFsZyI6IlJTQS1PQUVQIn0");
+    assertThat(response.getBody())
+        .startsWith(
+            "eyJraWQiOiI3NWRjMmNlYjZhMDIyNDZiMjkwOWY2YjdmNzcxNmU0MDkzMjE1NDlkIiwiZW5jIjoiQTI1NkdDTSIsImFsZyI6IlJTQS1PQUVQIn0");
 
-    //TODO: Can we decrypt for 'nicer' test?
-
+    // TODO: Can we decrypt for 'nicer' test?
+    assertThat(decryptToken(response.getBody())).isEqualTo("blah");
 
     // TODO: Check if the authenicated message sent ot PubSub
   }
 
   private String createUrl(String urlFormat, int port, String param1) {
     return String.format(urlFormat, port, param1);
+  }
+
+  private String decryptToken(String token) {
+    JweDecryptor jweDecryptor = new JweDecryptor(keyStore);
+    return jweDecryptor.decrypt(token);
   }
 }
