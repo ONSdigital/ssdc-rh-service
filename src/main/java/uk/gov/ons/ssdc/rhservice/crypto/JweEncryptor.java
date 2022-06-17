@@ -5,15 +5,15 @@ import java.util.Map;
 import java.util.Optional;
 
 public class JweEncryptor {
-  private static String KEYTYPE_PUBLIC = "public";
+  private final static String KEYTYPE_PUBLIC = "public";
+  private final static String KEYTYPE_PRIVATE = "private";
 
-  private JWSHelper.EncodeJws jwsEncoder;
-  private JWEHelper.EncryptJwe jweEncryptor;
+  private JWSHelper.EncodeJws encodeJws;
+  private JWEHelper.EncryptJwe encryptJwe;
   private Key privateKey;
   private Key publicKey;
 
   public JweEncryptor(KeyStore keyStore, String keyPurpose) {
-    String KEYTYPE_PRIVATE = "private";
     Optional<Key> privateKeyOpt = keyStore.getKeyForPurposeAndType(keyPurpose, KEYTYPE_PRIVATE);
     if (privateKeyOpt.isPresent()) {
       this.privateKey = privateKeyOpt.get();
@@ -28,12 +28,12 @@ public class JweEncryptor {
       throw new RuntimeException("Failed to retrieve public key to encode payload");
     }
 
-    this.jwsEncoder = new JWSHelper.EncodeJws(this.privateKey);
-    this.jweEncryptor = new JWEHelper.EncryptJwe(this.publicKey);
+    this.encodeJws = new JWSHelper.EncodeJws(this.privateKey);
+    this.encryptJwe = new JWEHelper.EncryptJwe(this.publicKey);
   }
 
   public String encrypt(Map<String, Object> claims) {
-    JWSObject jws = jwsEncoder.encode(claims);
-    return jweEncryptor.encrypt(jws);
+    JWSObject jws = encodeJws.encode(claims);
+    return encryptJwe.encrypt(jws);
   }
 }
