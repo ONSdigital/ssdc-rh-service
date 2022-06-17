@@ -1,9 +1,8 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
 import com.nimbusds.jose.JWEObject;
-import org.apache.commons.lang3.StringUtils;
-
 import java.text.ParseException;
+import org.apache.commons.lang3.StringUtils;
 
 public class JWEHelper {
 

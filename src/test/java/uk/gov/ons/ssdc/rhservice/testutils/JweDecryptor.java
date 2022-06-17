@@ -1,12 +1,11 @@
 package uk.gov.ons.ssdc.rhservice.testutils;
 
 import com.nimbusds.jose.JWSObject;
+import java.util.Optional;
 import uk.gov.ons.ssdc.rhservice.crypto.JWEHelper;
 import uk.gov.ons.ssdc.rhservice.crypto.JWSHelper;
 import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
 import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
-
-import java.util.Optional;
 
 public class JweDecryptor {
 
