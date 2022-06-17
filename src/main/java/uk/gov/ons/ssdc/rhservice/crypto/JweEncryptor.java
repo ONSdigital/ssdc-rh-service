@@ -32,8 +32,8 @@ public class JweEncryptor {
     this.encryptJwe = new JWEHelper.EncryptJwe(this.publicKey);
   }
 
-  public String encrypt(Map<String, Object> claims) {
-    JWSObject jws = encodeJws.encode(claims);
+  public String encrypt(Map<String, Object> payload) {
+    JWSObject jws = encodeJws.encode(payload);
     return encryptJwe.encrypt(jws);
   }
 }

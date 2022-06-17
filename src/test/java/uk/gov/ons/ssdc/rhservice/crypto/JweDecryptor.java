@@ -13,12 +13,12 @@ public class JweDecryptor {
     this.keyStore = keyStore;
   }
 
-  public String decrypt(String jwe) {
+  public String decrypt(String encryptedValue) {
 
-    Optional<Key> publicKey = keyStore.getKeyById(jweHelper.getKid(jwe));
+    Optional<Key> publicKey = keyStore.getKeyById(jweHelper.getKid(encryptedValue));
     JWSObject jws;
     if (publicKey.isPresent()) {
-      jws = jweHelper.decrypt(jwe, publicKey.get());
+      jws = jweHelper.decrypt(encryptedValue, publicKey.get());
     } else {
       throw new RuntimeException("Failed to retrieve public key to decrypt JWE");
     }
