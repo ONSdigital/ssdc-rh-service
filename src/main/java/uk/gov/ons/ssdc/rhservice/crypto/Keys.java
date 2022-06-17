@@ -1,8 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
-import lombok.Data;
-
 import java.util.Map;
+import lombok.Data;
 
 /** Holder for Cryptographic keys */
 @Data

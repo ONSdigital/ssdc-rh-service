@@ -2,19 +2,17 @@ package uk.gov.ons.ssdc.rhservice.crypto;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class KeyStore {
 
-  //TODO: load in with @Value CryptoKeys and use in Constructor
+  // TODO: load in with @Value CryptoKeys and use in Constructor
   @Value("${keystore}")
   private String cryptoKeys;
 

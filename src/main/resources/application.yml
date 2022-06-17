@@ -66,3 +66,6 @@ keystore: '{
     }
   }
 }'
+
+eq:
+  response-id-salt: CENSUS

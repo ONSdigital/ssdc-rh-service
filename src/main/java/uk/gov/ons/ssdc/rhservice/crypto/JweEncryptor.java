@@ -1,10 +1,8 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
 import com.nimbusds.jose.JWSObject;
-
 import java.util.Map;
 import java.util.Optional;
-
 
 public class JweEncryptor {
   private static String KEYTYPE_PUBLIC = "public";
@@ -14,7 +12,7 @@ public class JweEncryptor {
   private Key privateKey;
   private Key publicKey;
 
-  public JweEncryptor(KeyStore keyStore, String keyPurpose)  {
+  public JweEncryptor(KeyStore keyStore, String keyPurpose) {
     String KEYTYPE_PRIVATE = "private";
     Optional<Key> privateKeyOpt = keyStore.getKeyForPurposeAndType(keyPurpose, KEYTYPE_PRIVATE);
     if (privateKeyOpt.isPresent()) {

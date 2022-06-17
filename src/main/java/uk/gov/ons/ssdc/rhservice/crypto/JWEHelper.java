@@ -10,9 +10,8 @@ import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSADecrypter;
 import com.nimbusds.jose.crypto.RSAEncrypter;
 import com.nimbusds.jose.jwk.RSAKey;
-import org.apache.commons.lang3.StringUtils;
-
 import java.text.ParseException;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class JWEHelper {
 

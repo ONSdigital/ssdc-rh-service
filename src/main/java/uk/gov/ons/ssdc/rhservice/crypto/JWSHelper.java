@@ -10,11 +10,8 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.shaded.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Map;
-
-
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class JWSHelper {
 
@@ -66,7 +63,7 @@ public abstract class JWSHelper {
     }
 
     private Payload buildClaims(Map<String, Object> claims) {
-      //import net.minidev.json.JSONObject had this originally
+      // import net.minidev.json.JSONObject had this originally
       JSONObject jsonObject = new JSONObject(claims);
       Payload jwsClaims = new Payload(jsonObject);
       return jwsClaims;

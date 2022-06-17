@@ -1,10 +1,8 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
 import com.nimbusds.jose.JWSObject;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Optional;
-
+import lombok.extern.slf4j.Slf4j;
 
 /** Decrypt a launch token. */
 @Slf4j

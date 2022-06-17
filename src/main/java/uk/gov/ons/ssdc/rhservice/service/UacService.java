@@ -8,29 +8,27 @@ import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @Service
 public class UacService {
-    private final UacRepository uacRepository;
-    private final CaseRepository caseRepository;
+  private final UacRepository uacRepository;
+  private final CaseRepository caseRepository;
 
-    public UacService(UacRepository uacRepository, CaseRepository caseRepository) {
-        this.uacRepository = uacRepository;
-        this.caseRepository = caseRepository;
+  public UacService(UacRepository uacRepository, CaseRepository caseRepository) {
+    this.uacRepository = uacRepository;
+    this.caseRepository = caseRepository;
+  }
+
+  public void validateUacHash(String uacHash) throws RuntimeException {
+    UacUpdateDTO uac =
+        uacRepository
+            .readUAC(uacHash)
+            .orElseThrow(() -> new RuntimeException("Failed to retrieve UAC"));
+
+    String caseId = uac.getCaseId();
+    if (StringUtils.isEmpty(caseId)) {
+      throw new RuntimeException("UAC has no caseId");
     }
 
-    public void validateUacHash(String uacHash) throws RuntimeException {
-        UacUpdateDTO uac = uacRepository
-                .readUAC(uacHash)
-                .orElseThrow(
-                        () -> new RuntimeException("Failed to retrieve UAC"));
+    caseRepository.readCaseUpdate(caseId).orElseThrow(() -> new RuntimeException("Case Not Found"));
 
-        String caseId = uac.getCaseId();
-        if (StringUtils.isEmpty(caseId)) {
-            throw new RuntimeException("UAC has no caseId");
-        }
-
-        caseRepository
-                .readCaseUpdate(caseId)
-                .orElseThrow(() -> new RuntimeException("Case Not Found"));
-
-        return;
-    }
+    return;
+  }
 }

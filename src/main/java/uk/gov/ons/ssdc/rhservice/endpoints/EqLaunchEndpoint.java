@@ -1,7 +1,5 @@
 package uk.gov.ons.ssdc.rhservice.endpoints;
 
-import io.micrometer.core.annotation.Timed;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,21 +24,29 @@ public class EqLaunchEndpoint {
   }
 
   @GetMapping(value = "/{uacHash}")
-  public ResponseEntity<String> generateEqLaunchToken( @PathVariable("uacHash") final String uacHash,
-      @RequestParam(required = true) String languageCode,  @RequestParam(required = true) String accountServiceUrl,
-      @RequestParam(required = true) String accountServiceLogoutUrl, @RequestParam(required = true) String clientIP) {
+  public ResponseEntity<String> generateEqLaunchToken(
+      @PathVariable("uacHash") final String uacHash,
+      @RequestParam(required = true) String languageCode,
+      @RequestParam(required = true) String accountServiceUrl,
+      @RequestParam(required = true) String accountServiceLogoutUrl,
+      @RequestParam(required = true) String clientIP) {
 
     uacService.validateUacHash(uacHash);
 
     Language language = validateAndGetLanguage(languageCode);
 
-    EqLaunchRequestDTO eqLaunchedDTO = buildLaunchRRequestDTO(accountServiceUrl, accountServiceLogoutUrl, clientIP, language);
+    EqLaunchRequestDTO eqLaunchedDTO =
+        buildLaunchRRequestDTO(accountServiceUrl, accountServiceLogoutUrl, clientIP, language);
 
-    String launchURL = eqLaunchService.generateEqLaunchToken(uacHash, eqLaunchedDTO);
-    return ResponseEntity.ok(launchURL);
+    String launchToken = eqLaunchService.generateEqLaunchToken(uacHash, eqLaunchedDTO);
+    return ResponseEntity.ok(launchToken);
   }
 
-  private EqLaunchRequestDTO buildLaunchRRequestDTO(String accountServiceUrl, String accountServiceLogoutUrl, String clientIP, Language language) {
+  private EqLaunchRequestDTO buildLaunchRRequestDTO(
+      String accountServiceUrl,
+      String accountServiceLogoutUrl,
+      String clientIP,
+      Language language) {
     EqLaunchRequestDTO eqLaunchedDTO = new EqLaunchRequestDTO();
     eqLaunchedDTO.setLanguageCode(language);
     eqLaunchedDTO.setAccountServiceUrl(accountServiceUrl);

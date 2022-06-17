@@ -6,6 +6,6 @@ import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 
 @Data
 public class LaunchDataDTO {
-    private UacUpdateDTO uacUpdateDTO;
-    private CaseUpdateDTO caseUpdateDTO;
+  private UacUpdateDTO uacUpdateDTO;
+  private CaseUpdateDTO caseUpdateDTO;
 }
