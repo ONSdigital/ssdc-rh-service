@@ -3,6 +3,8 @@ package uk.gov.ons.ssdc.rhservice.endpoints;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -10,12 +12,15 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
+import uk.gov.ons.ssdc.rhservice.crypto.keys.Keys;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
@@ -42,6 +47,9 @@ class EqLaunchEndpointIT {
 
   @Autowired private KeyStore keyStore;
 
+  @Value("${eqDecryptKeys}")
+  private String eqDecryptKeys;
+
   @Test
   void testEqLaunchUrlSuccessfullyReturned() throws UnirestException {
 
@@ -66,12 +74,13 @@ class EqLaunchEndpointIT {
             .asString();
 
     assertThat(response.getStatus()).isEqualTo(OK.value());
-    assertThat(response.getBody())
-        .startsWith(
-            "eyJraWQiOiI3NWRjMmNlYjZhMDIyNDZiMjkwOWY2YjdmNzcxNmU0MDkzMjE1NDlkIiwiZW5jIjoiQTI1NkdDTSIsImFsZyI6IlJTQS1PQUVQIn0");
+//    assertThat(response.getBody())
+//        .startsWith(
+//            "eyJraWQiOiJiYzI2Yjc4MGFhNDZmMDUzMjkxYmExMjIwNjJlNjA3NTY1NmMyMzQ1IiwiZW5jIjoiQTI1NkdDTSIsImFsZyI6IlJTQS1PQUVQIn0");
 
-    // TODO: Can we decrypt for 'nicer' test?
-    //    assertThat(decryptToken(response.getBody())).isEqualTo("blah");
+    String decryptedToken = decryptToken(response.getBody());
+
+//        assertThat(decryptToken(response.getBody())).isEqualTo("blah");
 
     // TODO: Check if the authenicated message sent ot PubSub
   }
@@ -81,7 +90,32 @@ class EqLaunchEndpointIT {
   }
 
   private String decryptToken(String token) {
-    JweDecryptor jweDecryptor = new JweDecryptor(keyStore);
+    KeyStore decryptionKeyStore = new KeyStore();
+    Keys keys = setUpKeys(eqDecryptKeys);
+
+    ReflectionTestUtils.setField(decryptionKeyStore, "keys", keys);
+
+    JweDecryptor jweDecryptor = new JweDecryptor(decryptionKeyStore);
     return jweDecryptor.decrypt(token);
+  }
+
+  @SuppressWarnings("deprecation")
+  private Keys setUpKeys(String decryptionKeys) {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+
+    Keys keys;
+    try {
+      keys = mapper.readValue(decryptionKeys, Keys.class);
+    } catch (Exception e) {
+      System.out.println("Failed to read cryptographic keys");
+      throw new RuntimeException("Failed to read cryptographic keys", e);
+    }
+    keys.getKeys()
+        .forEach(
+            (key, value) -> {
+              value.setKid(key);
+            });
+    return keys;
   }
 }
