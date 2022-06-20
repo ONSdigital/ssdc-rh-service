@@ -3,9 +3,13 @@ package uk.gov.ons.ssdc.rhservice.endpoints;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +36,7 @@ class EqLaunchEndpointIT {
   public static final String UAC_HASH = "UAC_HASH";
   public static final String QID = "QID";
   public static final String CASE_ID = UUID.randomUUID().toString();
+  public static final String COLLEX_ID = UUID.randomUUID().toString();
 
   @LocalServerPort private int port;
 
@@ -41,17 +46,16 @@ class EqLaunchEndpointIT {
 
   @Autowired private UacRepository uacRepository;
 
-  @Autowired private KeyStore keyStore;
-
-  @Value("${eqDecryptKeys}")
-  private String eqDecryptKeys;
+  @Value("${eqDecryptionKeyStore}")
+  private String eqDecryptionKeyStore;
 
   @Test
-  void testEqLaunchUrlSuccessfullyReturned() throws UnirestException {
+  void testEqLaunchUrlSuccessfullyReturned()
+      throws UnirestException, JsonProcessingException {
 
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(CASE_ID);
-    caseUpdateDTO.setCollectionExerciseId("COLLEX_ID");
+    caseUpdateDTO.setCollectionExerciseId(COLLEX_ID);
     caseRepository.writeCaseUpdate(caseUpdateDTO);
 
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
@@ -70,14 +74,15 @@ class EqLaunchEndpointIT {
             .asString();
 
     assertThat(response.getStatus()).isEqualTo(OK.value());
-    //    assertThat(response.getBody())
-    //        .startsWith(
-    //
-    // "eyJraWQiOiJiYzI2Yjc4MGFhNDZmMDUzMjkxYmExMjIwNjJlNjA3NTY1NmMyMzQ1IiwiZW5jIjoiQTI1NkdDTSIsImFsZyI6IlJTQS1PQUVQIn0");
 
     String decryptedToken = decryptToken(response.getBody());
+    Map<String, String> tokenData = new ObjectMapper().readValue(decryptedToken, HashMap.class);
 
-    //    assertThat(decryptToken(response.getBody())).isEqualTo("blah");
+    assertThat(tokenData)
+        .containsEntry("case_id", CASE_ID)
+        .containsEntry("questionnaire_id", QID)
+        .containsEntry("collection_exercise_sid", COLLEX_ID)
+        .containsEntry("language_code", "en");
 
     // TODO: Check if the authenicated message sent ot PubSub
   }
@@ -87,7 +92,7 @@ class EqLaunchEndpointIT {
   }
 
   private String decryptToken(String token) {
-    KeyStore decryptionKeyStore = new KeyStore(eqDecryptKeys);
+    KeyStore decryptionKeyStore = new KeyStore(eqDecryptionKeyStore);
     JweDecryptor jweDecryptor = new JweDecryptor(decryptionKeyStore);
     return jweDecryptor.decrypt(token);
   }

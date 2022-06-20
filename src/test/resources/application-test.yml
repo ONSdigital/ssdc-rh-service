@@ -38,7 +38,6 @@ keystore: '[
     }
 ]'
 
-
 eqDecryptKeys: '[
     {
       "keyId": "f008897e548d5c4fb9271e5a85f6fc4759301f26",
