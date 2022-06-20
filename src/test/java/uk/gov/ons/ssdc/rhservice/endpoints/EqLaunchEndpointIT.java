@@ -95,24 +95,4 @@ class EqLaunchEndpointIT {
     JweDecryptor jweDecryptor = new JweDecryptor(decryptionKeyStore);
     return jweDecryptor.decrypt(token);
   }
-
-  @SuppressWarnings("deprecation")
-  private Keys setUpKeys(String decryptionKeys) {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
-
-    Keys keys;
-    try {
-      keys = mapper.readValue(decryptionKeys, Keys.class);
-    } catch (Exception e) {
-      System.out.println("Failed to read cryptographic keys");
-      throw new RuntimeException("Failed to read cryptographic keys", e);
-    }
-    keys.getKeys()
-        .forEach(
-            (key, value) -> {
-              value.setKid(key);
-            });
-    return keys;
-  }
 }
