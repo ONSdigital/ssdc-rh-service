@@ -3,8 +3,6 @@ package uk.gov.ons.ssdc.rhservice.endpoints;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -18,9 +16,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.Keys;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
@@ -81,7 +77,7 @@ class EqLaunchEndpointIT {
 
     String decryptedToken = decryptToken(response.getBody());
 
-//    assertThat(decryptToken(response.getBody())).isEqualTo("blah");
+    //    assertThat(decryptToken(response.getBody())).isEqualTo("blah");
 
     // TODO: Check if the authenicated message sent ot PubSub
   }

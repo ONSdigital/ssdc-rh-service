@@ -4,12 +4,10 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.crypto.JwtEncryptor;
 import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
-import uk.gov.ons.ssdc.rhservice.model.EqLaunchRequestDTO;
 
 @Service
 public class EqLaunchService {
   private final EqPayloadBuilder eqPayloadBuilder;
-
   private final JwtEncryptor jwtEncryptor;
 
   public EqLaunchService(EqPayloadBuilder eqPayloadBuilder, KeyStore keyStore) {
@@ -17,15 +15,18 @@ public class EqLaunchService {
     this.jwtEncryptor = new JwtEncryptor(keyStore, "authentication");
   }
 
-  public String generateEqLaunchToken(String uacHash, EqLaunchRequestDTO eqLaunchedDTO) {
-    Map<String, Object> payload = eqPayloadBuilder.buildEqPayloadMap(uacHash, eqLaunchedDTO);
+  public String generateEqLaunchToken(
+      String uacHash,
+      String accountServiceUrl,
+      String accountServiceLogoutUrl,
+      String clientIP,
+      String languageCode) {
+    Map<String, Object> payload =
+        eqPayloadBuilder.buildEqPayloadMap(
+            uacHash, accountServiceUrl, accountServiceLogoutUrl, languageCode);
 
-    return jwtEncryptor.encrypt(payload);
-
-    // TODO: IMPLEMENT this the SRM way
-    //    EqLaunch eqLaunch = new EqLaunch();
-    //    eqLaunch.setQid(launchData.getUacUpdateDTO().getQid());
     // eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, Channel.RH, eqLaunch);
+    return jwtEncryptor.encrypt(payload);
   }
 
   // TODO, make this all work, not urgent yet - but needs completing for ticket.

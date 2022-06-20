@@ -49,7 +49,6 @@ public class EncodeJws {
   }
 
   private Payload buildClaims(Map<String, Object> claims) {
-    // import net.minidev.json.JSONObject had this originally
     JSONObject jsonObject = new JSONObject(claims);
     return new Payload(jsonObject);
   }

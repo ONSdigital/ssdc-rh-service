@@ -4,20 +4,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.ons.ssdc.rhservice.model.EqLaunchRequestDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
-import uk.gov.ons.ssdc.rhservice.utils.Language;
 
 @Service
 public class EqPayloadBuilder {
+  private static final Set<String> ALLOWED_LANGUAGE_CODES = Set.<String>of("cy", "en");
+
   @Value("${eq.response-id-salt")
   private String responseIdSalt;
 
@@ -29,24 +30,14 @@ public class EqPayloadBuilder {
     this.caseRepository = caseRepository;
   }
 
-  public Map<String, Object> buildEqPayloadMap(String uacHash, EqLaunchRequestDTO eqLaunchedDTO) {
-    UacUpdateDTO uacUpdateDTO = getUacFromHash(uacHash);
-    CaseUpdateDTO caseUpdateDTO = getCaseFromUac(uacUpdateDTO.getCaseId());
-
-    return createPayloadMap(
-        uacUpdateDTO,
-        caseUpdateDTO,
-        eqLaunchedDTO.getAccountServiceUrl(),
-        eqLaunchedDTO.getAccountServiceLogoutUrl(),
-        eqLaunchedDTO.getLanguageCode());
-  }
-
-  private Map<String, Object> createPayloadMap(
-      UacUpdateDTO uacUpdateDTO,
-      CaseUpdateDTO caseUpdateDTO,
+  public Map<String, Object> buildEqPayloadMap(
+      String uacHash,
       String accountServiceUrl,
       String accountServiceLogoutUrl,
-      Language languageCode) {
+      String languageCode) {
+    UacUpdateDTO uacUpdateDTO = getUacFromHash(uacHash);
+    CaseUpdateDTO caseUpdateDTO = getCaseFromUac(uacUpdateDTO.getCaseId());
+    validateLanguageCode(languageCode);
 
     UUID caseId = UUID.fromString(caseUpdateDTO.getCaseId());
     String questionnaireId = uacUpdateDTO.getQid();
@@ -69,7 +60,7 @@ public class EqPayloadBuilder {
     payload.computeIfAbsent("user_id", (k) -> "RH");
     String caseIdStr = caseUpdateDTO.getCaseId();
     payload.computeIfAbsent("case_id", (k) -> caseIdStr);
-    payload.computeIfAbsent("language_code", (k) -> languageCode.getIsoLikeCode());
+    payload.computeIfAbsent("language_code", (k) -> languageCode);
     payload.computeIfAbsent("eq_id", (k) -> "9999");
     payload.computeIfAbsent("period_id", (k) -> caseUpdateDTO.getCollectionExerciseId());
     payload.computeIfAbsent("form_type", (k) -> "zzz");
@@ -121,5 +112,10 @@ public class EqPayloadBuilder {
     return uacRepository
         .readUAC(uacHash)
         .orElseThrow(() -> new RuntimeException("Failed to retrieve UAC"));
+  }
+
+  private void validateLanguageCode(String languageCode) {
+    if (!ALLOWED_LANGUAGE_CODES.contains(languageCode))
+      throw new RuntimeException("Invalid language code: '" + languageCode + "'");
   }
 }
