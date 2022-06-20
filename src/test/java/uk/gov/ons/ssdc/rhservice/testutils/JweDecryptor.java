@@ -5,7 +5,6 @@ import com.nimbusds.jose.JWSObject;
 import java.text.ParseException;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.ons.ssdc.rhservice.crypto.JWSHelper;
 import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
 import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
 
@@ -21,17 +20,17 @@ public class JweDecryptor {
 
   public String decrypt(String encryptedValue) {
 
-    Optional<Key> publicKey = keyStore.getKeyById(getKid(encryptedValue));
+    Optional<Key> publicKey = keyStore.getKeyById(getJweKeyId(encryptedValue));
     JWSObject jws;
 
-    Optional<Key> key = keyStore.getKeyById(getKid(encryptedValue));
+    Optional<Key> key = keyStore.getKeyById(getJweKeyId(encryptedValue));
     if (publicKey.isPresent()) {
       jws = jweHelper.decrypt(encryptedValue, key.get());
     } else {
       throw new RuntimeException("Failed to decrypt JWE");
     }
 
-    Optional<Key> privateKey = keyStore.getKeyById(JWSHelper.getKid(jws));
+    Optional<Key> privateKey = keyStore.getKeyById(getJwsKeyId(jws));
     if (privateKey.isPresent()) {
       return jwsHelper.decode(jws, privateKey.get());
     } else {
@@ -39,7 +38,7 @@ public class JweDecryptor {
     }
   }
 
-  private String getKid(String jwe) {
+  private String getJweKeyId(String jwe) {
     try {
       JWEObject jweObject = JWEObject.parse(jwe);
       String keyId = jweObject.getHeader().getKeyID();
@@ -51,5 +50,13 @@ public class JweDecryptor {
     } catch (ParseException e) {
       throw new RuntimeException("Failed to parse JWE string");
     }
+  }
+
+  private String getJwsKeyId(JWSObject jwsObject) {
+    String keyId = jwsObject.getHeader().getKeyID();
+    if (StringUtils.isEmpty(keyId)) {
+      throw new RuntimeException("Failed to extract Key Id");
+    }
+    return keyId;
   }
 }
