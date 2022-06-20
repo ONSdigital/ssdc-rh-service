@@ -3,8 +3,6 @@ package uk.gov.ons.ssdc.rhservice.crypto;
 import com.nimbusds.jose.JWSObject;
 import java.util.Map;
 import java.util.Optional;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
 
 public class JwtEncryptor {
   private static final String KEYTYPE_PUBLIC = "public";

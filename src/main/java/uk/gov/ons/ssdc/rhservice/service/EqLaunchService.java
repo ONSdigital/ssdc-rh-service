@@ -3,7 +3,7 @@ package uk.gov.ons.ssdc.rhservice.service;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.crypto.JwtEncryptor;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
+import uk.gov.ons.ssdc.rhservice.crypto.KeyStore;
 
 @Service
 public class EqLaunchService {

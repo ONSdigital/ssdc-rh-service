@@ -11,7 +11,7 @@ import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @MessageEndpoint
 public class UacUpdateReceiver {
-  private UacRepository respondentUacRepo;
+  private final UacRepository respondentUacRepo;
 
   public UacUpdateReceiver(UacRepository respondentUacRepo) {
     this.respondentUacRepo = respondentUacRepo;

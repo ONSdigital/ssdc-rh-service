@@ -10,12 +10,11 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import java.util.Map;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
 
 public class EncodeJws {
-  private Key key;
-  private JWSHeader jwsHeader;
-  private RSASSASigner signer;
+  private final Key key;
+  private final JWSHeader jwsHeader;
+  private final RSASSASigner signer;
 
   public EncodeJws(Key key) {
     this.key = key;
@@ -44,7 +43,7 @@ public class EncodeJws {
   private JWSHeader buildHeader(Key key) {
     return new JWSHeader.Builder(JWSAlgorithm.RS256)
         .type(JOSEObjectType.JWT)
-        .keyID(key.getKid())
+        .keyID(key.getKeyId())
         .build();
   }
 

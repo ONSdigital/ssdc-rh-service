@@ -5,8 +5,8 @@ import com.nimbusds.jose.JWSObject;
 import java.text.ParseException;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
+import uk.gov.ons.ssdc.rhservice.crypto.Key;
+import uk.gov.ons.ssdc.rhservice.crypto.KeyStore;
 
 public class JweDecryptor {
 

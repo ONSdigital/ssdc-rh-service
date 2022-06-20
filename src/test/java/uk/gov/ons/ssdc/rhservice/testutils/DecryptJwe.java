@@ -8,7 +8,7 @@ import com.nimbusds.jose.crypto.RSADecrypter;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.RSAKey;
 import java.text.ParseException;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
+import uk.gov.ons.ssdc.rhservice.crypto.Key;
 
 public class DecryptJwe {
   public JWSObject decrypt(String jwe, Key key) {

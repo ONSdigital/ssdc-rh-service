@@ -17,7 +17,7 @@ import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @Service
 public class EqPayloadBuilder {
-  private static final Set<String> ALLOWED_LANGUAGE_CODES = Set.<String>of("cy", "en");
+  private static final Set<String> ALLOWED_LANGUAGE_CODES = Set.of("cy", "en");
 
   @Value("${eq.response-id-salt")
   private String responseIdSalt;
@@ -91,7 +91,7 @@ public class EqPayloadBuilder {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       md.update(salt.getBytes());
       byte[] bytes = md.digest(questionnaireId.getBytes());
-      responseId.append((new String(Hex.encode(bytes)).substring(0, 16)));
+      responseId.append((new String(Hex.encode(bytes))), 0, 16);
     } catch (NoSuchAlgorithmException ex) {
       throw new RuntimeException("No SHA-256 algorithm while encrypting questionnaire", ex);
     }

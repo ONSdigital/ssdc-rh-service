@@ -10,7 +10,7 @@ import uk.gov.ons.ssdc.rhservice.service.RHFirestoreClient;
 @Service
 public class UacRepository {
 
-  private RHFirestoreClient rhFirestoreClient;
+  private final RHFirestoreClient rhFirestoreClient;
 
   @Value("${cloud-storage.uac-schema-name}")
   private String uacSchemaName;

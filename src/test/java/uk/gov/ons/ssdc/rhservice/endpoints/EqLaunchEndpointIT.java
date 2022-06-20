@@ -16,7 +16,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.KeyStore;
+import uk.gov.ons.ssdc.rhservice.crypto.KeyStore;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;

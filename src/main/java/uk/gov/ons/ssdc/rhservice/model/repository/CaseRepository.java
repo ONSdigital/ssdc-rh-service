@@ -8,7 +8,7 @@ import uk.gov.ons.ssdc.rhservice.service.RHFirestoreClient;
 
 @Service
 public class CaseRepository {
-  private RHFirestoreClient rhFirestoreClient;
+  private final RHFirestoreClient rhFirestoreClient;
 
   @Value("${cloud-storage.case-schema-name}")
   private String caseSchemaName;

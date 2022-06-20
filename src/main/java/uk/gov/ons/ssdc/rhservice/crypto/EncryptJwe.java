@@ -9,7 +9,6 @@ import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSAEncrypter;
 import com.nimbusds.jose.jwk.RSAKey;
-import uk.gov.ons.ssdc.rhservice.crypto.keys.Key;
 
 public class EncryptJwe {
   private final JWEHeader jweHeader;
@@ -43,7 +42,7 @@ public class EncryptJwe {
 
     // We HAVE to use the deprecated Algo to remain compatible with EQ
     return new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP, EncryptionMethod.A256GCM)
-        .keyID(key.getKid())
+        .keyID(key.getKeyId())
         .build();
   }
 }
