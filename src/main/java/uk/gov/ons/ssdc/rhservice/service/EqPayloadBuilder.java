@@ -37,46 +37,49 @@ public class EqPayloadBuilder {
       String languageCode) {
     UacUpdateDTO uacUpdateDTO = getUacFromHash(uacHash);
     CaseUpdateDTO caseUpdateDTO = getCaseFromUac(uacUpdateDTO.getCaseId());
-    validateLanguageCode(languageCode);
-
-    UUID caseId = UUID.fromString(caseUpdateDTO.getCaseId());
-    String questionnaireId = uacUpdateDTO.getQid();
+    validateData(caseUpdateDTO, uacUpdateDTO.getQid(), languageCode);
 
     long currentTimeInSeconds = System.currentTimeMillis() / 1000;
 
+    //RM presuming this is expiration time
+    long exp_time =  currentTimeInSeconds + (5 * 60);
+
     LinkedHashMap<String, Object> payload = new LinkedHashMap<>();
 
-    payload.computeIfAbsent("jti", (k) -> UUID.randomUUID().toString());
-    payload.computeIfAbsent("tx_id", (k) -> UUID.randomUUID().toString());
-    payload.computeIfAbsent("iat", (k) -> currentTimeInSeconds);
-    payload.computeIfAbsent("exp", (k) -> currentTimeInSeconds + (5 * 60));
-    payload.computeIfAbsent(
-        "collection_exercise_sid", (k) -> caseUpdateDTO.getCollectionExerciseId());
+    payload.put("jti", UUID.randomUUID().toString());
+    payload.put("tx_id", UUID.randomUUID().toString());
+    payload.put("iat", currentTimeInSeconds);
+    payload.put("exp", exp_time);
+    payload.put("collection_exercise_sid", caseUpdateDTO.getCollectionExerciseId());
 
-    verifyNotNull(caseUpdateDTO.getCollectionExerciseId(), "collection id", caseId);
-    verifyNotNull(questionnaireId, "questionnaireId", caseId);
+    payload.put("ru_ref", uacUpdateDTO.getQid());
+    payload.put("user_id", "RH");
+    payload.put("case_id", caseUpdateDTO.getCaseId());
+    payload.put("language_code", languageCode);
+    payload.put("eq_id", "9999");
+    payload.put("period_id", caseUpdateDTO.getCollectionExerciseId());
+    payload.put("form_type", "zzz");
+    payload.put("schema_name", "zzz_9999");
+    payload.put("survey_url", uacUpdateDTO.getCollectionInstrumentUrl());
+    payload.put("case_ref", caseUpdateDTO.getCaseRef());
+    payload.put("ru_name", "West Efford Cottage, y y y ??");
 
-    payload.computeIfAbsent("ru_ref", (k) -> questionnaireId);
-    payload.computeIfAbsent("user_id", (k) -> "RH");
-    String caseIdStr = caseUpdateDTO.getCaseId();
-    payload.computeIfAbsent("case_id", (k) -> caseIdStr);
-    payload.computeIfAbsent("language_code", (k) -> languageCode);
-    payload.computeIfAbsent("eq_id", (k) -> "9999");
-    payload.computeIfAbsent("period_id", (k) -> caseUpdateDTO.getCollectionExerciseId());
-    payload.computeIfAbsent("form_type", (k) -> "zzz");
-    payload.computeIfAbsent("schema_name", (k) -> "zzz_9999");
-    payload.computeIfAbsent("survey_url", (k) -> uacUpdateDTO.getCollectionInstrumentUrl());
-    payload.computeIfAbsent("case_ref", (k) -> caseUpdateDTO.getCaseRef());
-    payload.computeIfAbsent("ru_name", (k) -> "West Efford Cottage, y y y ??");
-
-    String responseId = encryptResponseId(questionnaireId, responseIdSalt);
-    payload.computeIfAbsent("response_id", (k) -> responseId);
-    payload.computeIfAbsent("account_service_url", (k) -> accountServiceUrl);
-    payload.computeIfAbsent("account_service_log_out_url", (k) -> accountServiceLogoutUrl);
-    payload.computeIfAbsent("channel", (k) -> "rh");
-    payload.computeIfAbsent("questionnaire_id", (k) -> questionnaireId);
+    payload.put("response_id", encryptResponseId(uacUpdateDTO.getQid(), responseIdSalt));
+    payload.put("account_service_url", accountServiceUrl);
+    payload.put("account_service_log_out_url", accountServiceLogoutUrl);
+    payload.put("channel", "rh");
+    payload.put("questionnaire_id", uacUpdateDTO.getQid());
 
     return payload;
+  }
+
+  private void validateData(CaseUpdateDTO caseUpdateDTO, String qid, String languageCode) {
+    verifyNotNull(
+        caseUpdateDTO.getCollectionExerciseId(),
+        "collection id",
+        UUID.fromString(caseUpdateDTO.getCaseId()));
+    verifyNotNull(qid, "questionnaireId", UUID.fromString(caseUpdateDTO.getCaseId()));
+    validateLanguageCode(languageCode);
   }
 
   private void verifyNotNull(Object fieldValue, String fieldName, UUID caseId) {
@@ -115,7 +118,8 @@ public class EqPayloadBuilder {
   }
 
   private void validateLanguageCode(String languageCode) {
-    if (!ALLOWED_LANGUAGE_CODES.contains(languageCode))
+    if (!ALLOWED_LANGUAGE_CODES.contains(languageCode)) {
       throw new RuntimeException("Invalid language code: '" + languageCode + "'");
+    }
   }
 }

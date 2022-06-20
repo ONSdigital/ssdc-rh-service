@@ -1,4 +1,4 @@
-package uk.gov.ons.ssdc.rhservice.crypto;
+package uk.gov.ons.ssdc.rhservice.model.dto;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;

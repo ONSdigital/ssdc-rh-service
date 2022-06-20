@@ -10,14 +10,13 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import java.util.Map;
+import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
 public class EncodeJws {
-  private final Key key;
   private final JWSHeader jwsHeader;
   private final RSASSASigner signer;
 
   public EncodeJws(Key key) {
-    this.key = key;
     this.jwsHeader = buildHeader(key);
     RSAKey jwk = (RSAKey) key.getJWK();
 

@@ -24,10 +24,10 @@ public class EqLaunchEndpoint {
   @GetMapping(value = "/{uacHash}")
   public ResponseEntity<String> generateEqLaunchToken(
       @PathVariable("uacHash") final String uacHash,
-      @RequestParam(required = true) String languageCode,
-      @RequestParam(required = true) String accountServiceUrl,
-      @RequestParam(required = true) String accountServiceLogoutUrl,
-      @RequestParam(required = true) String clientIP) {
+      @RequestParam String languageCode,
+      @RequestParam String accountServiceUrl,
+      @RequestParam String accountServiceLogoutUrl,
+      @RequestParam String clientIP) {
 
     uacService.validateUacHash(uacHash);
 

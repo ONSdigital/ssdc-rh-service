@@ -48,8 +48,6 @@ public class RHFirestoreDataPersist {
   }
 
   private boolean isRetryableFirestoreException(Exception e) {
-    boolean retryable = false;
-
     // Traverse the exception chain looking for a StatusRuntimeException
     Throwable t = e;
     while (t != null) {
@@ -69,6 +67,6 @@ public class RHFirestoreDataPersist {
       t = t.getCause();
     }
 
-    return retryable;
+    return false;
   }
 }

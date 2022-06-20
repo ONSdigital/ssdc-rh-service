@@ -6,15 +6,14 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
 @Component
 public class KeyStore {
 
   private final List<Key> keys;
 
-  @SuppressWarnings("deprecation")
   public KeyStore(@Value("${keystore}") String cryptoKeys) {
-
     ObjectMapper mapper = new ObjectMapper();
     try {
       keys = Arrays.stream(mapper.readValue(cryptoKeys, Key[].class)).toList();
