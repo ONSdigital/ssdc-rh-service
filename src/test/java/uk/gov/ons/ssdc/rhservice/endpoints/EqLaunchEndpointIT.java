@@ -36,6 +36,7 @@ class EqLaunchEndpointIT {
   public static final String UAC_HASH = "UAC_HASH";
   public static final String QID = "QID";
   public static final String CASE_ID = UUID.randomUUID().toString();
+  public static final String COLLEX_ID = UUID.randomUUID().toString();
 
   @LocalServerPort private int port;
 
@@ -45,18 +46,16 @@ class EqLaunchEndpointIT {
 
   @Autowired private UacRepository uacRepository;
 
-  @Autowired private KeyStore keyStore;
-
   @Value("${eqDecryptionKeyStore}")
   private String eqDecryptionKeyStore;
 
   @Test
   void testEqLaunchUrlSuccessfullyReturned()
-      throws UnirestException, JsonProcessingException, JsonProcessingException {
+      throws UnirestException, JsonProcessingException {
 
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(CASE_ID);
-    caseUpdateDTO.setCollectionExerciseId("COLLEX_ID");
+    caseUpdateDTO.setCollectionExerciseId(COLLEX_ID);
     caseRepository.writeCaseUpdate(caseUpdateDTO);
 
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
@@ -81,7 +80,9 @@ class EqLaunchEndpointIT {
 
     assertThat(tokenData)
         .containsEntry("case_id", CASE_ID)
-        .containsEntry("questionnaire_id", QID);
+        .containsEntry("questionnaire_id", QID)
+        .containsEntry("collection_exercise_sid", COLLEX_ID)
+        .containsEntry("language_code", "en");
 
     // TODO: Check if the authenicated message sent ot PubSub
   }
