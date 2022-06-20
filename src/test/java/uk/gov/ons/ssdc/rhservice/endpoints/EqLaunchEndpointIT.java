@@ -46,12 +46,11 @@ class EqLaunchEndpointIT {
 
   @Autowired private UacRepository uacRepository;
 
-  @Value("${eqDecryptionKeyStore}")
-  private String eqDecryptionKeyStore;
+  @Value("${eqDecryptKeys}")
+  private String eqDecryptKeys;
 
   @Test
-  void testEqLaunchUrlSuccessfullyReturned()
-      throws UnirestException, JsonProcessingException {
+  void testEqLaunchUrlSuccessfullyReturned() throws UnirestException, JsonProcessingException {
 
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId(CASE_ID);
@@ -92,7 +91,7 @@ class EqLaunchEndpointIT {
   }
 
   private String decryptToken(String token) {
-    KeyStore decryptionKeyStore = new KeyStore(eqDecryptionKeyStore);
+    KeyStore decryptionKeyStore = new KeyStore(eqDecryptKeys);
     JweDecryptor jweDecryptor = new JweDecryptor(decryptionKeyStore);
     return jweDecryptor.decrypt(token);
   }
