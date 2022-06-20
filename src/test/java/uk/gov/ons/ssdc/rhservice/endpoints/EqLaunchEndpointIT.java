@@ -74,13 +74,14 @@ class EqLaunchEndpointIT {
             .asString();
 
     assertThat(response.getStatus()).isEqualTo(OK.value());
-//    assertThat(response.getBody())
-//        .startsWith(
-//            "eyJraWQiOiJiYzI2Yjc4MGFhNDZmMDUzMjkxYmExMjIwNjJlNjA3NTY1NmMyMzQ1IiwiZW5jIjoiQTI1NkdDTSIsImFsZyI6IlJTQS1PQUVQIn0");
+    //    assertThat(response.getBody())
+    //        .startsWith(
+    //
+    // "eyJraWQiOiJiYzI2Yjc4MGFhNDZmMDUzMjkxYmExMjIwNjJlNjA3NTY1NmMyMzQ1IiwiZW5jIjoiQTI1NkdDTSIsImFsZyI6IlJTQS1PQUVQIn0");
 
     String decryptedToken = decryptToken(response.getBody());
 
-//        assertThat(decryptToken(response.getBody())).isEqualTo("blah");
+//    assertThat(decryptToken(response.getBody())).isEqualTo("blah");
 
     // TODO: Check if the authenicated message sent ot PubSub
   }
@@ -90,11 +91,7 @@ class EqLaunchEndpointIT {
   }
 
   private String decryptToken(String token) {
-    KeyStore decryptionKeyStore = new KeyStore();
-    Keys keys = setUpKeys(eqDecryptKeys);
-
-    ReflectionTestUtils.setField(decryptionKeyStore, "keys", keys);
-
+    KeyStore decryptionKeyStore = new KeyStore(eqDecryptKeys);
     JweDecryptor jweDecryptor = new JweDecryptor(decryptionKeyStore);
     return jweDecryptor.decrypt(token);
   }
