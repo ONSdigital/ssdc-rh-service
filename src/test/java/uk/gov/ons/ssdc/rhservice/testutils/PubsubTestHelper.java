@@ -1,11 +1,17 @@
 package uk.gov.ons.ssdc.rhservice.testutils;
 
+import static com.google.cloud.spring.pubsub.support.PubSubSubscriptionUtils.toProjectSubscriptionName;
 import static com.google.cloud.spring.pubsub.support.PubSubTopicUtils.toProjectTopicName;
 import static uk.gov.ons.ssdc.rhservice.testutils.TestConstants.OUR_PUBSUB_PROJECT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.cloud.spring.autoconfigure.pubsub.GcpPubSubProperties;
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
+
+import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -27,7 +33,7 @@ import uk.gov.ons.ssdc.rhservice.utils.ObjectMapperFactory;
 @Component
 @ActiveProfiles("test")
 @EnableRetry
-public class PubsubHelper {
+public class PubsubTestHelper {
   @Qualifier("pubSubTemplateForIntegrationTests")
   @Autowired
   private PubSubTemplate pubSubTemplate;
@@ -95,6 +101,36 @@ public class PubsubHelper {
       }
     }
   }
+
+  public <T> QueueSpy sharedProjectListen(String subscription, Class<T> contentClass) {
+    String fullyQualifiedSubscription =
+            toProjectSubscriptionName(subscription, sharedPubsubProject).toString();
+    return listen(fullyQualifiedSubscription, contentClass);
+  }
+
+  public <T> QueueSpy listen(String subscription, Class<T> contentClass) {
+    BlockingQueue<T> queue = new ArrayBlockingQueue(50);
+    Subscriber subscriber =
+            pubSubTemplate.subscribe(
+                    subscription,
+                    message -> {
+                      try {
+                        T messageObject =
+                                objectMapper.readValue(
+                                        message.getPubsubMessage().getData().toByteArray(), contentClass);
+                        queue.add(messageObject);
+                        message.ack();
+                      } catch (IOException e) {
+                        System.out.println("ERROR: Cannot unmarshal bad data on PubSub subscription");
+                      } finally {
+                        // Always want to ack, to get rid of dodgy messages
+                        message.ack();
+                      }
+                    });
+
+    return new QueueSpy(queue, subscriber);
+  }
+
 
   @Data
   @AllArgsConstructor

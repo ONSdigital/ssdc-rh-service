@@ -18,7 +18,7 @@ import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.testutils.FireStorePoller;
-import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
+import uk.gov.ons.ssdc.rhservice.testutils.PubsubTestHelper;
 
 @ContextConfiguration
 @ActiveProfiles("test")
@@ -28,7 +28,7 @@ class UacUpdateReceiverIT {
   @Value("${queueconfig.uac-update-topic}")
   private String uacUpdateTopic;
 
-  @Autowired private PubsubHelper pubsubHelper;
+  @Autowired private PubsubTestHelper pubsubTestHelper;
 
   @Autowired private FireStorePoller fireStorePoller;
 
@@ -49,7 +49,7 @@ class UacUpdateReceiverIT {
     event.setPayload(payloadDTO);
 
     // WHEN
-    pubsubHelper.sendMessageToSharedProject(uacUpdateTopic, event);
+    pubsubTestHelper.sendMessageToSharedProject(uacUpdateTopic, event);
 
     // THEN
     Optional<UacUpdateDTO> uacOpt = fireStorePoller.getUacByHash(uacUpdateDTO.getUacHash());

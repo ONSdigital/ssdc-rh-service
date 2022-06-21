@@ -8,3 +8,6 @@ curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/e
 
 curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/topics/event_case-update
 curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/event_case-update_rh -H 'Content-Type: application/json' -d '{"topic": "projects/shared-project/topics/event_case-update"}'
+
+curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/topics/event_uac-authentication
+curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/event_uac_authentication_rh -H 'Content-Type: application/json' -d '{"topic": "projects/shared-project/topics/event_uac-authentication"}'
