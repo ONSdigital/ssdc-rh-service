@@ -9,15 +9,22 @@ import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSAEncrypter;
 import com.nimbusds.jose.jwk.RSAKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
+import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.stringToKey;
+
+@Service
 public class EncryptJwe {
   private final JWEHeader jweHeader;
   private final RSAEncrypter encryptor;
 
-  public EncryptJwe(Key key) {
-    this.jweHeader = buildHeader(key);
-    RSAKey jwk = (RSAKey) key.getJWK();
+  public EncryptJwe(@Value("${jwe_key}") String jws_key_str) {
+    Key jws_public_key = stringToKey(jws_key_str);
+
+    this.jweHeader = buildHeader(jws_public_key);
+    RSAKey jwk = (RSAKey) jws_public_key.getJWK();
 
     try {
       encryptor = new RSAEncrypter(jwk);
