@@ -41,7 +41,6 @@ public class EqPayloadBuilder {
 
     long currentTimeInSeconds = System.currentTimeMillis() / 1000;
 
-    //RM presuming this is expiration time
     long exp_time =  currentTimeInSeconds + (5 * 60);
 
     LinkedHashMap<String, Object> payload = new LinkedHashMap<>();
@@ -62,7 +61,6 @@ public class EqPayloadBuilder {
     payload.put("schema_name", "zzz_9999");
     payload.put("survey_url", uacUpdateDTO.getCollectionInstrumentUrl());
     payload.put("case_ref", caseUpdateDTO.getCaseRef());
-    payload.put("ru_name", "West Efford Cottage, y y y ??");
 
     payload.put("response_id", encryptResponseId(uacUpdateDTO.getQid(), responseIdSalt));
     payload.put("account_service_url", accountServiceUrl);
