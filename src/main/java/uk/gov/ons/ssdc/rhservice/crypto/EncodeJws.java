@@ -1,7 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.auto.value.extension.serializable.SerializableAutoValue;
+import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.stringToKey;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -11,55 +11,50 @@ import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.shaded.json.JSONObject;
-
 import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
-import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.stringToKey;
-
 @Service
 public class EncodeJws {
-    private final JWSHeader jwsHeader;
-    private final RSASSASigner signer;
+  private final JWSHeader jwsHeader;
+  private final RSASSASigner signer;
 
-    public EncodeJws(@Value("${jws_key}") String jws_key_str) {
-        Key jws_private_key = stringToKey(jws_key_str);
+  public EncodeJws(@Value("${jws_key}") String jws_key_str) {
+    Key jws_private_key = stringToKey(jws_key_str);
 
-        this.jwsHeader = buildHeader(jws_private_key);
-        RSAKey jwk = (RSAKey) jws_private_key.getJWK();
+    this.jwsHeader = buildHeader(jws_private_key);
+    RSAKey jwk = (RSAKey) jws_private_key.getJWK();
 
-        try {
-            this.signer = new RSASSASigner(jwk);
-        } catch (JOSEException e) {
-            throw new RuntimeException("Failed to create private JWSSigner to sign claims");
-        }
+    try {
+      this.signer = new RSASSASigner(jwk);
+    } catch (JOSEException e) {
+      throw new RuntimeException("Failed to create private JWSSigner to sign claims");
     }
+  }
 
-    public JWSObject encode(Map<String, Object> claims) {
-        Payload jwsClaims = buildClaims(claims);
-        JWSObject jwsObject = new JWSObject(jwsHeader, jwsClaims);
+  public JWSObject encode(Map<String, Object> claims) {
+    Payload jwsClaims = buildClaims(claims);
+    JWSObject jwsObject = new JWSObject(jwsHeader, jwsClaims);
 
-        try {
-            jwsObject.sign(this.signer);
-            return jwsObject;
-        } catch (JOSEException e) {
-            throw new RuntimeException("Failed to sign claims");
-        }
+    try {
+      jwsObject.sign(this.signer);
+      return jwsObject;
+    } catch (JOSEException e) {
+      throw new RuntimeException("Failed to sign claims");
     }
+  }
 
-    private JWSHeader buildHeader(Key key) {
-        return new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .type(JOSEObjectType.JWT)
-                .keyID(key.getKeyId())
-                .build();
-    }
+  private JWSHeader buildHeader(Key key) {
+    return new JWSHeader.Builder(JWSAlgorithm.RS256)
+        .type(JOSEObjectType.JWT)
+        .keyID(key.getKeyId())
+        .build();
+  }
 
-    private Payload buildClaims(Map<String, Object> claims) {
-        JSONObject jsonObject = new JSONObject(claims);
-        return new Payload(jsonObject);
-    }
+  private Payload buildClaims(Map<String, Object> claims) {
+    JSONObject jsonObject = new JSONObject(claims);
+    return new Payload(jsonObject);
+  }
 }

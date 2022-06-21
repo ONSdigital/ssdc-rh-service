@@ -41,7 +41,7 @@ public class EqPayloadBuilder {
 
     long currentTimeInSeconds = System.currentTimeMillis() / 1000;
 
-    long exp_time =  currentTimeInSeconds + (5 * 60);
+    long exp_time = currentTimeInSeconds + (5 * 60);
 
     LinkedHashMap<String, Object> payload = new LinkedHashMap<>();
 
