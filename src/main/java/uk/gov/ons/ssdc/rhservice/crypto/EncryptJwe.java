@@ -20,11 +20,11 @@ public class EncryptJwe {
   private final JWEHeader jweHeader;
   private final RSAEncrypter encryptor;
 
-  public EncryptJwe(@Value("${jwe_key}") String jws_key_str) {
-    Key jws_public_key = stringToKey(jws_key_str);
+  public EncryptJwe(@Value("${jwe_key}") String jwsKeyStr) {
+    Key jwsPublicKey = stringToKey(jwsKeyStr);
 
-    this.jweHeader = buildHeader(jws_public_key);
-    RSAKey jwk = (RSAKey) jws_public_key.getJWK();
+    this.jweHeader = buildHeader(jwsPublicKey);
+    RSAKey jwk = (RSAKey) jwsPublicKey.getJWK();
 
     try {
       encryptor = new RSAEncrypter(jwk);

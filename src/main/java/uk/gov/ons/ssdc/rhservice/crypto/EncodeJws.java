@@ -21,11 +21,11 @@ public class EncodeJws {
   private final JWSHeader jwsHeader;
   private final RSASSASigner signer;
 
-  public EncodeJws(@Value("${jws_key}") String jws_key_str) {
-    Key jws_private_key = stringToKey(jws_key_str);
+  public EncodeJws(@Value("${jws_key}") String jwsKeyStr) {
+    Key jwsPrivateKey = stringToKey(jwsKeyStr);
 
-    this.jwsHeader = buildHeader(jws_private_key);
-    RSAKey jwk = (RSAKey) jws_private_key.getJWK();
+    this.jwsHeader = buildHeader(jwsPrivateKey);
+    RSAKey jwk = (RSAKey) jwsPrivateKey.getJWK();
 
     try {
       this.signer = new RSASSASigner(jwk);

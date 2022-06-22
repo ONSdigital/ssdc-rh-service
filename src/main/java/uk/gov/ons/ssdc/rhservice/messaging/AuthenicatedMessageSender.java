@@ -1,4 +1,4 @@
-package uk.gov.ons.ssdc.rhservice.service;
+package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.convertObjectToJson;
 

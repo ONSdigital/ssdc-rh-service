@@ -1,9 +1,10 @@
-package uk.gov.ons.ssdc.rhservice.service;
+package uk.gov.ons.ssdc.rhservice.messaging;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static uk.gov.ons.ssdc.rhservice.service.AuthenicatedMessageSender.OUTBOUND_EVENT_SCHEMA_VERSION;
+import static uk.gov.ons.ssdc.rhservice.messaging.AuthenicatedMessageSender.OUTBOUND_EVENT_SCHEMA_VERSION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.OffsetDateTime;

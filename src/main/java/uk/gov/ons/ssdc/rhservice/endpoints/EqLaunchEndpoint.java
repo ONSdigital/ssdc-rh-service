@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ssdc.rhservice.crypto.EncodeJws;
 import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
-import uk.gov.ons.ssdc.rhservice.service.AuthenicatedMessageSender;
+import uk.gov.ons.ssdc.rhservice.messaging.AuthenicatedMessageSender;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
 import uk.gov.ons.ssdc.rhservice.service.UacService;
 
