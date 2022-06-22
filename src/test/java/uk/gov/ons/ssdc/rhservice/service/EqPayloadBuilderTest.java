@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,18 +39,11 @@ class EqPayloadBuilderTest {
     // Given
     ReflectionTestUtils.setField(underTest, "responseIdSalt", "TEST");
 
-    UacUpdateDTO uacUpdate = new UacUpdateDTO();
-    uacUpdate.setUacHash("UAC_HASH");
-    uacUpdate.setCaseId(UUID.randomUUID().toString());
-    uacUpdate.setQid("QID");
-    uacUpdate.setCollectionInstrumentUrl("test.com");
+    UacUpdateDTO uacUpdate = getUacUpdate();
     Optional<UacUpdateDTO> uacOpt = Optional.of(uacUpdate);
     when(uacRepository.readUAC(uacUpdate.getUacHash())).thenReturn(uacOpt);
 
-    CaseUpdateDTO caseUpdate = new CaseUpdateDTO();
-    caseUpdate.setCaseId(uacUpdate.getCaseId());
-    caseUpdate.setCollectionExerciseId(UUID.randomUUID().toString());
-    caseUpdate.setCaseRef("CASE_REF");
+    CaseUpdateDTO caseUpdate = getCaseUpdate(uacUpdate);
     Optional<CaseUpdateDTO> caseOpt = Optional.of(caseUpdate);
     when(caseRepository.readCaseUpdate(uacUpdate.getCaseId())).thenReturn(caseOpt);
 
@@ -58,7 +53,7 @@ class EqPayloadBuilderTest {
             uacUpdate.getUacHash(), ACCOUNT_SERVICE_URL, ACCOUNT_SERVICE_LOGOUT_URL, LANGUAGE_CODE);
 
     // Then
-    String expectedEncryptedResponseId = "QIDdd6d792814af2084";
+    String expectedEncryptedResponseId = "TEST_QIDa8410f66014e5778";
     assertThat(eqPayload)
         .containsKey("jti")
         .containsKey("tx_id")
@@ -98,8 +93,7 @@ class EqPayloadBuilderTest {
   @Test
   void testGetCaseWithEmptyCaseIdFailure() {
     // Given
-    UacUpdateDTO uacUpdate = new UacUpdateDTO();
-    uacUpdate.setUacHash("UAC_HASH");
+    UacUpdateDTO uacUpdate = getUacUpdate();
     uacUpdate.setCaseId(null);
     Optional<UacUpdateDTO> uacOpt = Optional.of(uacUpdate);
     when(uacRepository.readUAC(uacUpdate.getUacHash())).thenReturn(uacOpt);
@@ -119,9 +113,7 @@ class EqPayloadBuilderTest {
   @Test
   void testCaseNotFoundFailure() {
     // Given
-    UacUpdateDTO uacUpdate = new UacUpdateDTO();
-    uacUpdate.setUacHash("UAC_HASH");
-    uacUpdate.setCaseId(UUID.randomUUID().toString());
+    UacUpdateDTO uacUpdate = getUacUpdate();
     Optional<UacUpdateDTO> uacOpt = Optional.of(uacUpdate);
     when(uacRepository.readUAC(uacUpdate.getUacHash())).thenReturn(uacOpt);
 
@@ -140,14 +132,11 @@ class EqPayloadBuilderTest {
   @Test
   void testValidateEmptyCollectionExerciseIdFailure() {
     // Given
-    UacUpdateDTO uacUpdate = new UacUpdateDTO();
-    uacUpdate.setCaseId("UAC_HASH");
-    uacUpdate.setCaseId(UUID.randomUUID().toString());
+    UacUpdateDTO uacUpdate = getUacUpdate();
     Optional<UacUpdateDTO> uacOpt = Optional.of(uacUpdate);
     when(uacRepository.readUAC(uacUpdate.getUacHash())).thenReturn(uacOpt);
 
-    CaseUpdateDTO caseUpdate = new CaseUpdateDTO();
-    caseUpdate.setCaseId(uacUpdate.getCaseId());
+    CaseUpdateDTO caseUpdate = getCaseUpdate(uacUpdate);
     caseUpdate.setCollectionExerciseId(null);
     Optional<CaseUpdateDTO> caseOpt = Optional.of(caseUpdate);
     when(caseRepository.readCaseUpdate(uacUpdate.getCaseId())).thenReturn(caseOpt);
@@ -170,16 +159,12 @@ class EqPayloadBuilderTest {
   @Test
   void testValidateEmptyQidFailure() {
     // Given
-    UacUpdateDTO uacUpdate = new UacUpdateDTO();
-    uacUpdate.setCaseId("UAC_HASH");
-    uacUpdate.setCaseId(UUID.randomUUID().toString());
+    UacUpdateDTO uacUpdate = getUacUpdate();
     uacUpdate.setQid(null);
     Optional<UacUpdateDTO> uacOpt = Optional.of(uacUpdate);
     when(uacRepository.readUAC(uacUpdate.getUacHash())).thenReturn(uacOpt);
 
-    CaseUpdateDTO caseUpdate = new CaseUpdateDTO();
-    caseUpdate.setCaseId(uacUpdate.getCaseId());
-    caseUpdate.setCollectionExerciseId(UUID.randomUUID().toString());
+    CaseUpdateDTO caseUpdate = getCaseUpdate(uacUpdate);
     Optional<CaseUpdateDTO> caseOpt = Optional.of(caseUpdate);
     when(caseRepository.readCaseUpdate(uacUpdate.getCaseId())).thenReturn(caseOpt);
 
@@ -200,23 +185,17 @@ class EqPayloadBuilderTest {
   @Test
   void testValidateLanguageCodeFailure() {
     // Given
-    UacUpdateDTO uacUpdate = new UacUpdateDTO();
-    uacUpdate.setCaseId("UAC_HASH");
-    uacUpdate.setCaseId(UUID.randomUUID().toString());
-    uacUpdate.setQid("QID");
+    UacUpdateDTO uacUpdate = getUacUpdate();
     Optional<UacUpdateDTO> uacOpt = Optional.of(uacUpdate);
     when(uacRepository.readUAC(uacUpdate.getUacHash())).thenReturn(uacOpt);
 
-    CaseUpdateDTO caseUpdate = new CaseUpdateDTO();
-    caseUpdate.setCaseId(uacUpdate.getCaseId());
-    caseUpdate.setCollectionExerciseId(UUID.randomUUID().toString());
+    CaseUpdateDTO caseUpdate = getCaseUpdate(uacUpdate);
     Optional<CaseUpdateDTO> caseOpt = Optional.of(caseUpdate);
     when(caseRepository.readCaseUpdate(uacUpdate.getCaseId())).thenReturn(caseOpt);
 
-    String invalidLanguageCode = "Invalid Language code";
-
     // When, Then
     String uacHash = uacUpdate.getUacHash();
+    String invalidLanguageCode = "Invalid Language code";
     RuntimeException thrownException =
         assertThrows(
             RuntimeException.class,
@@ -225,5 +204,45 @@ class EqPayloadBuilderTest {
                     uacHash, ACCOUNT_SERVICE_URL, ACCOUNT_SERVICE_LOGOUT_URL, invalidLanguageCode));
     assertThat(thrownException.getMessage())
         .isEqualTo(String.format("Invalid language code: '%s'", invalidLanguageCode));
+  }
+
+  private CaseUpdateDTO getCaseUpdate(UacUpdateDTO uacUpdate) {
+    CaseUpdateDTO caseUpdate = new CaseUpdateDTO();
+
+    caseUpdate.setCaseId(uacUpdate.getCaseId());
+    caseUpdate.setSurveyId(uacUpdate.getSurveyId());
+    caseUpdate.setCollectionExerciseId(uacUpdate.getCollectionExerciseId());
+    caseUpdate.setInvalid(false);
+    caseUpdate.setRefusalReceived(null);
+
+    Map<String, String> sample = new HashMap<>();
+    sample.put("ADDRESS_LINE1", "123 Fake Street");
+    caseUpdate.setSample(sample);
+
+    Map<String, String> sampleSensitive = new HashMap<>();
+    sampleSensitive.put("Telephone", "020712345");
+    caseUpdate.setSampleSensitive(sampleSensitive);
+
+    caseUpdate.setCaseRef("CASE_REF");
+    caseUpdate.setCreatedAt(new Date(System.currentTimeMillis()));
+    caseUpdate.setLastUpdatedAt(null);
+
+    return caseUpdate;
+  }
+
+  private UacUpdateDTO getUacUpdate() {
+    UacUpdateDTO uacUpdate = new UacUpdateDTO();
+
+    uacUpdate.setCaseId(UUID.randomUUID().toString());
+    uacUpdate.setCollectionExerciseId(UUID.randomUUID().toString());
+    uacUpdate.setSurveyId("TEST_SURVEY");
+    uacUpdate.setCollectionInstrumentUrl("test.com");
+    uacUpdate.setActive(true);
+    uacUpdate.setUacHash("TEST_UAC_HASH");
+    uacUpdate.setQid("TEST_QID");
+    uacUpdate.setReceiptReceived(false);
+    uacUpdate.setEqLaunched(false);
+
+    return uacUpdate;
   }
 }
