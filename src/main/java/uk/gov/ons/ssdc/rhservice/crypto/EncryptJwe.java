@@ -29,7 +29,7 @@ public class EncryptJwe {
     try {
       encryptor = new RSAEncrypter(jwk);
     } catch (JOSEException e) {
-      throw new RuntimeException("Cannot initialise encryption for JWE");
+      throw new RuntimeException("Cannot initialise encryption for JWE", e);
     }
   }
 
@@ -41,7 +41,7 @@ public class EncryptJwe {
       jweObject.encrypt(this.encryptor);
       return jweObject.serialize();
     } catch (JOSEException e) {
-      throw new RuntimeException("Failed to encrypt JWE");
+      throw new RuntimeException("Failed to encrypt JWE", e);
     }
   }
 

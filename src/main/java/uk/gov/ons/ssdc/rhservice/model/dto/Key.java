@@ -15,7 +15,7 @@ public class Key {
     try {
       return JWK.parseFromPEMEncodedObjects(value);
     } catch (JOSEException ex) {
-      throw new RuntimeException("Could not parse key value");
+      throw new RuntimeException("Could not parse key value", ex);
     }
   }
 }

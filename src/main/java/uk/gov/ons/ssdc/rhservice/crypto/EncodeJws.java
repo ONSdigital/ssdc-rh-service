@@ -30,7 +30,7 @@ public class EncodeJws {
     try {
       this.signer = new RSASSASigner(jwk);
     } catch (JOSEException e) {
-      throw new RuntimeException("Failed to create private JWSSigner to sign claims");
+      throw new RuntimeException("Failed to create private JWSSigner to sign claims", e);
     }
   }
 
@@ -42,7 +42,7 @@ public class EncodeJws {
       jwsObject.sign(this.signer);
       return jwsObject;
     } catch (JOSEException e) {
-      throw new RuntimeException("Failed to sign claims");
+      throw new RuntimeException("Failed to sign claims", e);
     }
   }
 
