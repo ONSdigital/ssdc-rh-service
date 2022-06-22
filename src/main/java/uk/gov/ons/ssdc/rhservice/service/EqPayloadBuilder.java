@@ -37,18 +37,18 @@ public class EqPayloadBuilder {
       String languageCode) {
     UacUpdateDTO uacUpdateDTO = getUacFromHash(uacHash);
     CaseUpdateDTO caseUpdateDTO = getCaseFromUac(uacUpdateDTO.getCaseId());
-    validateData(caseUpdateDTO, uacUpdateDTO.getQid(), languageCode);
+    validateData(caseUpdateDTO, uacUpdateDTO, languageCode);
 
     long currentTimeInSeconds = System.currentTimeMillis() / 1000;
 
-    long exp_time = currentTimeInSeconds + (5 * 60);
+    long expTime = currentTimeInSeconds + (5 * 60);
 
     LinkedHashMap<String, Object> payload = new LinkedHashMap<>();
 
     payload.put("jti", UUID.randomUUID().toString());
     payload.put("tx_id", UUID.randomUUID().toString());
     payload.put("iat", currentTimeInSeconds);
-    payload.put("exp", exp_time);
+    payload.put("exp", expTime);
     payload.put("collection_exercise_sid", caseUpdateDTO.getCollectionExerciseId());
 
     payload.put("ru_ref", uacUpdateDTO.getQid());
@@ -71,19 +71,23 @@ public class EqPayloadBuilder {
     return payload;
   }
 
-  private void validateData(CaseUpdateDTO caseUpdateDTO, String qid, String languageCode) {
-    verifyNotNull(
-        caseUpdateDTO.getCollectionExerciseId(),
-        "collection id",
-        UUID.fromString(caseUpdateDTO.getCaseId()));
-    verifyNotNull(qid, "questionnaireId", UUID.fromString(caseUpdateDTO.getCaseId()));
-    validateLanguageCode(languageCode);
-  }
+  private void validateData(
+      CaseUpdateDTO caseUpdateDTO, UacUpdateDTO uacUpdateDTO, String languageCode) {
+    String collectionExerciseId = caseUpdateDTO.getCollectionExerciseId();
+    String caseId = caseUpdateDTO.getCaseId();
 
-  private void verifyNotNull(Object fieldValue, String fieldName, UUID caseId) {
-    if (fieldValue == null) {
-      throw new RuntimeException("No value supplied for " + fieldName + " field of case " + caseId);
+    if (StringUtils.isEmpty(collectionExerciseId)) {
+      throw new RuntimeException(
+          String.format(
+              "collectionExerciseId '%s' not found for caseId '%s'", collectionExerciseId, caseId));
     }
+
+    String qid = uacUpdateDTO.getQid();
+    if (StringUtils.isEmpty(qid)) {
+      throw new RuntimeException(String.format("QID '%s' not found for caseId '%s'", qid, caseId));
+    }
+
+    validateLanguageCode(languageCode);
   }
 
   private String encryptResponseId(String questionnaireId, String salt) {
@@ -106,7 +110,7 @@ public class EqPayloadBuilder {
 
     return caseRepository
         .readCaseUpdate(caseId)
-        .orElseThrow(() -> new RuntimeException("Case Not Found"));
+        .orElseThrow(() -> new RuntimeException(String.format("caseId '%s' not found", caseId)));
   }
 
   private UacUpdateDTO getUacFromHash(String uacHash) {
@@ -117,7 +121,7 @@ public class EqPayloadBuilder {
 
   private void validateLanguageCode(String languageCode) {
     if (!ALLOWED_LANGUAGE_CODES.contains(languageCode)) {
-      throw new RuntimeException("Invalid language code: '" + languageCode + "'");
+      throw new RuntimeException(String.format("Invalid language code: '%s'", languageCode));
     }
   }
 }
