@@ -124,18 +124,16 @@
             <version>9.23</version>
         </dependency>
 
-<!--        TODO: Try upping version and see if it works -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.66</version>
+            <version>1.70</version>
         </dependency>
 
-        <!--        TODO: Try upping version and see if it works -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.64</version>
+            <version>1.70</version>
         </dependency>
 
         <!-- Test Dependencies below this point -->
