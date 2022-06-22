@@ -11,16 +11,16 @@ import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @MessageEndpoint
 public class UacUpdateReceiver {
-  private final UacRepository respondentUacRepo;
+  private final UacRepository uacRepository;
 
-  public UacUpdateReceiver(UacRepository respondentUacRepo) {
-    this.respondentUacRepo = respondentUacRepo;
+  public UacUpdateReceiver(UacRepository uacRepository) {
+    this.uacRepository = uacRepository;
   }
 
   @ServiceActivator(inputChannel = "uacUpdateInputChannel", adviceChain = "retryAdvice")
   public void receiveMessage(Message<byte[]> message) {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
     UacUpdateDTO uacUpdateDTO = event.getPayload().getUacUpdate();
-    respondentUacRepo.writeUAC(uacUpdateDTO);
+    uacRepository.writeUAC(uacUpdateDTO);
   }
 }
