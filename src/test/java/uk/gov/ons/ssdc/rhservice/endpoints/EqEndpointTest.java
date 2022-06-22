@@ -1,26 +1,26 @@
-//package uk.gov.ons.ssdc.rhservice.endpoints;
+// package uk.gov.ons.ssdc.rhservice.endpoints;
 //
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.springframework.http.MediaType;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.MvcResult;
-//import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+// import org.junit.jupiter.api.AfterEach;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.mockito.InjectMocks;
+// import org.mockito.Mock;
+// import org.springframework.http.MediaType;
+// import org.springframework.test.web.servlet.MockMvc;
+// import org.springframework.test.web.servlet.MvcResult;
+// import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 //
-//import java.util.Map;
+// import java.util.Map;
 //
-//import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.Mockito.reset;
-//import static org.mockito.Mockito.when;
-//import static org.mockito.MockitoAnnotations.initMocks;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
+// import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+// import static org.mockito.ArgumentMatchers.any;
+// import static org.mockito.Mockito.reset;
+// import static org.mockito.Mockito.when;
+// import static org.mockito.MockitoAnnotations.initMocks;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 //
-//public class CaseEndpointUnitTest {
+// public class CaseEndpointUnitTest {
 //    private MockMvc mockMvc;
 //
 ////    @Mock
@@ -53,7 +53,8 @@
 //
 //        // Then
 //        CaseContainerDTO responseCaseDTO =
-//                mapper.readValue(result.getResponse().getContentAsString(), CaseContainerDTO.class);
+//                mapper.readValue(result.getResponse().getContentAsString(),
+// CaseContainerDTO.class);
 //        Case responseCase = new Case();
 //        responseCase.setCaseRef(Long.parseLong(responseCaseDTO.getCaseRef()));
 //        responseCase.setId(responseCaseDTO.getId());
