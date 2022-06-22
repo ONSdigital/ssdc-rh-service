@@ -13,12 +13,12 @@ import java.text.ParseException;
 import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
 public class DecryptJwt {
-  public static JWSObject decryptJwe(String jwe, String key_str) {
+  public static JWSObject decryptJwe(String token, String key_str) {
     Key jwe_key = stringToKey(key_str);
 
     JWEObject jweObject;
     try {
-      jweObject = JWEObject.parse(jwe);
+      jweObject = JWEObject.parse(token);
     } catch (ParseException e) {
       throw new RuntimeException("Failed to parse JWE string");
     }

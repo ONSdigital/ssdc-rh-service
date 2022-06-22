@@ -38,7 +38,7 @@ public class EqLaunchEndpointTest {
   @InjectMocks private EqLaunchEndpoint underTest;
 
   @Test
-  public void getCaseReturnsExpectedCaseFields() throws Exception {
+  public void testCallingEndpointGetsToken() {
     // Given
     Map<String, Object> payload = new HashMap<>();
     JWSObject jwsObject = Mockito.mock(JWSObject.class);
@@ -64,5 +64,6 @@ public class EqLaunchEndpointTest {
         .buildEqPayloadMap(uacHash, accountServiceUrl, accountServiceLogoutUrl, languageCode);
     verify(encodeJws).encode(payload);
     verify(encryptJwe).encrypt(jwsObject);
+    verify(authenicatedMessageSender).buildAndSendUacAuthentication(any());
   }
 }
