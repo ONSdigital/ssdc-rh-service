@@ -5,14 +5,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.gov.ons.ssdc.rhservice.service.AuthenicatedMessageSender.OUTBOUND_EVENT_SCHEMA_VERSION;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -49,7 +47,8 @@ class AuthenicatedMessageSenderTest {
     ArgumentCaptor<String> eventArgCaptor = ArgumentCaptor.forClass(String.class);
     verify(pubsubHelper).sendMessageToSharedProject(eq(TEST_TOPIC), eventArgCaptor.capture());
 
-    EventDTO eventDTO = ObjectMapperFactory.objectMapper().readValue(eventArgCaptor.getValue(), EventDTO.class);
+    EventDTO eventDTO =
+        ObjectMapperFactory.objectMapper().readValue(eventArgCaptor.getValue(), EventDTO.class);
 
     EventHeaderDTO eventHeaderDTO = eventDTO.getHeader();
     assertThat(eventHeaderDTO.getVersion()).isEqualTo(OUTBOUND_EVENT_SCHEMA_VERSION);
