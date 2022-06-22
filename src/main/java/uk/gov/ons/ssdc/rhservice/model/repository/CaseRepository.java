@@ -22,7 +22,7 @@ public class CaseRepository {
     rhFirestoreClient.storeObject(caseSchemaName, id, caseUpdate);
   }
 
-  public Optional<CaseUpdateDTO> readCaseUpdate(final String caseId) {
+  public Optional<CaseUpdateDTO> readCaseUpdate(String caseId) {
     return rhFirestoreClient.retrieveObject(CaseUpdateDTO.class, caseSchemaName, caseId);
   }
 }

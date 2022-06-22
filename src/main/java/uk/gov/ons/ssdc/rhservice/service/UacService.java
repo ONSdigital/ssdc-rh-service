@@ -30,7 +30,5 @@ public class UacService {
     caseRepository
         .readCaseUpdate(caseId)
         .orElseThrow(() -> new RuntimeException("Case Not Found for UAC"));
-
-    return;
   }
 }
