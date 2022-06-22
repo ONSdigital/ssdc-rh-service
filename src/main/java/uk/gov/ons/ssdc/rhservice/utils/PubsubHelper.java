@@ -1,6 +1,12 @@
 package uk.gov.ons.ssdc.rhservice.utils;
 
+import static com.google.cloud.spring.pubsub.support.PubSubTopicUtils.toProjectTopicName;
+
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
@@ -9,19 +15,11 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static com.google.cloud.spring.pubsub.support.PubSubTopicUtils.toProjectTopicName;
-
 @Component
 @EnableRetry
 public class PubsubHelper {
 
-  @Autowired
-  private PubSubTemplate pubSubTemplate;
+  @Autowired private PubSubTemplate pubSubTemplate;
 
   @Value("${queueconfig.shared-pubsub-project}")
   private String sharedPubsubProject;

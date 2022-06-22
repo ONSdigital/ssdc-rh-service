@@ -1,13 +1,12 @@
 package uk.gov.ons.ssdc.rhservice.testutils;
 
-import com.google.cloud.pubsub.v1.Subscriber;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.google.cloud.pubsub.v1.Subscriber;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.assertNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
 public class QueueSpy<T> implements AutoCloseable {

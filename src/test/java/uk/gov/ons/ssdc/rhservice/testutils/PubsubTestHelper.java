@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.cloud.spring.autoconfigure.pubsub.GcpPubSubProperties;
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
-
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -104,33 +103,32 @@ public class PubsubTestHelper {
 
   public <T> QueueSpy sharedProjectListen(String subscription, Class<T> contentClass) {
     String fullyQualifiedSubscription =
-            toProjectSubscriptionName(subscription, sharedPubsubProject).toString();
+        toProjectSubscriptionName(subscription, sharedPubsubProject).toString();
     return listen(fullyQualifiedSubscription, contentClass);
   }
 
   public <T> QueueSpy listen(String subscription, Class<T> contentClass) {
     BlockingQueue<T> queue = new ArrayBlockingQueue(50);
     Subscriber subscriber =
-            pubSubTemplate.subscribe(
-                    subscription,
-                    message -> {
-                      try {
-                        T messageObject =
-                                objectMapper.readValue(
-                                        message.getPubsubMessage().getData().toByteArray(), contentClass);
-                        queue.add(messageObject);
-                        message.ack();
-                      } catch (IOException e) {
-                        System.out.println("ERROR: Cannot unmarshal bad data on PubSub subscription");
-                      } finally {
-                        // Always want to ack, to get rid of dodgy messages
-                        message.ack();
-                      }
-                    });
+        pubSubTemplate.subscribe(
+            subscription,
+            message -> {
+              try {
+                T messageObject =
+                    objectMapper.readValue(
+                        message.getPubsubMessage().getData().toByteArray(), contentClass);
+                queue.add(messageObject);
+                message.ack();
+              } catch (IOException e) {
+                System.out.println("ERROR: Cannot unmarshal bad data on PubSub subscription");
+              } finally {
+                // Always want to ack, to get rid of dodgy messages
+                message.ack();
+              }
+            });
 
     return new QueueSpy(queue, subscriber);
   }
-
 
   @Data
   @AllArgsConstructor

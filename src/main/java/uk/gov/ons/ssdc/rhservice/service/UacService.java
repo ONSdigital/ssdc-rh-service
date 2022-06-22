@@ -27,7 +27,9 @@ public class UacService {
       throw new RuntimeException("UAC has no caseId");
     }
 
-    caseRepository.readCaseUpdate(caseId).orElseThrow(() -> new RuntimeException("Case Not Found"));
+    caseRepository
+        .readCaseUpdate(caseId)
+        .orElseThrow(() -> new RuntimeException("Case Not Found for UAC"));
 
     return;
   }
