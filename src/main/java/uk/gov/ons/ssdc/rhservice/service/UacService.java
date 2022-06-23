@@ -1,7 +1,9 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
@@ -20,7 +22,8 @@ public class UacService {
     UacUpdateDTO uac =
         uacRepository
             .readUAC(uacHash)
-            .orElseThrow(() -> new RuntimeException("Failed to retrieve UAC"));
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Failed to retrieve UAC"));
 
     String caseId = uac.getCaseId();
     if (StringUtils.isEmpty(caseId)) {

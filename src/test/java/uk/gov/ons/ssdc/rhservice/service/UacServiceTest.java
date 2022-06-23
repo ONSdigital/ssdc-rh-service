@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
@@ -48,10 +49,11 @@ class UacServiceTest {
   public void uacHashNotFound() {
     when(uacRepository.readUAC(any())).thenReturn(Optional.empty());
 
-    RuntimeException thrown =
-        assertThrows(RuntimeException.class, () -> underTest.validateUacHash(UAC_HASH));
+    ResponseStatusException thrown =
+        assertThrows(ResponseStatusException.class, () -> underTest.validateUacHash(UAC_HASH));
 
-    Assertions.assertThat(thrown.getMessage()).isEqualTo("Failed to retrieve UAC");
+    Assertions.assertThat(thrown.getMessage())
+        .isEqualTo("404 NOT_FOUND \"Failed to retrieve UAC\"");
   }
 
   @Test
