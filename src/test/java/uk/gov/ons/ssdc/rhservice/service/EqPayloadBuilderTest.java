@@ -1,15 +1,20 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -75,6 +80,19 @@ class EqPayloadBuilderTest {
         .containsEntry("account_service_log_out_url", ACCOUNT_SERVICE_LOGOUT_URL)
         .containsEntry("channel", "rh")
         .containsEntry("questionnaire_id", uacUpdate.getQid());
+
+    long iat = (long) eqPayload.get("iat");
+    Date iatDate = new Date(TimeUnit.SECONDS.toMillis(iat));
+    OffsetDateTime iatOffsetDateTime = iatDate.toInstant().atOffset(ZoneOffset.UTC);
+
+    long exp = (long) eqPayload.get("exp");
+    Date expDate = new Date(TimeUnit.SECONDS.toMillis(exp));
+    OffsetDateTime expOffsetDateTime = expDate.toInstant().atOffset(ZoneOffset.UTC);
+
+    // TODO: These time assertions are brittle when debugging. We should consider mocking time if we
+    // have further need for this
+    assertThat(iatOffsetDateTime).isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.SECONDS));
+    assertThat(expOffsetDateTime).isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.MINUTES));
   }
 
   @Test
