@@ -29,7 +29,6 @@ class UacUpdateReceiverIT {
   private String uacUpdateTopic;
 
   @Autowired private PubsubTestHelper pubsubTestHelper;
-
   @Autowired private FireStorePoller fireStorePoller;
 
   @Test

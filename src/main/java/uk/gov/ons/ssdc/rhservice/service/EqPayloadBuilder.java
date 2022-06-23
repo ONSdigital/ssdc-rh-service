@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
-import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @Service
 public class EqPayloadBuilder {
@@ -22,21 +20,13 @@ public class EqPayloadBuilder {
   @Value("${eq.response-id-salt")
   private String responseIdSalt;
 
-  private final UacRepository uacRepository;
-  private final CaseRepository caseRepository;
-
-  public EqPayloadBuilder(UacRepository uacRepository, CaseRepository caseRepository) {
-    this.uacRepository = uacRepository;
-    this.caseRepository = caseRepository;
-  }
-
   public Map<String, Object> buildEqPayloadMap(
-      String uacHash,
       String accountServiceUrl,
       String accountServiceLogoutUrl,
-      String languageCode) {
-    UacUpdateDTO uacUpdateDTO = getUacFromHash(uacHash);
-    CaseUpdateDTO caseUpdateDTO = getCaseFromUac(uacUpdateDTO.getCaseId());
+      String languageCode,
+      UacUpdateDTO uacUpdateDTO,
+      CaseUpdateDTO caseUpdateDTO) {
+
     validateData(caseUpdateDTO, uacUpdateDTO, languageCode);
 
     long currentTimeInSeconds = System.currentTimeMillis() / 1000;
@@ -101,22 +91,6 @@ public class EqPayloadBuilder {
       throw new RuntimeException("No SHA-256 algorithm while encrypting questionnaire", ex);
     }
     return responseId.toString();
-  }
-
-  private CaseUpdateDTO getCaseFromUac(String caseId) {
-    if (StringUtils.isEmpty(caseId)) {
-      throw new RuntimeException("UAC has no caseId");
-    }
-
-    return caseRepository
-        .readCaseUpdate(caseId)
-        .orElseThrow(() -> new RuntimeException(String.format("caseId '%s' not found", caseId)));
-  }
-
-  private UacUpdateDTO getUacFromHash(String uacHash) {
-    return uacRepository
-        .readUAC(uacHash)
-        .orElseThrow(() -> new RuntimeException("Failed to retrieve UAC"));
   }
 
   private void validateLanguageCode(String languageCode) {

@@ -1,5 +1,6 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -7,13 +8,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
@@ -33,15 +32,24 @@ class UacServiceTest {
   @Test
   public void testUacHashMatched() {
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
-    uacUpdateDTO.setCaseId(CASE_ID);
     when(uacRepository.readUAC(any())).thenReturn(Optional.of(uacUpdateDTO));
+
+    Optional<UacUpdateDTO> uacOpt = underTest.getUac(UAC_HASH);
+    assertThat(uacOpt.get()).isEqualTo(uacUpdateDTO);
+
+    verify(uacRepository).readUAC(eq(UAC_HASH));
+  }
+
+  @Test
+  public void checkCaseReturned() {
+    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    uacUpdateDTO.setCaseId(CASE_ID);
 
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     when(caseRepository.readCaseUpdate(any())).thenReturn(Optional.of(caseUpdateDTO));
 
-    underTest.validateUacHash(UAC_HASH);
+    assertThat(underTest.getCaseFromUac(uacUpdateDTO)).isEqualTo(caseUpdateDTO);
 
-    verify(uacRepository).readUAC(eq(UAC_HASH));
     verify(caseRepository).readCaseUpdate(eq(CASE_ID));
   }
 
@@ -49,38 +57,31 @@ class UacServiceTest {
   public void uacHashNotFound() {
     when(uacRepository.readUAC(any())).thenReturn(Optional.empty());
 
-    ResponseStatusException thrown =
-        assertThrows(ResponseStatusException.class, () -> underTest.validateUacHash(UAC_HASH));
-
-    Assertions.assertThat(thrown.getMessage())
-        .isEqualTo("404 NOT_FOUND \"Failed to retrieve UAC\"");
+    assertThat(underTest.getUac(UAC_HASH)).isEmpty();
   }
 
   @Test
   public void uacHasNoCaseId() {
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
-    when(uacRepository.readUAC(any())).thenReturn(Optional.of(uacUpdateDTO));
 
     RuntimeException thrown =
-        assertThrows(RuntimeException.class, () -> underTest.validateUacHash(UAC_HASH));
+        assertThrows(RuntimeException.class, () -> underTest.getCaseFromUac(uacUpdateDTO));
 
-    Assertions.assertThat(thrown.getMessage()).isEqualTo("UAC has no caseId");
+    assertThat(thrown.getMessage()).isEqualTo("UAC has no caseId");
   }
 
   @Test
   public void caseNotFound() {
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
     uacUpdateDTO.setCaseId(CASE_ID);
-    when(uacRepository.readUAC(any())).thenReturn(Optional.of(uacUpdateDTO));
 
     when(caseRepository.readCaseUpdate(any())).thenReturn(Optional.empty());
 
     RuntimeException thrown =
-        assertThrows(RuntimeException.class, () -> underTest.validateUacHash(UAC_HASH));
+        assertThrows(RuntimeException.class, () -> underTest.getCaseFromUac(uacUpdateDTO));
 
-    Assertions.assertThat(thrown.getMessage()).isEqualTo("Case Not Found for UAC");
+    assertThat(thrown.getMessage()).isEqualTo("Case Not Found for UAC");
 
-    verify(uacRepository).readUAC(eq(UAC_HASH));
     verify(caseRepository).readCaseUpdate(eq(CASE_ID));
   }
 }

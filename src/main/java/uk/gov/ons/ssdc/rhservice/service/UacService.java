@@ -1,9 +1,9 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
@@ -18,19 +18,18 @@ public class UacService {
     this.caseRepository = caseRepository;
   }
 
-  public void validateUacHash(String uacHash) throws RuntimeException {
-    UacUpdateDTO uac =
-        uacRepository
-            .readUAC(uacHash)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Failed to retrieve UAC"));
+  public Optional<UacUpdateDTO> getUac(String uacHash) throws RuntimeException {
+    return uacRepository.readUAC(uacHash);
+  }
 
-    String caseId = uac.getCaseId();
+  public CaseUpdateDTO getCaseFromUac(UacUpdateDTO uacUpdateDTO) {
+
+    String caseId = uacUpdateDTO.getCaseId();
     if (StringUtils.isEmpty(caseId)) {
       throw new RuntimeException("UAC has no caseId");
     }
 
-    caseRepository
+    return caseRepository
         .readCaseUpdate(caseId)
         .orElseThrow(() -> new RuntimeException("Case Not Found for UAC"));
   }

@@ -1,7 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.endpoints;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +12,7 @@ import com.nimbusds.jose.JWSObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,6 @@ import uk.gov.ons.ssdc.rhservice.testutils.QueueSpy;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 class EqLaunchEndpointIT {
-  public static final String UAC_HASH = "UAC_HASH";
   public static final String QID = "QID";
   public static final String CASE_ID = UUID.randomUUID().toString();
   public static final String COLLEX_ID = UUID.randomUUID().toString();
@@ -58,6 +58,7 @@ class EqLaunchEndpointIT {
   @Test
   void testEqLaunchUrlSuccessfullyReturned()
       throws UnirestException, JsonProcessingException, InterruptedException {
+    String uacHash = RandomStringUtils.randomAlphabetic(10);
 
     try (QueueSpy<EventDTO> outboundCaseQueueSpy =
         pubsubTestHelper.sharedProjectListen(
@@ -68,18 +69,17 @@ class EqLaunchEndpointIT {
       caseRepository.writeCaseUpdate(caseUpdateDTO);
 
       UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
-      uacUpdateDTO.setUacHash(UAC_HASH);
+      uacUpdateDTO.setUacHash(uacHash);
       uacUpdateDTO.setQid(QID);
       uacUpdateDTO.setCaseId(CASE_ID);
       uacRepository.writeUAC(uacUpdateDTO);
 
       HttpResponse<String> response =
-          Unirest.get(createUrl("http://localhost:%d/eqLaunch/%s", port, UAC_HASH))
+          Unirest.get(createUrl("http://localhost:%d/eqLaunch/%s", port, uacHash))
               .header("accept", "application/json")
               .queryString("languageCode", "en")
               .queryString("accountServiceUrl", "http://xyz.com")
               .queryString("accountServiceLogoutUrl", "http://logggedOut.com")
-              .queryString("clientIP", "XXX.XXX.XXX.XXX")
               .asString();
 
       assertThat(response.getStatus()).isEqualTo(OK.value());
@@ -96,6 +96,42 @@ class EqLaunchEndpointIT {
       EventDTO actualEvent = outboundCaseQueueSpy.checkExpectedMessageReceived();
       assertThat(actualEvent.getPayload().getUacAuthenticationDTO().getQid()).isEqualTo(QID);
     }
+  }
+
+  @Test
+  public void testUacNotFound() throws UnirestException {
+    String uacHash = RandomStringUtils.randomAlphabetic(10);
+
+    HttpResponse<String> response =
+        Unirest.get(createUrl("http://localhost:%d/eqLaunch/%s", port, uacHash))
+            .header("accept", "application/json")
+            .queryString("languageCode", "en")
+            .queryString("accountServiceUrl", "http://xyz.com")
+            .queryString("accountServiceLogoutUrl", "http://logggedOut.com")
+            .asString();
+
+    assertThat(response.getStatus()).isEqualTo(NOT_FOUND.value());
+    assertThat(response.getBody()).endsWith("UAC Not Found");
+  }
+
+  @Test
+  public void testCaseNotFoundThrows500() throws UnirestException {
+    String uacHash = RandomStringUtils.randomAlphabetic(10);
+    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    uacUpdateDTO.setUacHash(uacHash);
+    uacUpdateDTO.setQid(QID);
+    uacUpdateDTO.setCaseId(CASE_ID);
+    uacRepository.writeUAC(uacUpdateDTO);
+
+    HttpResponse<String> response =
+        Unirest.get(createUrl("http://localhost:%d/eqLaunch/%s", port, uacHash))
+            .header("accept", "application/json")
+            .queryString("languageCode", "en")
+            .queryString("accountServiceUrl", "http://xyz.com")
+            .queryString("accountServiceLogoutUrl", "http://logggedOut.com")
+            .asString();
+
+    assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR.value());
   }
 
   private String createUrl(String urlFormat, int port, String param1) {

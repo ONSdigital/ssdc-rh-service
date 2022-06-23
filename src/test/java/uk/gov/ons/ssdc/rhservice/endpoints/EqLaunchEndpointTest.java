@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.nimbusds.jose.JWSObject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.ons.ssdc.rhservice.crypto.EncodeJws;
 import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
 import uk.gov.ons.ssdc.rhservice.messaging.AuthenicatedMessageSender;
+import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
 import uk.gov.ons.ssdc.rhservice.service.UacService;
 
@@ -47,10 +50,14 @@ public class EqLaunchEndpointTest {
     String languageCode = "LANGUAGE_CODE";
     String accountServiceUrl = "ACCOUNT_SERVICE_URL";
     String accountServiceLogoutUrl = "ACCOUNT_SERVICE_LOGOUT_URL";
+    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
 
-    when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any())).thenReturn(payload);
+    when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any(), any())).thenReturn(payload);
     when(encodeJws.encode(any())).thenReturn(jwsObject);
     when(encryptJwe.encrypt(any())).thenReturn(expectedToken);
+    when(uacService.getUac(any())).thenReturn(Optional.of(uacUpdateDTO));
+    when(uacService.getCaseFromUac(any())).thenReturn(caseUpdateDTO);
 
     // when
     ResponseEntity<String> response =
@@ -59,9 +66,11 @@ public class EqLaunchEndpointTest {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEqualTo(expectedToken);
-    verify(uacService).validateUacHash(uacHash);
+    verify(uacService).getUac(uacHash);
+    verify(uacService).getCaseFromUac(uacUpdateDTO);
     verify(eqPayloadBuilder)
-        .buildEqPayloadMap(uacHash, accountServiceUrl, accountServiceLogoutUrl, languageCode);
+        .buildEqPayloadMap(
+            accountServiceUrl, accountServiceLogoutUrl, languageCode, uacUpdateDTO, caseUpdateDTO);
     verify(encodeJws).encode(payload);
     verify(encryptJwe).encrypt(jwsObject);
     verify(authenicatedMessageSender).buildAndSendUacAuthentication(any());
