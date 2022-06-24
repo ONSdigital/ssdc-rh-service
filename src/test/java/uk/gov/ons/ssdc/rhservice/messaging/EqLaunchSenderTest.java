@@ -33,8 +33,7 @@ class EqLaunchSenderTest {
 
   @Mock PubsubHelper pubsubHelper;
 
-  @InjectMocks
-  EqLaunchSender underTest;
+  @InjectMocks EqLaunchSender underTest;
 
   @Test
   public void testMessageSent() throws JsonProcessingException {
