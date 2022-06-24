@@ -26,7 +26,7 @@ public class AuthenticatedMessageSender {
   }
 
   public void buildAndSendEqLaunchEvent(Map<String, Object> payload) {
-    EventDTO eqLaunchedEvent = new EventDTO();
+    EventDTO eqLaunchEvent = new EventDTO();
     EventHeaderDTO eventHeader = new EventHeaderDTO();
     eventHeader.setVersion(OUTBOUND_EVENT_SCHEMA_VERSION);
     eventHeader.setTopic(eqLaunchTopic);
@@ -37,15 +37,15 @@ public class AuthenticatedMessageSender {
     eventHeader.setCorrelationId(UUID.fromString(payload.get("tx_id").toString()));
     eventHeader.setOriginatingUser("RH");
 
-    eqLaunchedEvent.setHeader(eventHeader);
+    eqLaunchEvent.setHeader(eventHeader);
 
     EqLaunchDTO eqLaunchDTO = new EqLaunchDTO();
     eqLaunchDTO.setQid(payload.get("questionnaire_id").toString());
     PayloadDTO payloadDTO = new PayloadDTO();
     payloadDTO.setEqLaunchDTO(eqLaunchDTO);
-    eqLaunchedEvent.setPayload(payloadDTO);
+    eqLaunchEvent.setPayload(payloadDTO);
 
-    String messageJson = convertObjectToJson(eqLaunchedEvent);
+    String messageJson = convertObjectToJson(eqLaunchEvent);
     pubsubHelper.sendMessageToSharedProject(eqLaunchTopic, messageJson);
   }
 }
