@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static uk.gov.ons.ssdc.rhservice.messaging.AuthenicatedMessageSender.OUTBOUND_EVENT_SCHEMA_VERSION;
+import static uk.gov.ons.ssdc.rhservice.messaging.AuthenticatedMessageSender.OUTBOUND_EVENT_SCHEMA_VERSION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.OffsetDateTime;
@@ -25,7 +25,7 @@ import uk.gov.ons.ssdc.rhservice.utils.ObjectMapperFactory;
 import uk.gov.ons.ssdc.rhservice.utils.PubsubHelper;
 
 @ExtendWith(MockitoExtension.class)
-class AuthenicatedMessageSenderTest {
+class AuthenticatedMessageSenderTest {
 
   public static final String TEST_QID = "TEST_QID";
   public static final String TEST_TOPIC = "Test-Topic";
@@ -33,7 +33,7 @@ class AuthenicatedMessageSenderTest {
 
   @Mock PubsubHelper pubsubHelper;
 
-  @InjectMocks AuthenicatedMessageSender underTest;
+  @InjectMocks AuthenticatedMessageSender underTest;
 
   @Test
   public void testMessageSent() throws JsonProcessingException {
@@ -41,9 +41,9 @@ class AuthenicatedMessageSenderTest {
     payload.put("questionnaire_id", TEST_QID);
     payload.put("tx_id", CORRELATION_ID);
 
-    ReflectionTestUtils.setField(underTest, "uacAuthenticationTopic", TEST_TOPIC);
+    ReflectionTestUtils.setField(underTest, "eqLaunchTopic", TEST_TOPIC);
 
-    underTest.buildAndSendUacAuthentication(payload);
+    underTest.buildAndSendEqLaunchEvent(payload);
 
     ArgumentCaptor<String> eventArgCaptor = ArgumentCaptor.forClass(String.class);
     verify(pubsubHelper).sendMessageToSharedProject(eq(TEST_TOPIC), eventArgCaptor.capture());

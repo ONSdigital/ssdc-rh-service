@@ -39,7 +39,7 @@ class EqLaunchEndpointIT {
   public static final String QID = "QID";
   public static final String CASE_ID = UUID.randomUUID().toString();
   public static final String COLLEX_ID = UUID.randomUUID().toString();
-  public static final String OUTBOUND_AUTHENTICATION_SUBSCRIPTION = "event_uac_authentication_rh";
+  public static final String OUTBOUND_EQ_LAUNCH_SUBSCRIPTION = "event_eq-launch";
 
   @LocalServerPort private int port;
 
@@ -61,8 +61,7 @@ class EqLaunchEndpointIT {
     String uacHash = RandomStringUtils.randomAlphabetic(10);
 
     try (QueueSpy<EventDTO> outboundCaseQueueSpy =
-        pubsubTestHelper.sharedProjectListen(
-            OUTBOUND_AUTHENTICATION_SUBSCRIPTION, EventDTO.class)) {
+        pubsubTestHelper.sharedProjectListen(OUTBOUND_EQ_LAUNCH_SUBSCRIPTION, EventDTO.class)) {
       CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
       caseUpdateDTO.setCaseId(CASE_ID);
       caseUpdateDTO.setCollectionExerciseId(COLLEX_ID);
@@ -94,7 +93,7 @@ class EqLaunchEndpointIT {
           .containsEntry("language_code", "en");
 
       EventDTO actualEvent = outboundCaseQueueSpy.checkExpectedMessageReceived();
-      assertThat(actualEvent.getPayload().getUacAuthenticationDTO().getQid()).isEqualTo(QID);
+      assertThat(actualEvent.getPayload().getEqLaunchDTO().getQid()).isEqualTo(QID);
     }
   }
 

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ssdc.rhservice.crypto.EncodeJws;
 import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
-import uk.gov.ons.ssdc.rhservice.messaging.AuthenicatedMessageSender;
+import uk.gov.ons.ssdc.rhservice.messaging.AuthenticatedMessageSender;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
@@ -25,19 +25,19 @@ public class EqLaunchEndpoint {
   private final EqPayloadBuilder eqPayloadBuilder;
   private final EncodeJws encodeJws;
   private final EncryptJwe encryptJwe;
-  private final AuthenicatedMessageSender authenicatedMessageSender;
+  private final AuthenticatedMessageSender authenticatedMessageSender;
 
   public EqLaunchEndpoint(
       UacService uacService,
       EqPayloadBuilder eqPayloadBuilder,
       EncodeJws encodeJws,
       EncryptJwe encryptJwe,
-      AuthenicatedMessageSender authenicatedMessageSender) {
+      AuthenticatedMessageSender authenticatedMessageSender) {
     this.uacService = uacService;
     this.eqPayloadBuilder = eqPayloadBuilder;
     this.encodeJws = encodeJws;
     this.encryptJwe = encryptJwe;
-    this.authenicatedMessageSender = authenicatedMessageSender;
+    this.authenticatedMessageSender = authenticatedMessageSender;
   }
 
   @GetMapping(value = "/{uacHash}")
@@ -65,7 +65,7 @@ public class EqLaunchEndpoint {
     // If this fails (it's retryable) then it will throw an Exception
     // It's unlikely, but do we want to do that? Stopping a launch
     // We could go down MessageSender route, but that's more complex and can in theory still fail?
-    authenicatedMessageSender.buildAndSendUacAuthentication(payload);
+    authenticatedMessageSender.buildAndSendEqLaunchEvent(payload);
 
     return ResponseEntity.ok(launchToken);
   }
