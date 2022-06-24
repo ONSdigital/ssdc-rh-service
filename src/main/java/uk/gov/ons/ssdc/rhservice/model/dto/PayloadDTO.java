@@ -9,5 +9,5 @@ import lombok.Data;
 public class PayloadDTO {
   private CaseUpdateDTO caseUpdate;
   private UacUpdateDTO uacUpdate;
-  private EqLaunchDTO eqLaunchDTO;
+  private EqLaunchDTO eqLaunch;
 }
