@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.ons.ssdc.rhservice.crypto.EncodeJws;
 import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
-import uk.gov.ons.ssdc.rhservice.messaging.AuthenticatedMessageSender;
+import uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
@@ -36,7 +36,7 @@ public class EqLaunchEndpointTest {
 
   @Mock private EncryptJwe encryptJwe;
 
-  @Mock private AuthenticatedMessageSender authenticatedMessageSender;
+  @Mock private EqLaunchSender eqLaunchSender;
 
   @InjectMocks private EqLaunchEndpoint underTest;
 
@@ -73,6 +73,6 @@ public class EqLaunchEndpointTest {
             accountServiceUrl, accountServiceLogoutUrl, languageCode, uacUpdateDTO, caseUpdateDTO);
     verify(encodeJws).encode(payload);
     verify(encryptJwe).encrypt(jwsObject);
-    verify(authenticatedMessageSender).buildAndSendEqLaunchEvent(any());
+    verify(eqLaunchSender).buildAndSendEqLaunchEvent(any());
   }
 }

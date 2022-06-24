@@ -93,7 +93,7 @@ class EqLaunchEndpointIT {
           .containsEntry("language_code", "en");
 
       EventDTO actualEvent = outboundCaseQueueSpy.checkExpectedMessageReceived();
-      assertThat(actualEvent.getPayload().getEqLaunchDTO().getQid()).isEqualTo(QID);
+      assertThat(actualEvent.getPayload().getEqLaunch().getQid()).isEqualTo(QID);
     }
   }
 

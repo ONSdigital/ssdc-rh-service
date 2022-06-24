@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static uk.gov.ons.ssdc.rhservice.messaging.AuthenticatedMessageSender.OUTBOUND_EVENT_SCHEMA_VERSION;
+import static uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender.OUTBOUND_EVENT_SCHEMA_VERSION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.OffsetDateTime;
@@ -25,7 +25,7 @@ import uk.gov.ons.ssdc.rhservice.utils.ObjectMapperFactory;
 import uk.gov.ons.ssdc.rhservice.utils.PubsubHelper;
 
 @ExtendWith(MockitoExtension.class)
-class AuthenticatedMessageSenderTest {
+class EqLaunchSenderTest {
 
   public static final String TEST_QID = "TEST_QID";
   public static final String TEST_TOPIC = "Test-Topic";
@@ -33,7 +33,8 @@ class AuthenticatedMessageSenderTest {
 
   @Mock PubsubHelper pubsubHelper;
 
-  @InjectMocks AuthenticatedMessageSender underTest;
+  @InjectMocks
+  EqLaunchSender underTest;
 
   @Test
   public void testMessageSent() throws JsonProcessingException {

@@ -14,14 +14,14 @@ import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
 import uk.gov.ons.ssdc.rhservice.utils.PubsubHelper;
 
 @Component
-public class AuthenticatedMessageSender {
+public class EqLaunchSender {
   public static final String OUTBOUND_EVENT_SCHEMA_VERSION = "0.5.0";
   private final PubsubHelper pubsubHelper;
 
   @Value("${queueconfig.eq-launch-topic}")
   private String eqLaunchTopic;
 
-  public AuthenticatedMessageSender(PubsubHelper pubsubHelper) {
+  public EqLaunchSender(PubsubHelper pubsubHelper) {
     this.pubsubHelper = pubsubHelper;
   }
 
@@ -42,7 +42,7 @@ public class AuthenticatedMessageSender {
     EqLaunchDTO eqLaunchDTO = new EqLaunchDTO();
     eqLaunchDTO.setQid(payload.get("questionnaire_id").toString());
     PayloadDTO payloadDTO = new PayloadDTO();
-    payloadDTO.setEqLaunchDTO(eqLaunchDTO);
+    payloadDTO.setEqLaunch(eqLaunchDTO);
     eqLaunchEvent.setPayload(payloadDTO);
 
     String messageJson = convertObjectToJson(eqLaunchEvent);
