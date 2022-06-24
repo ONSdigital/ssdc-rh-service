@@ -52,7 +52,10 @@ public class EqPayloadBuilder {
     payload.put("survey_url", uacUpdateDTO.getCollectionInstrumentUrl());
     payload.put("case_ref", caseUpdateDTO.getCaseRef());
 
-    payload.put("response_id", encryptResponseId(uacUpdateDTO.getQid(), responseIdSalt));
+    payload.put(
+        "response_id",
+        encryptResponseId(
+            uacUpdateDTO.getQid(), responseIdSalt)); // TODO: Is encrypting this necessary?
     payload.put("account_service_url", accountServiceUrl);
     payload.put("account_service_log_out_url", accountServiceLogoutUrl);
     payload.put("channel", "rh");
@@ -80,6 +83,7 @@ public class EqPayloadBuilder {
     validateLanguageCode(languageCode);
   }
 
+  // TODO: Do we even need to do this? We need to understand why this is might be needed
   private String encryptResponseId(String questionnaireId, String salt) {
     StringBuilder responseId = new StringBuilder(questionnaireId);
     try {
