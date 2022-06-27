@@ -19,7 +19,7 @@ import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
 import uk.gov.ons.ssdc.rhservice.testutils.FireStorePoller;
-import uk.gov.ons.ssdc.rhservice.testutils.PubsubHelper;
+import uk.gov.ons.ssdc.rhservice.testutils.PubsubTestHelper;
 
 @ContextConfiguration
 @ActiveProfiles("test")
@@ -30,7 +30,7 @@ class CaseUpdateReceiverIT {
   @Value("${queueconfig.case-update-topic}")
   private String caseUpdateTopic;
 
-  @Autowired private PubsubHelper pubsubHelper;
+  @Autowired private PubsubTestHelper pubsubTestHelper;
 
   @Autowired private FireStorePoller fireStorePoller;
 
@@ -49,7 +49,7 @@ class CaseUpdateReceiverIT {
     event.setPayload(payloadDTO);
 
     // WHEN
-    pubsubHelper.sendMessageToSharedProject(caseUpdateTopic, event);
+    pubsubTestHelper.sendMessageToSharedProject(caseUpdateTopic, event);
 
     // THEN
     Optional<CaseUpdateDTO> cazeOpt = fireStorePoller.getCaseById(caseUpdateDTO.getCaseId());

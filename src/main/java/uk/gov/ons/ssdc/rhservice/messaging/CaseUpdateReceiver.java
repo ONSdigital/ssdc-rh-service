@@ -12,10 +12,10 @@ import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 
 @MessageEndpoint
 public class CaseUpdateReceiver {
-  private final CaseRepository respondentCaseRepo;
+  private final CaseRepository caseRepository;
 
-  public CaseUpdateReceiver(CaseRepository respondentCaseRepo) {
-    this.respondentCaseRepo = respondentCaseRepo;
+  public CaseUpdateReceiver(CaseRepository caseRepository) {
+    this.caseRepository = caseRepository;
   }
 
   @Transactional
@@ -23,6 +23,6 @@ public class CaseUpdateReceiver {
   public void receiveMessage(Message<byte[]> message) {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
     CaseUpdateDTO caseUpdate = event.getPayload().getCaseUpdate();
-    respondentCaseRepo.writeCaseUpdate(caseUpdate);
+    caseRepository.writeCaseUpdate(caseUpdate);
   }
 }

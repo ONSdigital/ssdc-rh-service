@@ -1,7 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.listener.RetryListenerSupport;
