@@ -51,6 +51,8 @@ public class EqLaunchEndpointTest {
     String accountServiceUrl = "ACCOUNT_SERVICE_URL";
     String accountServiceLogoutUrl = "ACCOUNT_SERVICE_LOGOUT_URL";
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    uacUpdateDTO.setReceiptReceived(false);
+    uacUpdateDTO.setActive(true);
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
 
     when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any(), any())).thenReturn(payload);

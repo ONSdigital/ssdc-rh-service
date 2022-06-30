@@ -71,6 +71,8 @@ class EqLaunchEndpointIT {
       uacUpdateDTO.setUacHash(uacHash);
       uacUpdateDTO.setQid(QID);
       uacUpdateDTO.setCaseId(CASE_ID);
+      uacUpdateDTO.setReceiptReceived(false);
+      uacUpdateDTO.setActive(true);
       uacRepository.writeUAC(uacUpdateDTO);
 
       HttpResponse<String> response =
@@ -120,6 +122,8 @@ class EqLaunchEndpointIT {
     uacUpdateDTO.setUacHash(uacHash);
     uacUpdateDTO.setQid(QID);
     uacUpdateDTO.setCaseId(CASE_ID);
+    uacUpdateDTO.setReceiptReceived(false);
+    uacUpdateDTO.setActive(true);
     uacRepository.writeUAC(uacUpdateDTO);
 
     HttpResponse<String> response =

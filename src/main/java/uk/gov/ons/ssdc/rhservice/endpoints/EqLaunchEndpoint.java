@@ -1,5 +1,6 @@
 package uk.gov.ons.ssdc.rhservice.endpoints;
 
+
 import com.nimbusds.jose.JWSObject;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +52,16 @@ public class EqLaunchEndpoint {
 
     if (uacOpt.isEmpty()) {
       return new ResponseEntity<>("UAC Not Found", HttpStatus.NOT_FOUND);
+    }
+
+    UacUpdateDTO uacUpdateDTO = uacOpt.get();
+
+    if (uacUpdateDTO.isReceiptReceived()) {
+      return new ResponseEntity<>("UAC_RECEIPTED", HttpStatus.BAD_REQUEST);
+    }
+
+    if (!uacUpdateDTO.isActive()) {
+      return new ResponseEntity<>("UAC_INACTIVE", HttpStatus.BAD_REQUEST);
     }
 
     CaseUpdateDTO caseUpdateDTO = uacService.getCaseFromUac(uacOpt.get());
