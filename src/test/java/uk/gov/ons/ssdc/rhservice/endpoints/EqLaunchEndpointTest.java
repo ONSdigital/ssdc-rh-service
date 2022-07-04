@@ -68,8 +68,7 @@ public class EqLaunchEndpointTest {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEqualTo(expectedToken);
-    verify(uacService).getUac(uacHash);
-    verify(uacService).getCaseFromUac(uacUpdateDTO);
+    verify(uacService).getUac(uacHash)
     verify(eqPayloadBuilder)
         .buildEqPayloadMap(
             accountServiceUrl, accountServiceLogoutUrl, languageCode, uacUpdateDTO, caseUpdateDTO);

@@ -48,7 +48,7 @@ public class UacService {
     return uacOr4xxResponseEntity;
   }
 
-  public CaseUpdateDTO getCaseFromUac(UacUpdateDTO uacUpdateDTO) {
+  private CaseUpdateDTO getCaseFromUac(UacUpdateDTO uacUpdateDTO) {
 
     String caseId = uacUpdateDTO.getCaseId();
     if (StringUtils.isEmpty(caseId)) {
