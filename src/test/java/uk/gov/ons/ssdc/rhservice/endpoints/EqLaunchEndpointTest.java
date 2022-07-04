@@ -76,4 +76,6 @@ public class EqLaunchEndpointTest {
     verify(encryptJwe).encrypt(jwsObject);
     verify(eqLaunchSender).buildAndSendEqLaunchEvent(any());
   }
+
+//  TODO: new test to check if Error Response Entity returned,
 }
