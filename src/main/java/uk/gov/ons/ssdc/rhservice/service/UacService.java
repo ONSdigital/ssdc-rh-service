@@ -47,7 +47,7 @@ public class UacService {
 
     uacOr4xxResponseEntity.setUacUpdateDTO(uacUpdateDTO);
     uacOr4xxResponseEntity.setCaseUpdateDTO(getCaseFromUac(uacUpdateDTO));
-
+    uacOr4xxResponseEntity.setResponseEntityOptional(Optional.empty());
     return uacOr4xxResponseEntity;
   }
 
