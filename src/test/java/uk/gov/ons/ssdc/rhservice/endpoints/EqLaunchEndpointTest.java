@@ -113,5 +113,4 @@ public class EqLaunchEndpointTest {
     verify(uacService).getUac(uacHash);
   }
 
-  //  TODO: new test to check if Error Response Entity returned,
 }
