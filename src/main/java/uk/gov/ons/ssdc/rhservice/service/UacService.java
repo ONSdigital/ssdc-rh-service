@@ -26,19 +26,22 @@ public class UacService {
     UacOr4xxResponseEntity uacOr4xxResponseEntity = new UacOr4xxResponseEntity();
 
     if (uacOpt.isEmpty()) {
-      uacOr4xxResponseEntity.setResponseEntityOptional(Optional.of(new ResponseEntity<>("UAC Not Found", HttpStatus.NOT_FOUND)));
+      uacOr4xxResponseEntity.setResponseEntityOptional(
+          Optional.of(new ResponseEntity<>("UAC Not Found", HttpStatus.NOT_FOUND)));
       return uacOr4xxResponseEntity;
     }
 
     UacUpdateDTO uacUpdateDTO = uacOpt.get();
 
     if (uacUpdateDTO.isReceiptReceived()) {
-      uacOr4xxResponseEntity.setResponseEntityOptional(Optional.of(new ResponseEntity<>("UAC_RECEIPTED", HttpStatus.BAD_REQUEST)));
+      uacOr4xxResponseEntity.setResponseEntityOptional(
+          Optional.of(new ResponseEntity<>("UAC_RECEIPTED", HttpStatus.BAD_REQUEST)));
       return uacOr4xxResponseEntity;
     }
 
     if (!uacUpdateDTO.isActive()) {
-      uacOr4xxResponseEntity.setResponseEntityOptional(Optional.of(new ResponseEntity<>("UAC_INACTIVE", HttpStatus.BAD_REQUEST)));
+      uacOr4xxResponseEntity.setResponseEntityOptional(
+          Optional.of(new ResponseEntity<>("UAC_INACTIVE", HttpStatus.BAD_REQUEST)));
       return uacOr4xxResponseEntity;
     }
 

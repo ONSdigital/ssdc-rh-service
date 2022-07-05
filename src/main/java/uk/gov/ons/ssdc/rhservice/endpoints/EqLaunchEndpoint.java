@@ -1,9 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.endpoints;
 
-
 import com.nimbusds.jose.JWSObject;
 import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ssdc.rhservice.crypto.EncodeJws;
 import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
 import uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender;
-import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacOr4xxResponseEntity;
-import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
 import uk.gov.ons.ssdc.rhservice.service.UacService;
 
@@ -51,14 +47,17 @@ public class EqLaunchEndpoint {
 
     UacOr4xxResponseEntity uacOr4xxResponseEntity = uacService.getUac(uacHash);
 
-    if(uacOr4xxResponseEntity.getResponseEntityOptional().isPresent()) {
+    if (uacOr4xxResponseEntity.getResponseEntityOptional().isPresent()) {
       return uacOr4xxResponseEntity.getResponseEntityOptional().get();
     }
 
     Map<String, Object> payload =
         eqPayloadBuilder.buildEqPayloadMap(
-            accountServiceUrl, accountServiceLogoutUrl, languageCode, uacOr4xxResponseEntity.getUacUpdateDTO(),
-                uacOr4xxResponseEntity.getCaseUpdateDTO());
+            accountServiceUrl,
+            accountServiceLogoutUrl,
+            languageCode,
+            uacOr4xxResponseEntity.getUacUpdateDTO(),
+            uacOr4xxResponseEntity.getCaseUpdateDTO());
 
     String launchToken = encrypt(payload);
 
