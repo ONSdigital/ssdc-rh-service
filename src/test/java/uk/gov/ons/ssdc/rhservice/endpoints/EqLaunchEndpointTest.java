@@ -112,5 +112,4 @@ public class EqLaunchEndpointTest {
     assertThat(response.getBody()).isEqualTo("UAC_RECEIPTED");
     verify(uacService).getUac(uacHash);
   }
-
 }
