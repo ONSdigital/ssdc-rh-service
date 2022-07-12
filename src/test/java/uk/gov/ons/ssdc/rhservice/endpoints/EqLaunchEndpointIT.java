@@ -112,7 +112,7 @@ class EqLaunchEndpointIT {
             .asString();
 
     assertThat(response.getStatus()).isEqualTo(NOT_FOUND.value());
-    assertThat(response.getBody()).endsWith("UAC Not Found");
+    assertThat(response.getBody()).endsWith("UAC_NOT_FOUND");
   }
 
   @Test

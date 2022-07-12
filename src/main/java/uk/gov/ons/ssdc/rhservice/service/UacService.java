@@ -27,7 +27,7 @@ public class UacService {
 
     if (uacOpt.isEmpty()) {
       uacOr4xxResponseEntity.setResponseEntityOptional(
-          Optional.of(new ResponseEntity<>("UAC Not Found", HttpStatus.NOT_FOUND)));
+          Optional.of(new ResponseEntity<>("UAC_NOT_FOUND", HttpStatus.NOT_FOUND)));
       return uacOr4xxResponseEntity;
     }
 

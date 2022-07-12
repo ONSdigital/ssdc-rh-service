@@ -58,7 +58,7 @@ class UacServiceTest {
     when(uacRepository.readUAC(any())).thenReturn(Optional.empty());
 
     Optional<ResponseEntity> responseEntity =
-        Optional.of(new ResponseEntity<>("UAC Not Found", HttpStatus.NOT_FOUND));
+        Optional.of(new ResponseEntity<>("UAC_NOT_FOUND", HttpStatus.NOT_FOUND));
 
     UacOr4xxResponseEntity uacOr4xxResponseEntity = underTest.getUac(UAC_HASH);
 
