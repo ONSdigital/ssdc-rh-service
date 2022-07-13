@@ -21,6 +21,7 @@ import uk.gov.ons.ssdc.rhservice.crypto.EncodeJws;
 import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
 import uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.UacOr4xxResponseEntity;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
 import uk.gov.ons.ssdc.rhservice.service.UacService;
@@ -51,28 +52,64 @@ public class EqLaunchEndpointTest {
     String accountServiceUrl = "ACCOUNT_SERVICE_URL";
     String accountServiceLogoutUrl = "ACCOUNT_SERVICE_LOGOUT_URL";
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    uacUpdateDTO.setReceiptReceived(false);
+    uacUpdateDTO.setActive(true);
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
+    UacOr4xxResponseEntity uacOr4xxResponseEntity = new UacOr4xxResponseEntity();
+    uacOr4xxResponseEntity.setUacUpdateDTO(uacUpdateDTO);
+    uacOr4xxResponseEntity.setCaseUpdateDTO(caseUpdateDTO);
+    uacOr4xxResponseEntity.setResponseEntityOptional(Optional.empty());
 
     when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any(), any())).thenReturn(payload);
     when(encodeJws.encode(any())).thenReturn(jwsObject);
     when(encryptJwe.encrypt(any())).thenReturn(expectedToken);
-    when(uacService.getUac(any())).thenReturn(Optional.of(uacUpdateDTO));
-    when(uacService.getCaseFromUac(any())).thenReturn(caseUpdateDTO);
+    when(uacService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
 
     // when
-    ResponseEntity<String> response =
+    ResponseEntity<?> response =
         underTest.generateEqLaunchToken(
             uacHash, languageCode, accountServiceUrl, accountServiceLogoutUrl);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEqualTo(expectedToken);
     verify(uacService).getUac(uacHash);
-    verify(uacService).getCaseFromUac(uacUpdateDTO);
     verify(eqPayloadBuilder)
         .buildEqPayloadMap(
             accountServiceUrl, accountServiceLogoutUrl, languageCode, uacUpdateDTO, caseUpdateDTO);
     verify(encodeJws).encode(payload);
     verify(encryptJwe).encrypt(jwsObject);
     verify(eqLaunchSender).buildAndSendEqLaunchEvent(any());
+  }
+
+  @Test
+  public void testCallingEndpointGetsResponseEntityReturned() {
+    // Given
+    Map<String, Object> payload = new HashMap<>();
+    JWSObject jwsObject = Mockito.mock(JWSObject.class);
+    String expectedToken = "cunninglyEncryptedToken";
+    String uacHash = "UAC_HASH";
+    String languageCode = "LANGUAGE_CODE";
+    String accountServiceUrl = "ACCOUNT_SERVICE_URL";
+    String accountServiceLogoutUrl = "ACCOUNT_SERVICE_LOGOUT_URL";
+    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    uacUpdateDTO.setReceiptReceived(true);
+    uacUpdateDTO.setActive(false);
+    CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
+    UacOr4xxResponseEntity uacOr4xxResponseEntity = new UacOr4xxResponseEntity();
+    uacOr4xxResponseEntity.setUacUpdateDTO(uacUpdateDTO);
+    uacOr4xxResponseEntity.setCaseUpdateDTO(caseUpdateDTO);
+    uacOr4xxResponseEntity.setResponseEntityOptional(
+        Optional.of(new ResponseEntity<>("UAC_RECEIPTED", HttpStatus.BAD_REQUEST)));
+
+    when(uacService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
+
+    // when
+    ResponseEntity<?> response =
+        underTest.generateEqLaunchToken(
+            uacHash, languageCode, accountServiceUrl, accountServiceLogoutUrl);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(response.getBody()).isEqualTo("UAC_RECEIPTED");
+    verify(uacService).getUac(uacHash);
   }
 }

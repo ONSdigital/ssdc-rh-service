@@ -2,7 +2,6 @@ package uk.gov.ons.ssdc.rhservice.endpoints;
 
 import com.nimbusds.jose.JWSObject;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ssdc.rhservice.crypto.EncodeJws;
 import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
 import uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender;
-import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.UacOr4xxResponseEntity;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
 import uk.gov.ons.ssdc.rhservice.service.UacService;
 
@@ -41,23 +39,25 @@ public class EqLaunchEndpoint {
   }
 
   @GetMapping(value = "/{uacHash}")
-  public ResponseEntity<String> generateEqLaunchToken(
+  public ResponseEntity<?> generateEqLaunchToken(
       @PathVariable("uacHash") final String uacHash,
       @RequestParam String languageCode,
       @RequestParam String accountServiceUrl,
       @RequestParam String accountServiceLogoutUrl) {
 
-    Optional<UacUpdateDTO> uacOpt = uacService.getUac(uacHash);
+    UacOr4xxResponseEntity uacOr4xxResponseEntity = uacService.getUac(uacHash);
 
-    if (uacOpt.isEmpty()) {
-      return new ResponseEntity<>("UAC Not Found", HttpStatus.NOT_FOUND);
+    if (uacOr4xxResponseEntity.getResponseEntityOptional().isPresent()) {
+      return uacOr4xxResponseEntity.getResponseEntityOptional().get();
     }
-
-    CaseUpdateDTO caseUpdateDTO = uacService.getCaseFromUac(uacOpt.get());
 
     Map<String, Object> payload =
         eqPayloadBuilder.buildEqPayloadMap(
-            accountServiceUrl, accountServiceLogoutUrl, languageCode, uacOpt.get(), caseUpdateDTO);
+            accountServiceUrl,
+            accountServiceLogoutUrl,
+            languageCode,
+            uacOr4xxResponseEntity.getUacUpdateDTO(),
+            uacOr4xxResponseEntity.getCaseUpdateDTO());
 
     String launchToken = encrypt(payload);
 
@@ -67,7 +67,7 @@ public class EqLaunchEndpoint {
     // We could go down MessageSender route, but that's more complex and can in theory still fail?
     eqLaunchSender.buildAndSendEqLaunchEvent(payload);
 
-    return ResponseEntity.ok(launchToken);
+    return new ResponseEntity<>(launchToken, HttpStatus.OK);
   }
 
   private String encrypt(Map<String, Object> payload) {

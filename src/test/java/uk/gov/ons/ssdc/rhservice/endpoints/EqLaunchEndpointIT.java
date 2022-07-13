@@ -71,6 +71,8 @@ class EqLaunchEndpointIT {
       uacUpdateDTO.setUacHash(uacHash);
       uacUpdateDTO.setQid(QID);
       uacUpdateDTO.setCaseId(CASE_ID);
+      uacUpdateDTO.setReceiptReceived(false);
+      uacUpdateDTO.setActive(true);
       uacRepository.writeUAC(uacUpdateDTO);
 
       HttpResponse<String> response =
@@ -110,7 +112,7 @@ class EqLaunchEndpointIT {
             .asString();
 
     assertThat(response.getStatus()).isEqualTo(NOT_FOUND.value());
-    assertThat(response.getBody()).endsWith("UAC Not Found");
+    assertThat(response.getBody()).endsWith("UAC_NOT_FOUND");
   }
 
   @Test
@@ -120,6 +122,8 @@ class EqLaunchEndpointIT {
     uacUpdateDTO.setUacHash(uacHash);
     uacUpdateDTO.setQid(QID);
     uacUpdateDTO.setCaseId(CASE_ID);
+    uacUpdateDTO.setReceiptReceived(false);
+    uacUpdateDTO.setActive(true);
     uacRepository.writeUAC(uacUpdateDTO);
 
     HttpResponse<String> response =
