@@ -35,10 +35,14 @@ public class EqPayloadBuilder {
 
     LinkedHashMap<String, Object> payload = new LinkedHashMap<>();
 
-    payload.put("jti", UUID.randomUUID().toString());
-    payload.put("tx_id", UUID.randomUUID().toString());
-    payload.put("iat", currentTimeInSeconds);
     payload.put("exp", expTime);
+    payload.put("iat", currentTimeInSeconds);
+    payload.put("jti", UUID.randomUUID().toString());
+
+
+    payload.put("tx_id", UUID.randomUUID().toString());
+
+
     payload.put("collection_exercise_sid", caseUpdateDTO.getCollectionExerciseId());
 
     payload.put("ru_ref", uacUpdateDTO.getQid());
@@ -63,6 +67,43 @@ public class EqPayloadBuilder {
 
     return payload;
   }
+
+  /*
+  Copied from https://github.com/ONSdigital/ons-schema-definitions/blob/v3/docs/rm_to_eq_runner_payload_v2.rst
+
+  Should we just make this a DTO? 
+
+  Comments added by me
+
+  {
+  "exp": 1458057712,
+  "iat": 1458047712,
+  "jti": "6b383088-b8f8-4167-8847-c4aaeda8fe16",
+  "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
+  "account_service_url": "https://upstream.example.com",
+  "case_id": "628256cf-5c78-4896-8bec-f0ddb69aaa11",
+  "channel": "RH",
+  "collection_exercise_sid": "789",
+  "region_code": "GB-WLS",
+  "response_expires_at": "2022-12-01T00:00:00+00:00",
+
+   // work already specced for this: https://trello.com/c/2EYYMlvH/240-properly-handle-and-document-eq-launch-response-id-hashing-and-peppering-5
+  "response_id": "QzXMrPqoLiyEyerrED88AbkQoQK0sVVX72ZtVphHr0w=",
+  "schema_name": "adhoc_0001",
+  "survey_metadata": {
+    "data": {
+      "case_ref": "1000000000000001",
+      "case_type": "B",
+      // Questionnaire_id will be a string of numbers, currently
+      "questionnaire_id": "bdf7dff2-1d73-4b97-bd2d-91f2e53160b9"
+    },
+    "receipting_keys": [
+      "questionnaire_id"
+    ]
+  }
+}
+
+   */
 
   private void validateData(
       CaseUpdateDTO caseUpdateDTO, UacUpdateDTO uacUpdateDTO, String languageCode) {
