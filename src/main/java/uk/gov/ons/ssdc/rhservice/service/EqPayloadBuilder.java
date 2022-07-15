@@ -71,34 +71,36 @@ public class EqPayloadBuilder {
   /*
   Copied from https://github.com/ONSdigital/ons-schema-definitions/blob/v3/docs/rm_to_eq_runner_payload_v2.rst
 
-  Should we just make this a DTO? 
+  Should we just make this a DTO, not sure of the benefit of a MAP.
+  POJOs would be a lot clearer
 
   Comments added by me
 
   {
-  "exp": 1458057712,
-  "iat": 1458047712,
-  "jti": "6b383088-b8f8-4167-8847-c4aaeda8fe16",
-  "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
-  "account_service_url": "https://upstream.example.com",
-  "case_id": "628256cf-5c78-4896-8bec-f0ddb69aaa11",
-  "channel": "RH",
-  "collection_exercise_sid": "789",
-  "region_code": "GB-WLS",
-  "response_expires_at": "2022-12-01T00:00:00+00:00",
-
-   // work already specced for this: https://trello.com/c/2EYYMlvH/240-properly-handle-and-document-eq-launch-response-id-hashing-and-peppering-5
-  "response_id": "QzXMrPqoLiyEyerrED88AbkQoQK0sVVX72ZtVphHr0w=",
-  "schema_name": "adhoc_0001",
+  "exp": 1458057712,                                            // currentTimeInSeconds
+  "iat": 1458047712,                                            // currentTimeInSeconds + 5 minutes (300)
+  "jti": "6b383088-b8f8-4167-8847-c4aaeda8fe16",                // a new UUID we can create
+  "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",              // UUID Transaction ID used to trace a transaction through the whole system.
+                                                                // MUST NOT be the same as the 'jti' value.
+  "account_service_url": "https://upstream.example.com",        // we already provide this, and logout??
+  "case_id": "628256cf-5c78-4896-8bec-f0ddb69aaa11",            // we have this
+  "channel": "RH",                                              // Just hardcode by us to RH
+  "collection_exercise_sid": "789",                             // A reference UUID -< as per doc.  (not sure why example is 3 long).  We have this
+  //"region_code": "GB-WLS",                                    // NOTE this is legacy.  we don't have this or need it for MVP
+  "language_code",                                              // Optional (official) field added by me.  We have en/cy, and are legally required to support
+  //"response_expires_at": "2022-12-01T00:00:00+00:00",         // Note: Optional, this is to delete partial responses after X time.
+                                                                // Not MVP. This would have to be defined at Survey level if we wanted to set it for some surveys.
+  "response_id": "QzXMrPqoLiyEyerrED88AbkQoQK0sVVX72ZtVphHr0w=", // work already specced for this: https://trello.com/c/2EYYMlvH/240-properly-handle-and-document-eq-launch-response-id-hashing-and-peppering-5
+  "schema_name": "adhoc_0001",                                  // Or schema Url.  Will need collex DTO for this, and for the DTO to start including the CI rules
   "survey_metadata": {
     "data": {
-      "case_ref": "1000000000000001",
-      "case_type": "B",
+      "case_ref": "1000000000000001",                              // we have this
+      "case_type": "B",                                            // not applicable to us, particualalry for MVP.
       // Questionnaire_id will be a string of numbers, currently
-      "questionnaire_id": "bdf7dff2-1d73-4b97-bd2d-91f2e53160b9"
+      "questionnaire_id": "bdf7dff2-1d73-4b97-bd2d-91f2e53160b9"   // qid in the UacUpdateDTO
     },
     "receipting_keys": [
-      "questionnaire_id"
+      "questionnaire_id"                                           // Can stay as is.
     ]
   }
 }

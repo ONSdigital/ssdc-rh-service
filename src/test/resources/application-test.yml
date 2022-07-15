@@ -13,10 +13,14 @@ queueconfig:
   shared-pubsub-project: shared-project
   case-update-topic: event_case-update
   uac-update-topic: event_uac-update
+  collection-exercise-topic: event_collection-exercise-update
+
 
 cloud-storage:
+#  TODO: are these needed here? aren't they just copies?
   case-schema-name: case
   uac-schema-name: uac
+  collection-exercise-schema-name: collectionexercise
   backoff:
     initial: 100
     multiplier: 1.0
