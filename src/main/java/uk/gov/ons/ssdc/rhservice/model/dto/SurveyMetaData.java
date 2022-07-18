@@ -8,4 +8,5 @@ import java.util.List;
 public class SurveyMetaData {
     //    TODO: add JSON mapping thing here, data is a bad name - is it a keyword
     private SurveyData data;
+    private List<String> receipting_keys;
 }

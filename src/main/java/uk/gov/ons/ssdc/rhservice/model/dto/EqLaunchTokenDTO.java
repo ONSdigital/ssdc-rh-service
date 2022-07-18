@@ -17,5 +17,6 @@ public class EqLaunchTokenDTO {
     String language_code;
     String response_id;
     String schema_url;
+    String version;
     SurveyMetaData survey_metadata;
 }

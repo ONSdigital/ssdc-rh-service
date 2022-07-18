@@ -48,6 +48,7 @@ public class EqPayloadBuilder {
         eqLaunchTokenDTO.setChannel("RH");
         eqLaunchTokenDTO.setCollection_exercise_sid(collectionExerciseUpdateDTO.getCollectionExerciseId());
         eqLaunchTokenDTO.setLanguage_code(languageCode);
+        eqLaunchTokenDTO.setVersion("V2"); //eq launch token schema, current V2 - this would good in app.yml
 
             // work for this in progress, needs salt n pepper
         eqLaunchTokenDTO.setResponse_id("XYZ");
@@ -58,7 +59,9 @@ public class EqPayloadBuilder {
         SurveyData data = new SurveyData();
         data.setCase_ref(caseUpdateDTO.getCaseRef());
         data.setQuestionnaire_id(uacUpdateDTO.getQid());
-        data.setReceipting_keys(List.of("questionnaire_id"));
+
+        // we've added the Questionnaire Id above in data,  here we tell EQ to receipt on questionnaire_id
+        surveyMetaData.setReceipting_keys(List.of("questionnaire_id"));
 
         surveyMetaData.setData(data);
         eqLaunchTokenDTO.setSurvey_metadata(surveyMetaData);
@@ -89,7 +92,7 @@ public class EqPayloadBuilder {
   //"response_expires_at": "2022-12-01T00:00:00+00:00",         // Note: Optional, this is to delete partial responses after X time.
                                                                 // Not MVP. This would have to be defined at Survey level if we wanted to set it for some surveys.
   "response_id": "QzXMrPqoLiyEyerrED88AbkQoQK0sVVX72ZtVphHr0w=", // work already specced for this: https://trello.com/c/2EYYMlvH/240-properly-handle-and-document-eq-launch-response-id-hashing-and-peppering-5
-  "schema_url": "adhoc_0001",                                    // schema url from the UAC_DTO
+  "schema_url": "xyz",                                           // example had it using name, we store the url which is primary option
   "survey_metadata": {
     "data": {
       "case_ref": "1000000000000001",                              // we have this
