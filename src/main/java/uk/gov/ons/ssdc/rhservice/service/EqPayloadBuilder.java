@@ -3,6 +3,7 @@ package uk.gov.ons.ssdc.rhservice.service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchTokenDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.SurveyData;
 import uk.gov.ons.ssdc.rhservice.model.dto.SurveyMetaData;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 
@@ -24,9 +26,8 @@ public class EqPayloadBuilder {
     @Value("${eq.response-id-salt")
     private String responseIdSalt;
 
-    public Map<String, Object> buildEqPayloadMap(
+    public EqLaunchTokenDTO buildEqPayloadMap(
             String accountServiceUrl,
-            String accountServiceLogoutUrl,
             String languageCode,
             UacUpdateDTO uacUpdateDTO,
             CaseUpdateDTO caseUpdateDTO, CollectionExerciseUpdateDTO collectionExerciseUpdateDTO) {
@@ -51,44 +52,18 @@ public class EqPayloadBuilder {
             // work for this in progress, needs salt n pepper
         eqLaunchTokenDTO.setResponse_id("XYZ");
 
-        eqLaunchTokenDTO.setSchema_url(collectionExerciseUpdateDTO.getCollectionInstrumentSelectionRules());
+        eqLaunchTokenDTO.setSchema_url(uacUpdateDTO.getCollectionInstrumentUrl());
 
-        String schema_url;
-        SurveyMetaData survey_metadata;
+        SurveyMetaData surveyMetaData = new SurveyMetaData();
+        SurveyData data = new SurveyData();
+        data.setCase_ref(caseUpdateDTO.getCaseRef());
+        data.setQuestionnaire_id(uacUpdateDTO.getQid());
+        data.setReceipting_keys(List.of("questionnaire_id"));
 
+        surveyMetaData.setData(data);
+        eqLaunchTokenDTO.setSurvey_metadata(surveyMetaData);
 
-
-        payload.put("exp", expTime);
-        payload.put("iat", currentTimeInSeconds);
-        payload.put("jti", UUID.randomUUID().toString());
-
-
-        payload.put("tx_id", UUID.randomUUID().toString());
-
-
-        payload.put("collection_exercise_sid", caseUpdateDTO.getCollectionExerciseId());
-
-        payload.put("ru_ref", uacUpdateDTO.getQid());
-        payload.put("user_id", "RH");
-        payload.put("case_id", caseUpdateDTO.getCaseId());
-        payload.put("language_code", languageCode);
-        payload.put("eq_id", "9999");
-        payload.put("period_id", caseUpdateDTO.getCollectionExerciseId());
-        payload.put("form_type", "zzz");
-        payload.put("schema_name", "zzz_9999");
-        payload.put("survey_url", uacUpdateDTO.getCollectionInstrumentUrl());
-        payload.put("case_ref", caseUpdateDTO.getCaseRef());
-
-        payload.put(
-                "response_id",
-                encryptResponseId(
-                        uacUpdateDTO.getQid(), responseIdSalt));
-        payload.put("account_service_url", accountServiceUrl);
-        payload.put("account_service_log_out_url", accountServiceLogoutUrl);
-        payload.put("channel", "rh");
-        payload.put("questionnaire_id", uacUpdateDTO.getQid());
-
-        return payload;
+        return eqLaunchTokenDTO;
     }
 
   /*
@@ -105,7 +80,7 @@ public class EqPayloadBuilder {
   "jti": "6b383088-b8f8-4167-8847-c4aaeda8fe16",                // a new UUID we can create
   "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",              // UUID Transaction ID used to trace a transaction through the whole system.
                                                                 // MUST NOT be the same as the 'jti' value.
-  "account_service_url": "https://upstream.example.com",        // we already provide this, and logout??
+  "account_service_url": "https://upstream.example.com",        // we already provide this, no place for logout, optional or otherwise
   "case_id": "628256cf-5c78-4896-8bec-f0ddb69aaa11",            // we have this
   "channel": "RH",                                              // Just hardcode by us to RH
   "collection_exercise_sid": "789",                             // A reference UUID -< as per doc.  (not sure why example is 3 long).  We have this
@@ -114,7 +89,7 @@ public class EqPayloadBuilder {
   //"response_expires_at": "2022-12-01T00:00:00+00:00",         // Note: Optional, this is to delete partial responses after X time.
                                                                 // Not MVP. This would have to be defined at Survey level if we wanted to set it for some surveys.
   "response_id": "QzXMrPqoLiyEyerrED88AbkQoQK0sVVX72ZtVphHr0w=", // work already specced for this: https://trello.com/c/2EYYMlvH/240-properly-handle-and-document-eq-launch-response-id-hashing-and-peppering-5
-  "schema_name": "adhoc_0001",                                  // Or schema Url.  Will need collex DTO for this, and for the DTO to start including the CI rules
+  "schema_url": "adhoc_0001",                                    // schema url from the UAC_DTO
   "survey_metadata": {
     "data": {
       "case_ref": "1000000000000001",                              // we have this
