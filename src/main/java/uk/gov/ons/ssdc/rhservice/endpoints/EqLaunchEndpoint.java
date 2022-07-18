@@ -57,7 +57,8 @@ public class EqLaunchEndpoint {
             accountServiceLogoutUrl,
             languageCode,
             uacOr4xxResponseEntity.getUacUpdateDTO(),
-            uacOr4xxResponseEntity.getCaseUpdateDTO());
+            uacOr4xxResponseEntity.getCaseUpdateDTO(),
+            uacOr4xxResponseEntity.getCollectionExerciseUpdateDTO());
 
     String launchToken = encrypt(payload);
 

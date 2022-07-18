@@ -60,7 +60,7 @@ public class EqLaunchEndpointTest {
     uacOr4xxResponseEntity.setCaseUpdateDTO(caseUpdateDTO);
     uacOr4xxResponseEntity.setResponseEntityOptional(Optional.empty());
 
-    when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any(), any())).thenReturn(payload);
+    when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any(), any(), uacOr4xxResponseEntity.getCollectionExerciseUpdateDTO())).thenReturn(payload);
     when(encodeJws.encode(any())).thenReturn(jwsObject);
     when(encryptJwe.encrypt(any())).thenReturn(expectedToken);
     when(uacService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
@@ -75,7 +75,7 @@ public class EqLaunchEndpointTest {
     verify(uacService).getUac(uacHash);
     verify(eqPayloadBuilder)
         .buildEqPayloadMap(
-            accountServiceUrl, accountServiceLogoutUrl, languageCode, uacUpdateDTO, caseUpdateDTO);
+            accountServiceUrl, accountServiceLogoutUrl, languageCode, uacUpdateDTO, caseUpdateDTO, uacOr4xxResponseEntity.getCollectionExerciseUpdateDTO());
     verify(encodeJws).encode(payload);
     verify(encryptJwe).encrypt(jwsObject);
     verify(eqLaunchSender).buildAndSendEqLaunchEvent(any());

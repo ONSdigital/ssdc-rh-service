@@ -40,7 +40,7 @@ class EqPayloadBuilderTest {
             ACCOUNT_SERVICE_LOGOUT_URL,
             LANGUAGE_CODE,
             uacUpdateDTO,
-            caseUpdateDTO);
+            caseUpdateDTO, uacOr4xxResponseEntity.getCollectionExerciseUpdateDTO());
 
     // Then
     String expectedEncryptedResponseId = "TEST_QIDa8410f66014e5778";
@@ -99,7 +99,7 @@ class EqPayloadBuilderTest {
                     ACCOUNT_SERVICE_LOGOUT_URL,
                     LANGUAGE_CODE,
                     uacUpdateDTO,
-                    caseUpdateDTO));
+                    caseUpdateDTO, uacOr4xxResponseEntity.getCollectionExerciseUpdateDTO()));
     assertThat(thrownException.getMessage())
         .isEqualTo(
             String.format(
@@ -127,7 +127,7 @@ class EqPayloadBuilderTest {
                     ACCOUNT_SERVICE_LOGOUT_URL,
                     LANGUAGE_CODE,
                     uacUpdateDTO,
-                    caseUpdateDTO));
+                    caseUpdateDTO, uacOr4xxResponseEntity.getCollectionExerciseUpdateDTO()));
     assertThat(thrownException.getMessage())
         .isEqualTo(
             String.format(
@@ -154,7 +154,7 @@ class EqPayloadBuilderTest {
                     ACCOUNT_SERVICE_LOGOUT_URL,
                     invalidLanguageCode,
                     uacUpdateDTO,
-                    caseUpdateDTO));
+                    caseUpdateDTO, uacOr4xxResponseEntity.getCollectionExerciseUpdateDTO()));
     assertThat(thrownException.getMessage())
         .isEqualTo(String.format("Invalid language code: '%s'", invalidLanguageCode));
   }
