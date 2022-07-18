@@ -18,7 +18,6 @@ public class EqPayloadBuilder {
 
   private static final Set<String> ALLOWED_LANGUAGE_CODES = Set.of("cy", "en");
 
-//  @Value("${eq.response-id-pepper")
   private String responseIdPepper;
 
   public EqPayloadBuilder(@Value("${eq.response-id-pepper}") String peppery) {

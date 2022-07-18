@@ -27,7 +27,7 @@ class EqPayloadBuilderTest {
   @Test
   void testBuildEqPayload() {
     // Given
-    EqPayloadBuilder underTest = new EqPayloadBuilder();
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     ReflectionTestUtils.setField(underTest, "responseIdPepper", "TEST");
 
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
@@ -42,8 +42,8 @@ class EqPayloadBuilderTest {
             uacUpdateDTO,
             caseUpdateDTO);
 
-    // Then
-    String expectedEncryptedResponseId = "TEST_QIDa8410f66014e5778";
+    String expectedEncryptedResponseId =
+        "a8410f66014e57788c7cfaec74fef4bdd347d2a62efc7dd2239a3eb19e37c32b";
     assertThat(eqPayload)
         .containsKey("jti")
         .containsKey("tx_id")
@@ -82,7 +82,7 @@ class EqPayloadBuilderTest {
 
   @Test
   void testValidateEmptyCollectionExerciseIdFailure() {
-    EqPayloadBuilder underTest = new EqPayloadBuilder();
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
 
     // Given
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
@@ -109,7 +109,7 @@ class EqPayloadBuilderTest {
 
   @Test
   void testValidateEmptyQidFailure() {
-    EqPayloadBuilder underTest = new EqPayloadBuilder();
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     // Given
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
     uacUpdateDTO.setQid(null);
@@ -137,7 +137,7 @@ class EqPayloadBuilderTest {
 
   @Test
   void testValidateLanguageCodeFailure() {
-    EqPayloadBuilder underTest = new EqPayloadBuilder();
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     // Given
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
 
