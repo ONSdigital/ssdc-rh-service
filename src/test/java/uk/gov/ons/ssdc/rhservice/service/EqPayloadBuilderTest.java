@@ -28,7 +28,7 @@ class EqPayloadBuilderTest {
   void testBuildEqPayload() {
     // Given
     EqPayloadBuilder underTest = new EqPayloadBuilder();
-    ReflectionTestUtils.setField(underTest, "responseIdSalt", "TEST");
+    ReflectionTestUtils.setField(underTest, "responseIdPepper", "TEST");
 
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);

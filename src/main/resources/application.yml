@@ -73,4 +73,4 @@ jwe_key:
 
 #TODO: Put something sensible here
 eq:
-  response-id-salt: SRM_PLACEHOLDER
+  response-id-pepper: SRM_PLACEHOLDER
