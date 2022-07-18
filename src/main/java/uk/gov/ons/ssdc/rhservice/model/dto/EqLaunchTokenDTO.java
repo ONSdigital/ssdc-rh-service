@@ -10,6 +10,7 @@ public class EqLaunchTokenDTO {
     String tx_id;
     String account_service_url;
     String case_id;
+    String version;
     String channel;
     String collection_exercise_sid;
     String language_code;
