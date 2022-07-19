@@ -42,8 +42,6 @@ class EqPayloadBuilderTest {
             uacUpdateDTO,
             caseUpdateDTO);
 
-    String expectedEncryptedResponseId =
-        "a8410f66014e57788c7cfaec74fef4bdd347d2a62efc7dd2239a3eb19e37c32b";
     assertThat(eqPayload)
         .containsKey("jti")
         .containsKey("tx_id")
@@ -60,7 +58,7 @@ class EqPayloadBuilderTest {
         .containsEntry("schema_name", "zzz_9999")
         .containsEntry("survey_url", uacUpdateDTO.getCollectionInstrumentUrl())
         .containsEntry("case_ref", caseUpdateDTO.getCaseRef())
-        .containsEntry("response_id", expectedEncryptedResponseId)
+        .containsEntry("response_id", "TEST_QID_a8410f66014e5778")
         .containsEntry("account_service_url", ACCOUNT_SERVICE_URL)
         .containsEntry("account_service_log_out_url", ACCOUNT_SERVICE_LOGOUT_URL)
         .containsEntry("channel", "rh")

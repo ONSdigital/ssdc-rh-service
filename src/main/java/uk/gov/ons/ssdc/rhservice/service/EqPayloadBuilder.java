@@ -93,7 +93,7 @@ public class EqPayloadBuilder {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       md.update(pepper.getBytes());
       byte[] bytes = md.digest(questionnaireId.getBytes());
-      return new String(Hex.encode(bytes));
+      return questionnaireId + "_" + new String(Hex.encode(bytes), 0, 16);
     } catch (NoSuchAlgorithmException ex) {
       throw new RuntimeException("No SHA-256 algorithm while encrypting questionnaire", ex);
     }
