@@ -88,9 +88,9 @@ public class EqPayloadBuilder {
   }
 
   /*
-    Note: yes this returns the plaintext questionnaireId and a hash of the questionnaireId
-    There is/was a valid downstream/EQ reason for doing this.  They also encrypt this field fully their end
-   */
+   Note: yes this returns the plaintext questionnaireId and a hash of the questionnaireId
+   There is/was a valid downstream/EQ reason for doing this.  They also encrypt this field fully their end
+  */
   private String encryptResponseId(String questionnaireId, String pepper) {
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
