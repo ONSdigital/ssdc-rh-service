@@ -27,8 +27,8 @@ class EqPayloadBuilderTest {
   @Test
   void testBuildEqPayload() {
     // Given
-    EqPayloadBuilder underTest = new EqPayloadBuilder();
-    ReflectionTestUtils.setField(underTest, "responseIdSalt", "TEST");
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
+    ReflectionTestUtils.setField(underTest, "responseIdPepper", "TEST");
 
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
@@ -42,8 +42,6 @@ class EqPayloadBuilderTest {
             uacUpdateDTO,
             caseUpdateDTO);
 
-    // Then
-    String expectedEncryptedResponseId = "TEST_QIDa8410f66014e5778";
     assertThat(eqPayload)
         .containsKey("jti")
         .containsKey("tx_id")
@@ -60,7 +58,7 @@ class EqPayloadBuilderTest {
         .containsEntry("schema_name", "zzz_9999")
         .containsEntry("survey_url", uacUpdateDTO.getCollectionInstrumentUrl())
         .containsEntry("case_ref", caseUpdateDTO.getCaseRef())
-        .containsEntry("response_id", expectedEncryptedResponseId)
+        .containsEntry("response_id", "TEST_QID_a8410f66014e5778")
         .containsEntry("account_service_url", ACCOUNT_SERVICE_URL)
         .containsEntry("account_service_log_out_url", ACCOUNT_SERVICE_LOGOUT_URL)
         .containsEntry("channel", "rh")
@@ -82,7 +80,7 @@ class EqPayloadBuilderTest {
 
   @Test
   void testValidateEmptyCollectionExerciseIdFailure() {
-    EqPayloadBuilder underTest = new EqPayloadBuilder();
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
 
     // Given
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
@@ -109,7 +107,7 @@ class EqPayloadBuilderTest {
 
   @Test
   void testValidateEmptyQidFailure() {
-    EqPayloadBuilder underTest = new EqPayloadBuilder();
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     // Given
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
     uacUpdateDTO.setQid(null);
@@ -137,7 +135,7 @@ class EqPayloadBuilderTest {
 
   @Test
   void testValidateLanguageCodeFailure() {
-    EqPayloadBuilder underTest = new EqPayloadBuilder();
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     // Given
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
 
