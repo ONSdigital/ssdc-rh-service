@@ -13,8 +13,8 @@ import java.text.ParseException;
 import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
 public class DecryptJwt {
-  public static JWSObject decryptJwe(String token, String key_str) {
-    Key jwe_key = stringToKey(key_str);
+  public static JWSObject decryptJwe(String token, Key key) {
+//    Key jwe_key = stringToKey(key_str);
 
     JWEObject jweObject;
     try {
@@ -24,7 +24,7 @@ public class DecryptJwt {
     }
 
     try {
-      jweObject.decrypt(new RSADecrypter((RSAKey) jwe_key.getJWK()));
+      jweObject.decrypt(new RSADecrypter((RSAKey) key.getJWK()));
     } catch (JOSEException e) {
       throw new RuntimeException("Failed to decrypt JWE with provided key");
     }
@@ -37,11 +37,11 @@ public class DecryptJwt {
     return payload.toJWSObject();
   }
 
-  public static String decodeJws(JWSObject jwsObject, String key_str) {
-    Key jws_key = stringToKey(key_str);
+  public static String decodeJws(JWSObject jwsObject, Key key) {
+//    Key jws_key = stringToKey(key_str);
 
     try {
-      if (jwsObject.verify(new RSASSAVerifier((RSAKey) jws_key.getJWK()))) {
+      if (jwsObject.verify(new RSASSAVerifier((RSAKey) key.getJWK()))) {
         Payload payload = jwsObject.getPayload();
         if (payload == null) {
           throw new RuntimeException("Extracted JWS Payload null");

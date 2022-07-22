@@ -2,6 +2,7 @@ package uk.gov.ons.ssdc.rhservice.endpoints;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
+import static uk.gov.ons.ssdc.rhservice.testutils.JsonHelper.stringToDecyptKeys;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.JWTKeysDecrypt;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
@@ -49,11 +51,8 @@ class EqLaunchEndpointIT {
 
   @Autowired private UacRepository uacRepository;
 
-  @Value("${jws_decode}")
-  private String jws_decode_key;
-
-  @Value("${jwe_decrypt}")
-  private String jwe_decrypt_key;
+  @Value("${jwt_decrypt_keys}")
+  private String jwtDecryptKeys;
 
   @Test
   void testEqLaunchUrlSuccessfullyReturned()
@@ -142,7 +141,10 @@ class EqLaunchEndpointIT {
   }
 
   private String decryptToken(String token) {
-    JWSObject jwsObject = DecryptJwt.decryptJwe(token, jwe_decrypt_key);
-    return DecryptJwt.decodeJws(jwsObject, jws_decode_key);
+    JWTKeysDecrypt jwtKeysDecrypt = stringToDecyptKeys(jwtDecryptKeys);
+
+
+    JWSObject jwsObject = DecryptJwt.decryptJwe(token, jwtKeysDecrypt.getJwePrivateKey());
+    return DecryptJwt.decodeJws(jwsObject, jwtKeysDecrypt.getJwsPublicKey());
   }
 }

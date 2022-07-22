@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.JWTKeys;
 import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
 public class JsonHelper {
@@ -20,6 +21,15 @@ public class JsonHelper {
   public static Key stringToKey(String keyString) {
     try {
       return objectMapper.readValue(keyString, Key.class);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to read cryptographic keys", e);
+    }
+  }
+
+  public static JWTKeys stringToKeys(String keyString) {
+    try {
+      JWTKeys a = objectMapper.readValue(keyString, JWTKeys.class);
+      return a;
     } catch (Exception e) {
       throw new RuntimeException("Failed to read cryptographic keys", e);
     }
