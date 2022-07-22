@@ -1,6 +1,5 @@
 package uk.gov.ons.ssdc.rhservice.testutils;
 
-
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.JWSObject;
