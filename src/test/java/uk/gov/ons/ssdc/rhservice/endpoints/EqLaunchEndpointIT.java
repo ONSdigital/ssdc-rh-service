@@ -143,7 +143,6 @@ class EqLaunchEndpointIT {
   private String decryptToken(String token) {
     JWTKeysDecrypt jwtKeysDecrypt = stringToDecyptKeys(jwtDecryptKeys);
 
-
     JWSObject jwsObject = DecryptJwt.decryptJwe(token, jwtKeysDecrypt.getJwePrivateKey());
     return DecryptJwt.decodeJws(jwsObject, jwtKeysDecrypt.getJwsPublicKey());
   }

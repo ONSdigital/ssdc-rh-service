@@ -1,6 +1,5 @@
 package uk.gov.ons.ssdc.rhservice.testutils;
 
-import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.stringToKey;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEObject;
@@ -14,7 +13,7 @@ import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
 public class DecryptJwt {
   public static JWSObject decryptJwe(String token, Key key) {
-//    Key jwe_key = stringToKey(key_str);
+    //    Key jwe_key = stringToKey(key_str);
 
     JWEObject jweObject;
     try {
@@ -38,7 +37,7 @@ public class DecryptJwt {
   }
 
   public static String decodeJws(JWSObject jwsObject, Key key) {
-//    Key jws_key = stringToKey(key_str);
+    //    Key jws_key = stringToKey(key_str);
 
     try {
       if (jwsObject.verify(new RSASSAVerifier((RSAKey) key.getJWK()))) {

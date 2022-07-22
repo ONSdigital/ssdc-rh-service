@@ -2,8 +2,6 @@ package uk.gov.ons.ssdc.rhservice.testutils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-
-import uk.gov.ons.ssdc.rhservice.model.dto.JWTKeys;
 import uk.gov.ons.ssdc.rhservice.model.dto.JWTKeysDecrypt;
 import uk.gov.ons.ssdc.rhservice.utils.ObjectMapperFactory;
 
