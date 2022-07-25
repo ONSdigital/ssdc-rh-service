@@ -2,7 +2,7 @@ package uk.gov.ons.ssdc.rhservice.endpoints;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
-import static uk.gov.ons.ssdc.rhservice.testutils.JsonHelper.stringToDecyptKeys;
+import static uk.gov.ons.ssdc.rhservice.testutils.JsonHelper.fileToDecryptKeys;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -141,7 +141,7 @@ class EqLaunchEndpointIT {
   }
 
   private String decryptToken(String token) {
-    JWTKeysDecrypt jwtKeysDecrypt = stringToDecyptKeys(jwtDecryptKeys);
+    JWTKeysDecrypt jwtKeysDecrypt = fileToDecryptKeys(jwtDecryptKeys);
 
     JWSObject jwsObject = DecryptJwt.decryptJwe(token, jwtKeysDecrypt.getJwePrivateKey());
     return DecryptJwt.decodeJws(jwsObject, jwtKeysDecrypt.getJwsPublicKey());

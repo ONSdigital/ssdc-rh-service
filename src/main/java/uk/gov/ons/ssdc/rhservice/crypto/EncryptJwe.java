@@ -1,6 +1,6 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
-import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.stringToKeys;
+import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.jwtKeyFilesToJWTKEYS;
 
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
@@ -21,7 +21,7 @@ public class EncryptJwe {
   private final RSAEncrypter encryptor;
 
   public EncryptJwe(@Value("${jwt_keys}") String jwtKeyStr) {
-    Key jwePublicKey = stringToKeys(jwtKeyStr).getJwePublicKey();
+    Key jwePublicKey = jwtKeyFilesToJWTKEYS(jwtKeyStr).getJwePublicKey();
 
     this.jweHeader = buildHeader(jwePublicKey);
     RSAKey jwk = (RSAKey) jwePublicKey.getJWK();

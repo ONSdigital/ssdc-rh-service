@@ -1,6 +1,6 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
-import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.stringToKeys;
+import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.jwtKeyFilesToJWTKEYS;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
@@ -22,7 +22,8 @@ public class EncodeJws {
   private final RSASSASigner signer;
 
   public EncodeJws(@Value("${jwt_keys}") String jwtKeyStr) {
-    Key jwsPrivateKey = stringToKeys(jwtKeyStr).getJwsPrivateKey();
+
+    Key jwsPrivateKey = jwtKeyFilesToJWTKEYS(jwtKeyStr).getJwsPrivateKey();
 
     this.jwsHeader = buildHeader(jwsPrivateKey);
     RSAKey jwk = (RSAKey) jwsPrivateKey.getJWK();
