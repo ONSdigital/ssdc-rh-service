@@ -16,18 +16,13 @@ public class JWTKeysLoader {
   private final ObjectMapper objectMapper = ObjectMapperFactory.objectMapper();
   private JWTKeys jwtKeys;
 
-  public JWTKeysLoader(@Value("${jwt_keys}") String jwtKeyStr) {
-    jwtKeys = jwtKeyFilesToJWTKEYS(jwtKeyStr);
-  }
-
-  public JWTKeys jwtKeyFilesToJWTKEYS(String fileLocation) {
-
-    Path filePath = Path.of(fileLocation);
+  public JWTKeysLoader(@Value("${jwt_keys}") String keyFileLocation) {
+    Path filePath = Path.of(keyFileLocation);
     try {
       String content = Files.readString(filePath);
-      return stringToKeys(content);
+      jwtKeys = stringToKeys(content);
     } catch (IOException e) {
-      throw new RuntimeException("Failed to load Keys file from: " + fileLocation, e);
+      throw new RuntimeException("Failed to load Keys file from: " + keyFileLocation, e);
     }
   }
 
