@@ -35,7 +35,7 @@ public class DecryptJwt {
   }
 
   public static String decodeJws(JWSObject jwsObject, Key key) {
-    
+
     try {
       if (jwsObject.verify(new RSASSAVerifier((RSAKey) key.getJWK()))) {
         Payload payload = jwsObject.getPayload();

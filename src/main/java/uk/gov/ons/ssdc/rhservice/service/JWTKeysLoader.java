@@ -28,8 +28,7 @@ public class JWTKeysLoader {
 
   private JWTKeys stringToKeys(String keyString) {
     try {
-      JWTKeys a = objectMapper.readValue(keyString, JWTKeys.class);
-      return a;
+      return objectMapper.readValue(keyString, JWTKeys.class);
     } catch (Exception e) {
       throw new RuntimeException("Failed to read cryptographic keys", e);
     }
