@@ -1,7 +1,5 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
-import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.jwtKeyFilesToJWTKEYS;
-
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -12,18 +10,18 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.Key;
+import uk.gov.ons.ssdc.rhservice.service.JWTKeysLoader;
 
 @Service
 public class EncodeJws {
   private final JWSHeader jwsHeader;
   private final RSASSASigner signer;
 
-  public EncodeJws(@Value("${jwt_keys}") String jwtKeyStr) {
+  public EncodeJws(JWTKeysLoader jwtKeysLoader) {
 
-    Key jwsPrivateKey = jwtKeyFilesToJWTKEYS(jwtKeyStr).getJwsPrivateKey();
+    Key jwsPrivateKey = jwtKeysLoader.getJwtKeys().getJwsPrivateKey();
 
     this.jwsHeader = buildHeader(jwsPrivateKey);
     RSAKey jwk = (RSAKey) jwsPrivateKey.getJWK();

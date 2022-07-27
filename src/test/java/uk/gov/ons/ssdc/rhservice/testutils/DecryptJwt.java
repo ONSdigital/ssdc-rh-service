@@ -12,7 +12,6 @@ import uk.gov.ons.ssdc.rhservice.model.dto.Key;
 
 public class DecryptJwt {
   public static JWSObject decryptJwe(String token, Key key) {
-    //    Key jwe_key = stringToKey(key_str);
 
     JWEObject jweObject;
     try {
