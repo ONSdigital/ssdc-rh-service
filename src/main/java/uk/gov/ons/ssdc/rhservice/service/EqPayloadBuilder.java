@@ -56,10 +56,7 @@ public class EqPayloadBuilder {
     payload.put("survey_url", uacUpdateDTO.getCollectionInstrumentUrl());
     payload.put("case_ref", caseUpdateDTO.getCaseRef());
 
-    payload.put(
-        "response_id",
-        encryptResponseId(
-            uacUpdateDTO.getQid(), responseIdPepper)); // TODO: Is encrypting this necessary?
+    payload.put("response_id", encryptResponseId(uacUpdateDTO.getQid(), responseIdPepper));
     payload.put("account_service_url", accountServiceUrl);
     payload.put("account_service_log_out_url", accountServiceLogoutUrl);
     payload.put("channel", "rh");
