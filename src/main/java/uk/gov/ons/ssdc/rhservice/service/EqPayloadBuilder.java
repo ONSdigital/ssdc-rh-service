@@ -2,7 +2,7 @@ package uk.gov.ons.ssdc.rhservice.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,114 +12,76 @@ import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchTokenDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.SurveyData;
-import uk.gov.ons.ssdc.rhservice.model.dto.SurveyMetaData;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 
 @Service
 public class EqPayloadBuilder {
 
   private static final Set<String> ALLOWED_LANGUAGE_CODES = Set.of("cy", "en");
+  public static final String EQ_SCHEMA_VERSION = "V2";
 
-  private String responseIdPepper;
+  private final String responseIdPepper;
 
   public EqPayloadBuilder(@Value("${eq.response-id-pepper}") String peppery) {
     this.responseIdPepper = peppery;
   }
 
-  public EqLaunchTokenDTO buildEqPayloadMap(
-          String accountServiceUrl,
-          String languageCode,
-          UacUpdateDTO uacUpdateDTO,
-          CaseUpdateDTO caseUpdateDTO) {
+  public Map<String, Object> buildEqPayloadMap(
+      String accountServiceUrl,
+      String languageCode,
+      UacUpdateDTO uacUpdateDTO,
+      CaseUpdateDTO caseUpdateDTO) {
 
     validateData(caseUpdateDTO, uacUpdateDTO, languageCode);
 
     long currentTimeInSeconds = System.currentTimeMillis() / 1000;
-
     long expTime = currentTimeInSeconds + (5 * 60);
 
-    EqLaunchTokenDTO eqLaunchTokenDTO = new EqLaunchTokenDTO();
-    eqLaunchTokenDTO.setExp(expTime);
-    eqLaunchTokenDTO.setIat(currentTimeInSeconds);
-    eqLaunchTokenDTO.setJti(UUID.randomUUID().toString());
-    eqLaunchTokenDTO.setTx_id(UUID.randomUUID().toString());
-    eqLaunchTokenDTO.setAccount_service_url(accountServiceUrl);
-    eqLaunchTokenDTO.setCase_id(caseUpdateDTO.getCaseId());
-    eqLaunchTokenDTO.setChannel("RH");
-    eqLaunchTokenDTO.setCollection_exercise_sid(caseUpdateDTO.getCollectionExerciseId());
-    eqLaunchTokenDTO.setLanguage_code(languageCode);
-    eqLaunchTokenDTO.setVersion("V2"); //eq launch token schema, current V2 - this would good in app.yml
+    /*
+     Schema from: https://github.com/ONSdigital/ons-schema-definitions/blob/v3/docs/rm_to_eq_runner_payload_v2.rst
 
-    // work for this in progress, needs salt n pepper
-    eqLaunchTokenDTO.setResponse_id("XYZ");
+     Why you may ask are we using a horrid Map rather than a lovely Java POJO?
+     Well the encryption library plays nicely with Maps, and is tried and tested that way.
+    */
+    Map<String, Object> eqTokenPayload = new HashMap<>();
+    eqTokenPayload.put("exp", expTime);
+    eqTokenPayload.put("iat", currentTimeInSeconds);
+    eqTokenPayload.put("jti", UUID.randomUUID().toString());
+    eqTokenPayload.put("tx_id", UUID.randomUUID().toString());
+    eqTokenPayload.put("account_service_url", accountServiceUrl);
+    eqTokenPayload.put("case_id", caseUpdateDTO.getCaseId());
+    eqTokenPayload.put("channel", "RH");
+    eqTokenPayload.put("collection_exercise_sid", caseUpdateDTO.getCollectionExerciseId());
+    eqTokenPayload.put("language_code", languageCode);
+    eqTokenPayload.put("version", EQ_SCHEMA_VERSION);
+    eqTokenPayload.put("response_id", encryptResponseId(uacUpdateDTO.getQid()));
+    eqTokenPayload.put("schema_url", uacUpdateDTO.getCollectionInstrumentUrl());
 
-    eqLaunchTokenDTO.setSchema_url(uacUpdateDTO.getCollectionInstrumentUrl());
+    eqTokenPayload.put("survey_metadata", getSurveyMetaData(uacUpdateDTO));
 
-    SurveyMetaData surveyMetaData = new SurveyMetaData();
-    SurveyData data = new SurveyData();
-    data.setCase_ref(caseUpdateDTO.getCaseRef());
-    data.setQuestionnaire_id(uacUpdateDTO.getQid());
-
-    // we've added the Questionnaire Id above in data,  here we tell EQ to receipt on questionnaire_id
-    surveyMetaData.setReceipting_keys(List.of("questionnaire_id"));
-
-    surveyMetaData.setData(data);
-    eqLaunchTokenDTO.setSurvey_metadata(surveyMetaData);
-
-    return eqLaunchTokenDTO;
+    return eqTokenPayload;
   }
 
-  /*
-  Copied from https://github.com/ONSdigital/ons-schema-definitions/blob/v3/docs/rm_to_eq_runner_payload_v2.rst
+  private Map<String, Object> getSurveyMetaData(UacUpdateDTO uacUpdateDTO) {
+    Map<String, String> data = new HashMap<>();
+    data.put("questionnaire_id", uacUpdateDTO.getQid());
 
-  Should we just make this a DTO, not sure of the benefit of a MAP.
-  POJOs would be a lot clearer
+    Map<String, Object> surveyMetaData = new HashMap<>();
+    surveyMetaData.put("data", data);
+    surveyMetaData.put("receipting_keys", List.of("questionnaire_id"));
 
-  Comments added by me
-
-  {
-  "exp": 1458057712,                                            // currentTimeInSeconds
-  "iat": 1458047712,                                            // currentTimeInSeconds + 5 minutes (300)
-  "jti": "6b383088-b8f8-4167-8847-c4aaeda8fe16",                // a new UUID we can create
-  "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",              // UUID Transaction ID used to trace a transaction through the whole system.
-                                                                // MUST NOT be the same as the 'jti' value.
-  "account_service_url": "https://upstream.example.com",        // we already provide this, no place for logout, optional or otherwise
-  "case_id": "628256cf-5c78-4896-8bec-f0ddb69aaa11",            // we have this
-  "channel": "RH",                                              // Just hardcode by us to RH
-  "collection_exercise_sid": "789",                             // A reference UUID -< as per doc.  (not sure why example is 3 long).  We have this
-  //"region_code": "GB-WLS",                                    // NOTE this is legacy.  we don't have this or need it for MVP
-  "language_code",                                              // Optional (official) field added by me.  We have en/cy, and are legally required to support
-  //"response_expires_at": "2022-12-01T00:00:00+00:00",         // Note: Optional, this is to delete partial responses after X time.
-                                                                // Not MVP. This would have to be defined at Survey level if we wanted to set it for some surveys.
-  "response_id": "QzXMrPqoLiyEyerrED88AbkQoQK0sVVX72ZtVphHr0w=", // work already specced for this: https://trello.com/c/2EYYMlvH/240-properly-handle-and-document-eq-launch-response-id-hashing-and-peppering-5
-  "schema_url": "xyz",                                           // example had it using name, we store the url which is primary option
-  "survey_metadata": {
-    "data": {
-      "case_ref": "1000000000000001",                              // we have this
-      "case_type": "B",                                            // not applicable to us, particualalry for MVP.
-      // Questionnaire_id will be a string of numbers, currently
-      "questionnaire_id": "bdf7dff2-1d73-4b97-bd2d-91f2e53160b9"   // qid in the UacUpdateDTO
-    },
-    "receipting_keys": [
-      "questionnaire_id"                                           // Can stay as is.
-    ]
+    return surveyMetaData;
   }
-}
-
-   */
 
   private void validateData(
-          CaseUpdateDTO caseUpdateDTO, UacUpdateDTO uacUpdateDTO, String languageCode) {
+      CaseUpdateDTO caseUpdateDTO, UacUpdateDTO uacUpdateDTO, String languageCode) {
     String collectionExerciseId = caseUpdateDTO.getCollectionExerciseId();
     String caseId = caseUpdateDTO.getCaseId();
 
     if (StringUtils.isEmpty(collectionExerciseId)) {
       throw new RuntimeException(
-              String.format(
-                      "collectionExerciseId '%s' not found for caseId '%s'", collectionExerciseId, caseId));
+          String.format(
+              "collectionExerciseId '%s' not found for caseId '%s'", collectionExerciseId, caseId));
     }
 
     String qid = uacUpdateDTO.getQid();
@@ -134,10 +96,10 @@ public class EqPayloadBuilder {
    Note: yes this returns the plaintext questionnaireId and a hash of the questionnaireId
    There is/was a valid downstream/EQ reason for doing this.  They also encrypt this field fully their end
   */
-  private String encryptResponseId(String questionnaireId, String pepper) {
+  private String encryptResponseId(String questionnaireId) {
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
-      md.update(pepper.getBytes());
+      md.update(responseIdPepper.getBytes());
       byte[] bytes = md.digest(questionnaireId.getBytes());
       return questionnaireId + "_" + new String(Hex.encode(bytes), 0, 16);
     } catch (NoSuchAlgorithmException ex) {

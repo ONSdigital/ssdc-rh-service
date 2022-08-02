@@ -25,7 +25,7 @@ public class EqLaunchSender {
     this.pubsubHelper = pubsubHelper;
   }
 
-  public void buildAndSendEqLaunchEvent(Map<String, Object> payload) {
+  public void buildAndSendEqLaunchEvent(Map<String, Object> payload, String qid) {
     EventDTO eqLaunchEvent = new EventDTO();
     EventHeaderDTO eventHeader = new EventHeaderDTO();
     eventHeader.setVersion(OUTBOUND_EVENT_SCHEMA_VERSION);
@@ -40,7 +40,7 @@ public class EqLaunchSender {
     eqLaunchEvent.setHeader(eventHeader);
 
     EqLaunchDTO eqLaunchDTO = new EqLaunchDTO();
-    eqLaunchDTO.setQid(payload.get("questionnaire_id").toString());
+    eqLaunchDTO.setQid(qid);
     PayloadDTO payloadDTO = new PayloadDTO();
     payloadDTO.setEqLaunch(eqLaunchDTO);
     eqLaunchEvent.setPayload(payloadDTO);

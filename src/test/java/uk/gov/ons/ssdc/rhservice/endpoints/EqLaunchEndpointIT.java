@@ -79,7 +79,6 @@ class EqLaunchEndpointIT {
               .header("accept", "application/json")
               .queryString("languageCode", "en")
               .queryString("accountServiceUrl", "http://xyz.com")
-              .queryString("accountServiceLogoutUrl", "http://logggedOut.com")
               .asString();
 
       assertThat(response.getStatus()).isEqualTo(OK.value());
@@ -89,7 +88,6 @@ class EqLaunchEndpointIT {
 
       assertThat(tokenData)
           .containsEntry("case_id", CASE_ID)
-          .containsEntry("questionnaire_id", QID)
           .containsEntry("collection_exercise_sid", COLLEX_ID)
           .containsEntry("language_code", "en");
 
@@ -107,7 +105,6 @@ class EqLaunchEndpointIT {
             .header("accept", "application/json")
             .queryString("languageCode", "en")
             .queryString("accountServiceUrl", "http://xyz.com")
-            .queryString("accountServiceLogoutUrl", "http://logggedOut.com")
             .asString();
 
     assertThat(response.getStatus()).isEqualTo(NOT_FOUND.value());
@@ -130,7 +127,6 @@ class EqLaunchEndpointIT {
             .header("accept", "application/json")
             .queryString("languageCode", "en")
             .queryString("accountServiceUrl", "http://xyz.com")
-            .queryString("accountServiceLogoutUrl", "http://logggedOut.com")
             .asString();
 
     assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR.value());

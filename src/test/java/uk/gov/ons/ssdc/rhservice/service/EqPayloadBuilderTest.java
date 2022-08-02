@@ -4,15 +4,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
@@ -21,14 +25,14 @@ import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 class EqPayloadBuilderTest {
 
   public static final String ACCOUNT_SERVICE_URL = "https://test.com";
-  public static final String ACCOUNT_SERVICE_LOGOUT_URL = "https://test.com";
   public static final String LANGUAGE_CODE = "en";
+  private static final String responseIdPepper = "TEST";
 
   @Test
   void testBuildEqPayload() {
     // Given
     EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
-    ReflectionTestUtils.setField(underTest, "responseIdPepper", "TEST");
+    ReflectionTestUtils.setField(underTest, "responseIdPepper", responseIdPepper);
 
     UacUpdateDTO uacUpdateDTO = getUacUpdate();
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
@@ -36,46 +40,40 @@ class EqPayloadBuilderTest {
     // When
     Map<String, Object> eqPayload =
         underTest.buildEqPayloadMap(
-            ACCOUNT_SERVICE_URL,
-            ACCOUNT_SERVICE_LOGOUT_URL,
-            LANGUAGE_CODE,
-            uacUpdateDTO,
-            caseUpdateDTO);
+            ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO);
 
-    assertThat(eqPayload)
-        .containsKey("jti")
-        .containsKey("tx_id")
-        .containsKey("iat")
-        .containsKey("exp")
-        .containsEntry("collection_exercise_sid", caseUpdateDTO.getCollectionExerciseId())
-        .containsEntry("ru_ref", uacUpdateDTO.getQid())
-        .containsEntry("user_id", "RH")
-        .containsEntry("case_id", caseUpdateDTO.getCaseId())
-        .containsEntry("language_code", LANGUAGE_CODE)
-        .containsEntry("eq_id", "9999")
-        .containsEntry("period_id", caseUpdateDTO.getCollectionExerciseId())
-        .containsEntry("form_type", "zzz")
-        .containsEntry("schema_name", "zzz_9999")
-        .containsEntry("survey_url", uacUpdateDTO.getCollectionInstrumentUrl())
-        .containsEntry("case_ref", caseUpdateDTO.getCaseRef())
-        .containsEntry("response_id", "TEST_QID_a8410f66014e5778")
-        .containsEntry("account_service_url", ACCOUNT_SERVICE_URL)
-        .containsEntry("account_service_log_out_url", ACCOUNT_SERVICE_LOGOUT_URL)
-        .containsEntry("channel", "rh")
-        .containsEntry("questionnaire_id", uacUpdateDTO.getQid());
+    assertThat(secondsStringToDateTime((long) eqPayload.get("exp")))
+        .isCloseTo(OffsetDateTime.now().plusMinutes(5), within(5, ChronoUnit.SECONDS));
+    assertThat(secondsStringToDateTime((long) eqPayload.get("iat")))
+        .isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.SECONDS));
 
-    long iat = (long) eqPayload.get("iat");
-    Date iatDate = new Date(TimeUnit.SECONDS.toMillis(iat));
-    OffsetDateTime iatOffsetDateTime = iatDate.toInstant().atOffset(ZoneOffset.UTC);
+    assertThat(UUID.fromString(eqPayload.get("jti").toString())).isNotNull();
+    assertThat(UUID.fromString(eqPayload.get("tx_id").toString())).isNotNull();
+    assertThat(UUID.fromString(eqPayload.get("tx_id").toString()))
+        .isNotEqualTo((UUID.fromString(eqPayload.get("jti").toString())));
 
-    long exp = (long) eqPayload.get("exp");
-    Date expDate = new Date(TimeUnit.SECONDS.toMillis(exp));
-    OffsetDateTime expOffsetDateTime = expDate.toInstant().atOffset(ZoneOffset.UTC);
+    assertThat(eqPayload.get("account_service_url")).isEqualTo(ACCOUNT_SERVICE_URL);
 
-    // TODO: These time assertions are brittle when debugging. We should consider mocking time if we
-    // have further need for this
-    assertThat(iatOffsetDateTime).isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.SECONDS));
-    assertThat(expOffsetDateTime).isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.MINUTES));
+    assertThat(eqPayload.get("case_id")).isEqualTo(caseUpdateDTO.getCaseId());
+    assertThat(eqPayload.get("channel")).isEqualTo("RH");
+    assertThat(eqPayload.get("collection_exercise_sid"))
+        .isEqualTo(caseUpdateDTO.getCollectionExerciseId());
+    assertThat(eqPayload.get("language_code")).isEqualTo(LANGUAGE_CODE);
+    assertThat(eqPayload.get("version")).isEqualTo("V2");
+    assertThat(eqPayload.get("response_id").toString())
+        .isEqualTo(getExpectedEncryptedResponseId(uacUpdateDTO.getQid()));
+    assertThat(eqPayload.get("schema_url")).isEqualTo(uacUpdateDTO.getCollectionInstrumentUrl());
+
+    Map<String, Object> actualSurveyMetaData =
+        (Map<String, Object>) eqPayload.get("survey_metadata");
+    Map<String, Object> actualData = (Map<String, Object>) actualSurveyMetaData.get("data");
+    assertThat(actualData.get("questionnaire_id")).isEqualTo(uacUpdateDTO.getQid());
+    assertThat(actualSurveyMetaData.get("receipting_keys")).isEqualTo(List.of("questionnaire_id"));
+  }
+
+  private OffsetDateTime secondsStringToDateTime(long actualSeconds) {
+    Date actualIatDate = new Date(TimeUnit.SECONDS.toMillis(actualSeconds));
+    return actualIatDate.toInstant().atOffset(ZoneOffset.UTC);
   }
 
   @Test
@@ -93,11 +91,7 @@ class EqPayloadBuilderTest {
             RuntimeException.class,
             () ->
                 underTest.buildEqPayloadMap(
-                    ACCOUNT_SERVICE_URL,
-                    ACCOUNT_SERVICE_LOGOUT_URL,
-                    LANGUAGE_CODE,
-                    uacUpdateDTO,
-                    caseUpdateDTO));
+                    ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO));
     assertThat(thrownException.getMessage())
         .isEqualTo(
             String.format(
@@ -121,11 +115,7 @@ class EqPayloadBuilderTest {
             RuntimeException.class,
             () ->
                 underTest.buildEqPayloadMap(
-                    ACCOUNT_SERVICE_URL,
-                    ACCOUNT_SERVICE_LOGOUT_URL,
-                    LANGUAGE_CODE,
-                    uacUpdateDTO,
-                    caseUpdateDTO));
+                    ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO));
     assertThat(thrownException.getMessage())
         .isEqualTo(
             String.format(
@@ -148,11 +138,7 @@ class EqPayloadBuilderTest {
             RuntimeException.class,
             () ->
                 underTest.buildEqPayloadMap(
-                    ACCOUNT_SERVICE_URL,
-                    ACCOUNT_SERVICE_LOGOUT_URL,
-                    invalidLanguageCode,
-                    uacUpdateDTO,
-                    caseUpdateDTO));
+                    ACCOUNT_SERVICE_URL, invalidLanguageCode, uacUpdateDTO, caseUpdateDTO));
     assertThat(thrownException.getMessage())
         .isEqualTo(String.format("Invalid language code: '%s'", invalidLanguageCode));
   }
@@ -195,5 +181,16 @@ class EqPayloadBuilderTest {
     uacUpdate.setEqLaunched(false);
 
     return uacUpdate;
+  }
+
+  private String getExpectedEncryptedResponseId(String questionnaireId) {
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      md.update(responseIdPepper.getBytes());
+      byte[] bytes = md.digest(questionnaireId.getBytes());
+      return questionnaireId + "_" + new String(Hex.encode(bytes), 0, 16);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new RuntimeException("No SHA-256 algorithm while encrypting questionnaire", ex);
+    }
   }
 }

@@ -43,7 +43,7 @@ class EqLaunchSenderTest {
 
     ReflectionTestUtils.setField(underTest, "eqLaunchTopic", TEST_TOPIC);
 
-    underTest.buildAndSendEqLaunchEvent(payload);
+    underTest.buildAndSendEqLaunchEvent(payload, TEST_QID);
 
     ArgumentCaptor<String> eventArgCaptor = ArgumentCaptor.forClass(String.class);
     verify(pubsubHelper).sendMessageToSharedProject(eq(TEST_TOPIC), eventArgCaptor.capture());

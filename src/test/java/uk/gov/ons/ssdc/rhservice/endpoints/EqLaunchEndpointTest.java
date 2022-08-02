@@ -44,7 +44,7 @@ public class EqLaunchEndpointTest {
   @Test
   public void testCallingEndpointGetsToken() {
     // Given
-    Map<String, Object> payload = new HashMap<>();
+    Map<String, Object> eqPayload = new HashMap<>();
     JWSObject jwsObject = Mockito.mock(JWSObject.class);
     String expectedToken = "cunninglyEncryptedToken";
     String uacHash = "UAC_HASH";
@@ -60,25 +60,23 @@ public class EqLaunchEndpointTest {
     uacOr4xxResponseEntity.setCaseUpdateDTO(caseUpdateDTO);
     uacOr4xxResponseEntity.setResponseEntityOptional(Optional.empty());
 
-    when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any(), any())).thenReturn(payload);
+    when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any())).thenReturn(eqPayload);
     when(encodeJws.encode(any())).thenReturn(jwsObject);
     when(encryptJwe.encrypt(any())).thenReturn(expectedToken);
     when(uacService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
 
     // when
     ResponseEntity<?> response =
-        underTest.generateEqLaunchToken(
-            uacHash, languageCode, accountServiceUrl, accountServiceLogoutUrl);
+        underTest.generateEqLaunchToken(uacHash, languageCode, accountServiceUrl);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEqualTo(expectedToken);
     verify(uacService).getUac(uacHash);
     verify(eqPayloadBuilder)
-        .buildEqPayloadMap(
-            accountServiceUrl, accountServiceLogoutUrl, languageCode, uacUpdateDTO, caseUpdateDTO);
-    verify(encodeJws).encode(payload);
+        .buildEqPayloadMap(accountServiceUrl, languageCode, uacUpdateDTO, caseUpdateDTO);
+    verify(encodeJws).encode(eqPayload);
     verify(encryptJwe).encrypt(jwsObject);
-    verify(eqLaunchSender).buildAndSendEqLaunchEvent(any());
+    verify(eqLaunchSender).buildAndSendEqLaunchEvent(any(), any());
   }
 
   @Test
@@ -105,8 +103,7 @@ public class EqLaunchEndpointTest {
 
     // when
     ResponseEntity<?> response =
-        underTest.generateEqLaunchToken(
-            uacHash, languageCode, accountServiceUrl, accountServiceLogoutUrl);
+        underTest.generateEqLaunchToken(uacHash, languageCode, accountServiceUrl);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isEqualTo("UAC_RECEIPTED");
