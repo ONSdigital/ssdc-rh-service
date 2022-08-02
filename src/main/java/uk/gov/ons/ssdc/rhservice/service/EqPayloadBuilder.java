@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,10 +20,14 @@ import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 
 @Service
 public class EqPayloadBuilder {
+
   private static final Set<String> ALLOWED_LANGUAGE_CODES = Set.of("cy", "en");
 
-  @Value("${eq.response-id-salt")
-  private String responseIdSalt;
+  private String responseIdPepper;
+
+  public EqPayloadBuilder(@Value("${eq.response-id-pepper}") String peppery) {
+    this.responseIdPepper = peppery;
+  }
 
   public EqLaunchTokenDTO buildEqPayloadMap(
           String accountServiceUrl,
@@ -127,17 +130,19 @@ public class EqPayloadBuilder {
     validateLanguageCode(languageCode);
   }
 
-  private String encryptResponseId(String questionnaireId, String salt) {
-    StringBuilder responseId = new StringBuilder(questionnaireId);
+  /*
+   Note: yes this returns the plaintext questionnaireId and a hash of the questionnaireId
+   There is/was a valid downstream/EQ reason for doing this.  They also encrypt this field fully their end
+  */
+  private String encryptResponseId(String questionnaireId, String pepper) {
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
-      md.update(salt.getBytes());
+      md.update(pepper.getBytes());
       byte[] bytes = md.digest(questionnaireId.getBytes());
-      responseId.append((new String(Hex.encode(bytes))), 0, 16);
+      return questionnaireId + "_" + new String(Hex.encode(bytes), 0, 16);
     } catch (NoSuchAlgorithmException ex) {
       throw new RuntimeException("No SHA-256 algorithm while encrypting questionnaire", ex);
     }
-    return responseId.toString();
   }
 
   private void validateLanguageCode(String languageCode) {

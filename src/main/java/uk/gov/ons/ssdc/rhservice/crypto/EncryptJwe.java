@@ -1,7 +1,5 @@
 package uk.gov.ons.ssdc.rhservice.crypto;
 
-import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.stringToKey;
-
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
@@ -11,20 +9,20 @@ import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSAEncrypter;
 import com.nimbusds.jose.jwk.RSAKey;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.Key;
+import uk.gov.ons.ssdc.rhservice.service.JWTKeysLoader;
 
 @Service
 public class EncryptJwe {
   private final JWEHeader jweHeader;
   private final RSAEncrypter encryptor;
 
-  public EncryptJwe(@Value("${jwe_key}") String jwsKeyStr) {
-    Key jwsPublicKey = stringToKey(jwsKeyStr);
+  public EncryptJwe(JWTKeysLoader jwtKeysLoader) {
+    Key jwePublicKey = jwtKeysLoader.getJwtKeys().getJwePublicKey();
 
-    this.jweHeader = buildHeader(jwsPublicKey);
-    RSAKey jwk = (RSAKey) jwsPublicKey.getJWK();
+    this.jweHeader = buildHeader(jwePublicKey);
+    RSAKey jwk = (RSAKey) jwePublicKey.getJWK();
 
     try {
       encryptor = new RSAEncrypter(jwk);
