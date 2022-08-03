@@ -2,7 +2,6 @@ package uk.gov.ons.ssdc.rhservice.testutils;
 
 import static com.google.cloud.spring.pubsub.support.PubSubSubscriptionUtils.toProjectSubscriptionName;
 import static com.google.cloud.spring.pubsub.support.PubSubTopicUtils.toProjectTopicName;
-import static uk.gov.ons.ssdc.rhservice.testutils.TestConstants.OUR_PUBSUB_PROJECT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.pubsub.v1.Subscriber;
@@ -25,8 +24,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.ssdc.rhservice.utils.ObjectMapperFactory;
 
 @Component
@@ -60,44 +57,6 @@ public class PubsubTestHelper {
       future.get(30, TimeUnit.SECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
       throw new RuntimeException(e);
-    }
-  }
-
-  public void purgeMessages(String subscription, String topic) {
-    purgeMessages(subscription, topic, OUR_PUBSUB_PROJECT);
-  }
-
-  public void purgeSharedProjectMessages(String subscription, String topic) {
-    purgeMessages(subscription, topic, sharedPubsubProject);
-  }
-
-  private void purgeMessages(String subscription, String topic, String project) {
-    RestTemplate restTemplate = new RestTemplate();
-
-    String subscriptionUrl =
-        "http://"
-            + gcpPubSubProperties.getEmulatorHost()
-            + "/v1/projects/"
-            + project
-            + "/subscriptions/"
-            + subscription;
-
-    try {
-      // There's no concept of a 'purge' with pubsub. Crudely, we have to delete & recreate
-      restTemplate.delete(subscriptionUrl);
-    } catch (HttpClientErrorException exception) {
-      if (exception.getRawStatusCode() != 404) {
-        throw exception;
-      }
-    }
-
-    try {
-      restTemplate.put(
-          subscriptionUrl, new SubscriptionTopic("projects/" + project + "/topics/" + topic));
-    } catch (HttpClientErrorException exception) {
-      if (exception.getRawStatusCode() != 409) {
-        throw exception;
-      }
     }
   }
 

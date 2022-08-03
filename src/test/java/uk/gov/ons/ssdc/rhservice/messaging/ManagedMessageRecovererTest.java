@@ -2,7 +2,6 @@ package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.google.cloud.spring.pubsub.support.BasicAcknowledgeablePubsubMessage;

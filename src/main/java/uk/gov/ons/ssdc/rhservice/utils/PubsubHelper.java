@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.EnableRetry;
@@ -19,7 +18,11 @@ import org.springframework.util.concurrent.ListenableFuture;
 @EnableRetry
 public class PubsubHelper {
 
-  @Autowired private PubSubTemplate pubSubTemplate;
+  private final PubSubTemplate pubSubTemplate;
+
+  public PubsubHelper(PubSubTemplate pubSubTemplate) {
+    this.pubSubTemplate = pubSubTemplate;
+  }
 
   @Value("${queueconfig.shared-pubsub-project}")
   private String sharedPubsubProject;

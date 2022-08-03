@@ -1,7 +1,5 @@
 package uk.gov.ons.ssdc.rhservice.testutils;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import com.google.cloud.pubsub.v1.Subscriber;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -20,10 +18,5 @@ public class QueueSpy<T> implements AutoCloseable {
 
   public T checkExpectedMessageReceived() throws InterruptedException {
     return queue.poll(20, TimeUnit.SECONDS);
-  }
-
-  public void checkMessageIsNotReceived(int timeOut) throws InterruptedException {
-    T actualMessage = queue.poll(timeOut, TimeUnit.SECONDS);
-    assertNull(actualMessage, "Message received when not expected");
   }
 }
