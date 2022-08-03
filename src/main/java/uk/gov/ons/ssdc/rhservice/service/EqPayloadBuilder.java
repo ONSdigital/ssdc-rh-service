@@ -40,7 +40,7 @@ public class EqPayloadBuilder {
     /*
      Schema from: https://github.com/ONSdigital/ons-schema-definitions/blob/v3/docs/rm_to_eq_runner_payload_v2.rst
 
-     Why you may ask are we using a horrid Map rather than a lovely Java POJO?
+     Why you may ask are we using a Map rather than a lovely POJO?
      Well the encryption library plays nicely with Maps, and is tried and tested that way.
     */
     Map<String, Object> eqTokenPayload = new HashMap<>();
@@ -56,7 +56,6 @@ public class EqPayloadBuilder {
     eqTokenPayload.put("version", EQ_SCHEMA_VERSION);
     eqTokenPayload.put("response_id", encryptResponseId(uacUpdateDTO.getQid()));
     eqTokenPayload.put("schema_url", uacUpdateDTO.getCollectionInstrumentUrl());
-
     eqTokenPayload.put("survey_metadata", getSurveyMetaData(uacUpdateDTO));
 
     return eqTokenPayload;
