@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jre-alpine
 
 CMD ["java", "-jar", "/opt/ssdc-rh-service.jar"]
 
