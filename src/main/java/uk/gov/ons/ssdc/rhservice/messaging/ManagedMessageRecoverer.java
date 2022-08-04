@@ -140,7 +140,7 @@ public class ManagedMessageRecoverer implements RecoveryCallback<Object> {
     }
 
     try {
-      // Send it back to the exception manager so it can be peeked
+      // Send it back to the exception manager, so it can be peeked
       exceptionManagerClient.respondToPeek(messageHash, rawMessageBody);
     } catch (Exception respondException) {
       // Nothing we can do about this - ignore it

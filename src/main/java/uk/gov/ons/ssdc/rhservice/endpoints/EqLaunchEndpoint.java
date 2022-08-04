@@ -42,8 +42,7 @@ public class EqLaunchEndpoint {
   public ResponseEntity<?> generateEqLaunchToken(
       @PathVariable("uacHash") final String uacHash,
       @RequestParam String languageCode,
-      @RequestParam String accountServiceUrl,
-      @RequestParam String accountServiceLogoutUrl) {
+      @RequestParam String accountServiceUrl) {
 
     UacOr4xxResponseEntity uacOr4xxResponseEntity = uacService.getUac(uacHash);
 
@@ -54,7 +53,6 @@ public class EqLaunchEndpoint {
     Map<String, Object> payload =
         eqPayloadBuilder.buildEqPayloadMap(
             accountServiceUrl,
-            accountServiceLogoutUrl,
             languageCode,
             uacOr4xxResponseEntity.getUacUpdateDTO(),
             uacOr4xxResponseEntity.getCaseUpdateDTO());
@@ -65,7 +63,8 @@ public class EqLaunchEndpoint {
     // If this fails (it's retryable) then it will throw an Exception
     // It's unlikely, but do we want to do that? Stopping a launch
     // We could go down MessageSender route, but that's more complex and can in theory still fail?
-    eqLaunchSender.buildAndSendEqLaunchEvent(payload);
+    eqLaunchSender.buildAndSendEqLaunchEvent(
+        payload, uacOr4xxResponseEntity.getUacUpdateDTO().getQid());
 
     return new ResponseEntity<>(launchToken, HttpStatus.OK);
   }

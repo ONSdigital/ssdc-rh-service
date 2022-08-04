@@ -22,7 +22,6 @@ import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @ExtendWith(MockitoExtension.class)
 class UacServiceTest {
-  public static final String CASE_ID = "CASE_ID";
   public static final String UAC_HASH = "UAC_HASH";
 
   @Mock UacRepository uacRepository;

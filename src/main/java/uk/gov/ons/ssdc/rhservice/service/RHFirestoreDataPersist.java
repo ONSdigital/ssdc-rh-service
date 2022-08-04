@@ -9,7 +9,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ssdc.rhservice.exceptions.DataStoreContentionException;
 
-// This is in it's own class as Spring Retryable doesn't work otherwise
+// This is in its own class as Spring Retryable doesn't work otherwise
 @Component
 public class RHFirestoreDataPersist {
 
