@@ -68,7 +68,9 @@ class EqPayloadBuilderTest {
         (Map<String, Object>) eqPayload.get("survey_metadata");
     Map<String, Object> actualData = (Map<String, Object>) actualSurveyMetaData.get("data");
     assertThat(actualData.get("questionnaire_id")).isEqualTo(uacUpdateDTO.getQid());
-    assertThat(actualSurveyMetaData.get("receipting_keys")).isEqualTo(List.of("questionnaire_id"));
+    assertThat(actualData.get("source")).isEqualTo("SRM");
+    assertThat(actualSurveyMetaData.get("receipting_keys"))
+        .isEqualTo(List.of("questionnaire_id", "source"));
   }
 
   private OffsetDateTime secondsStringToDateTime(long actualSeconds) {
