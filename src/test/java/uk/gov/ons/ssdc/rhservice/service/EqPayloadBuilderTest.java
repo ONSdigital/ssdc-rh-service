@@ -67,10 +67,9 @@ class EqPayloadBuilderTest {
     Map<String, Object> actualSurveyMetaData =
         (Map<String, Object>) eqPayload.get("survey_metadata");
     Map<String, Object> actualData = (Map<String, Object>) actualSurveyMetaData.get("data");
-    assertThat(actualData.get("questionnaire_id")).isEqualTo(uacUpdateDTO.getQid());
+    assertThat(actualData.get("qid")).isEqualTo(uacUpdateDTO.getQid());
     assertThat(actualData.get("source")).isEqualTo("SRM");
-    assertThat(actualSurveyMetaData.get("receipting_keys"))
-        .isEqualTo(List.of("questionnaire_id", "source"));
+    assertThat(actualSurveyMetaData.get("receipting_keys")).isEqualTo(List.of("qid", "source"));
   }
 
   private OffsetDateTime secondsStringToDateTime(long actualSeconds) {
@@ -185,14 +184,14 @@ class EqPayloadBuilderTest {
     return uacUpdate;
   }
 
-  private String getExpectedEncryptedResponseId(String questionnaireId) {
+  private String getExpectedEncryptedResponseId(String qid) {
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       md.update(responseIdPepper.getBytes());
-      byte[] bytes = md.digest(questionnaireId.getBytes());
-      return questionnaireId + "_" + new String(Hex.encode(bytes), 0, 16);
+      byte[] bytes = md.digest(qid.getBytes());
+      return qid + "_" + new String(Hex.encode(bytes), 0, 16);
     } catch (NoSuchAlgorithmException ex) {
-      throw new RuntimeException("No SHA-256 algorithm while encrypting questionnaire", ex);
+      throw new RuntimeException("No SHA-256 algorithm while encrypting qid", ex);
     }
   }
 }

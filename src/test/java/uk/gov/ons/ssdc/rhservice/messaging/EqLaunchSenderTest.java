@@ -38,7 +38,7 @@ class EqLaunchSenderTest {
   @Test
   public void testMessageSent() throws JsonProcessingException {
     Map<String, Object> payload = new HashMap<>();
-    payload.put("questionnaire_id", TEST_QID);
+    payload.put("qid", TEST_QID);
     payload.put("tx_id", CORRELATION_ID);
 
     ReflectionTestUtils.setField(underTest, "eqLaunchTopic", TEST_TOPIC);

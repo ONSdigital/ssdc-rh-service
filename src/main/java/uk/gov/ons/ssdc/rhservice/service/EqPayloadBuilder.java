@@ -63,12 +63,12 @@ public class EqPayloadBuilder {
 
   private Map<String, Object> getSurveyMetaData(UacUpdateDTO uacUpdateDTO) {
     Map<String, String> data = new HashMap<>();
-    data.put("questionnaire_id", uacUpdateDTO.getQid());
+    data.put("qid", uacUpdateDTO.getQid());
     data.put("source", "SRM");
 
     Map<String, Object> surveyMetaData = new HashMap<>();
     surveyMetaData.put("data", data);
-    surveyMetaData.put("receipting_keys", List.of("questionnaire_id", "source"));
+    surveyMetaData.put("receipting_keys", List.of("qid", "source"));
 
     return surveyMetaData;
   }
@@ -93,17 +93,17 @@ public class EqPayloadBuilder {
   }
 
   /*
-   Note: yes this returns the plaintext questionnaireId and a hash of the questionnaireId
+   Note: yes this returns the plaintext qid and a hash of the qid
    There is/was a valid downstream/EQ reason for doing this.  They also encrypt this field fully their end
   */
-  private String encryptResponseId(String questionnaireId) {
+  private String encryptResponseId(String qid) {
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       md.update(responseIdPepper.getBytes());
-      byte[] bytes = md.digest(questionnaireId.getBytes());
-      return questionnaireId + "_" + new String(Hex.encode(bytes), 0, 16);
+      byte[] bytes = md.digest(qid.getBytes());
+      return qid + "_" + new String(Hex.encode(bytes), 0, 16);
     } catch (NoSuchAlgorithmException ex) {
-      throw new RuntimeException("No SHA-256 algorithm while encrypting questionnaire", ex);
+      throw new RuntimeException("No SHA-256 algorithm while encrypting qid", ex);
     }
   }
 
