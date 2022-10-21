@@ -64,11 +64,10 @@ public class EqPayloadBuilder {
   private Map<String, Object> getSurveyMetaData(UacUpdateDTO uacUpdateDTO) {
     Map<String, String> data = new HashMap<>();
     data.put("qid", uacUpdateDTO.getQid());
-    data.put("source", "SRM");
 
     Map<String, Object> surveyMetaData = new HashMap<>();
     surveyMetaData.put("data", data);
-    surveyMetaData.put("receipting_keys", List.of("qid", "source"));
+    surveyMetaData.put("receipting_keys", List.of("qid"));
 
     return surveyMetaData;
   }
