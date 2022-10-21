@@ -55,7 +55,10 @@ public class EqPayloadBuilder {
     eqTokenPayload.put("language_code", languageCode);
     eqTokenPayload.put("version", EQ_SCHEMA_VERSION);
     eqTokenPayload.put("response_id", encryptResponseId(uacUpdateDTO.getQid()));
-    eqTokenPayload.put("schema_url", uacUpdateDTO.getCollectionInstrumentUrl());
+    // TODO: this is a tactical hack, we'd believed that the prefered schemaUrl field would be
+    // populated
+    // TODO: ticket to do this properly: https://trello.com/c/XEEIGcJW
+    eqTokenPayload.put("schema_name", uacUpdateDTO.getCollectionInstrumentUrl());
     eqTokenPayload.put("survey_metadata", getSurveyMetaData(uacUpdateDTO));
 
     return eqTokenPayload;

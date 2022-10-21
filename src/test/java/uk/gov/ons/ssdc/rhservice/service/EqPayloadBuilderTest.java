@@ -62,7 +62,7 @@ class EqPayloadBuilderTest {
     assertThat(eqPayload.get("version")).isEqualTo("V2");
     assertThat(eqPayload.get("response_id").toString())
         .isEqualTo(getExpectedEncryptedResponseId(uacUpdateDTO.getQid()));
-    assertThat(eqPayload.get("schema_url")).isEqualTo(uacUpdateDTO.getCollectionInstrumentUrl());
+    assertThat(eqPayload.get("schema_name")).isEqualTo(uacUpdateDTO.getCollectionInstrumentUrl());
 
     Map<String, Object> actualSurveyMetaData =
         (Map<String, Object>) eqPayload.get("survey_metadata");
