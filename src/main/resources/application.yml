@@ -45,7 +45,7 @@ management:
     health:
       enabled: true
     metrics:
-      enabled: true
+      enabled: false
   health:
     pubsub:
       enabled: false
