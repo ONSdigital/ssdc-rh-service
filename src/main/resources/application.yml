@@ -37,15 +37,10 @@ exceptionmanager:
 
 management:
   endpoints:
-    web:
-      exposure:
-        include: metrics,health
     enabled-by-default: false
   endpoint:
     health:
       enabled: true
-    metrics:
-      enabled: false
   health:
     pubsub:
       enabled: false
