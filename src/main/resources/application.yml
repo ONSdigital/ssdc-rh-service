@@ -34,6 +34,7 @@ exceptionmanager:
     host: localhost
     port: 8666
 
+
 management:
   endpoints:
     enabled-by-default: false
@@ -43,6 +44,15 @@ management:
   health:
     pubsub:
       enabled: false
+  metrics:
+    tags:
+      application: RespondentHomeService
+      pod: ${HOSTNAME}
+    export:
+      stackdriver:
+        project-id: dummy-project-id
+        enabled: false
+        step: PT1M
 
 messagelogging:
   logstacktraces: false

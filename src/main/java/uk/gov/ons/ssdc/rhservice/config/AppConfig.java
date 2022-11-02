@@ -5,6 +5,9 @@ import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import com.google.cloud.spring.pubsub.support.PublisherFactory;
 import com.google.cloud.spring.pubsub.support.SubscriberFactory;
 import com.google.cloud.spring.pubsub.support.converter.SimplePubSubMessageConverter;
+import io.micrometer.stackdriver.StackdriverConfig;
+import io.micrometer.stackdriver.StackdriverMeterRegistry;
+import java.time.Duration;
 import java.util.TimeZone;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +16,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
+
+  @Value("${management.metrics.export.stackdriver.project-id}")
+  private String stackdriverProjectId;
+
+  @Value("${management.metrics.export.stackdriver.enabled}")
+  private boolean stackdriverEnabled;
+
+  @Value("${management.metrics.export.stackdriver.step}")
+  private String stackdriverStep;
 
   @Value("${logging.profile}")
   private String loggingProfile;
@@ -39,5 +51,37 @@ public class AppConfig {
     }
 
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+  }
+
+  @Bean
+  StackdriverConfig stackdriverConfig() {
+    return new StackdriverConfig() {
+      @Override
+      public Duration step() {
+        return Duration.parse(stackdriverStep);
+      }
+
+      @Override
+      public boolean enabled() {
+        return stackdriverEnabled;
+      }
+
+      @Override
+      public String projectId() {
+        return stackdriverProjectId;
+      }
+
+      @Override
+      public String get(String key) {
+        return null;
+      }
+    };
+  }
+
+  @Bean
+  StackdriverMeterRegistry meterRegistry(StackdriverConfig stackdriverConfig) {
+
+    StackdriverMeterRegistry.builder(stackdriverConfig).build();
+    return StackdriverMeterRegistry.builder(stackdriverConfig).build();
   }
 }

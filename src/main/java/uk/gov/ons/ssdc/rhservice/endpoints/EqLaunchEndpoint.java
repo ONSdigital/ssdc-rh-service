@@ -1,6 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.endpoints;
 
 import com.nimbusds.jose.JWSObject;
+import io.micrometer.core.annotation.Timed;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
 import uk.gov.ons.ssdc.rhservice.service.UacService;
 
 @RestController
+@Timed
 @RequestMapping(value = "/eqLaunch", produces = "application/json")
 public class EqLaunchEndpoint {
   private final UacService uacService;
