@@ -18,7 +18,7 @@ import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 public class EqPayloadBuilder {
 
   private static final Set<String> ALLOWED_LANGUAGE_CODES = Set.of("cy", "en");
-  public static final String EQ_SCHEMA_VERSION = "V2";
+  public static final String EQ_SCHEMA_VERSION = "v2";
 
   private final String responseIdPepper;
 
