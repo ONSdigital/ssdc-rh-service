@@ -59,7 +59,7 @@ class EqPayloadBuilderTest {
     assertThat(eqPayload.get("collection_exercise_sid"))
         .isEqualTo(caseUpdateDTO.getCollectionExerciseId());
     assertThat(eqPayload.get("language_code")).isEqualTo(LANGUAGE_CODE);
-    assertThat(eqPayload.get("version")).isEqualTo("V2");
+    assertThat(eqPayload.get("version")).isEqualTo("v2");
     assertThat(eqPayload.get("response_id").toString())
         .isEqualTo(getExpectedEncryptedResponseId(uacUpdateDTO.getQid()));
     assertThat(eqPayload.get("schema_name")).isEqualTo(uacUpdateDTO.getCollectionInstrumentUrl());
