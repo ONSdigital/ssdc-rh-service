@@ -15,6 +15,7 @@ spring:
 queueconfig:
   case-update-subscription: event_case-update_rh
   uac-update-subscription: event_uac-update_rh
+  collection-exercise-subscription: event_collection-exercise-update_rh
   eq-launch-topic: event_eq-launch
   shared-pubsub-project: shared-project
 
