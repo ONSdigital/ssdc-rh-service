@@ -28,7 +28,7 @@ import uk.gov.ons.ssdc.rhservice.testutils.PubsubTestHelper;
 @ExtendWith(SpringExtension.class)
 class CollectionExerciseReceiverIT {
 
-  @Value("${queueconfig.collection-exercise-topic}")
+  @Value("${queueconfig.collection-exercise-update-topic}")
   private String collectionExerciseTopic;
 
   @Autowired private PubsubTestHelper pubsubTestHelper;

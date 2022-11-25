@@ -2,23 +2,22 @@ package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static uk.gov.ons.ssdc.rhservice.utils.JsonHelper.convertJsonBytesToEvent;
 
-import java.util.Map;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
-import uk.gov.ons.ssdc.rhservice.survey.specific.PhmSpecific;
+import uk.gov.ons.ssdc.rhservice.survey.specific.LaunhDataFieldSetter;
 
 @MessageEndpoint
 public class UacUpdateReceiver {
   private final UacRepository uacRepository;
-  private final PhmSpecific phmSpecific;
+  private final LaunhDataFieldSetter launhDataFieldSetter;
 
-  public UacUpdateReceiver(UacRepository uacRepository, PhmSpecific phmSpecific) {
+  public UacUpdateReceiver(UacRepository uacRepository, LaunhDataFieldSetter launhDataFieldSetter) {
     this.uacRepository = uacRepository;
-    this.phmSpecific = phmSpecific;
+    this.launhDataFieldSetter = launhDataFieldSetter;
   }
 
   @ServiceActivator(inputChannel = "uacUpdateInputChannel", adviceChain = "retryAdvice")
@@ -27,8 +26,7 @@ public class UacUpdateReceiver {
     UacUpdateDTO uacUpdateDTO = event.getPayload().getUacUpdate();
 
     if (uacUpdateDTO.isActive()) {
-      Map<String, String> phmFieldsToStamp = phmSpecific.getPHMFieldsToStampFromCase(uacUpdateDTO);
-      uacUpdateDTO.setLaunchData(phmFieldsToStamp);
+      launhDataFieldSetter.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
     }
 
     uacRepository.writeUAC(uacUpdateDTO);

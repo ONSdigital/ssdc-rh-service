@@ -7,10 +7,16 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.ons.ssdc.rhservice.exceptions.CaseNotFoundException;
+import uk.gov.ons.ssdc.rhservice.exceptions.CollectionExerciseNotFoundException;
+import uk.gov.ons.ssdc.rhservice.exceptions.SurveyNotFoundException;
 import uk.gov.ons.ssdc.rhservice.exceptions.UacNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.SurveyDto;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
+import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
+import uk.gov.ons.ssdc.rhservice.model.repository.SurveyRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @Component
@@ -18,6 +24,8 @@ import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 public class FireStorePoller {
   @Autowired private CaseRepository caseRepository;
   @Autowired private UacRepository uacRepository;
+  @Autowired private CollectionExerciseRepository collectionExerciseRepository;
+  @Autowired private SurveyRepository surveyRepository;
 
   @Retryable(
       value = {CaseNotFoundException.class},
@@ -97,5 +105,36 @@ public class FireStorePoller {
     throw new UacNotFoundException("Updated Uac Not found: " + hash);
   }
 
-  
+  @Retryable(
+      value = {CollectionExerciseNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<CollectionExerciseUpdateDTO> getCollectionExerciseById(
+      String collectionExcerciseId) throws CollectionExerciseNotFoundException {
+
+    Optional<CollectionExerciseUpdateDTO> collexOpt =
+        collectionExerciseRepository.readCollectionExerciseUpdate(collectionExcerciseId);
+
+    if (collexOpt.isPresent()) {
+      return collexOpt;
+    } else {
+      throw new CollectionExerciseNotFoundException(
+          "Collection Exercise Not found: " + collectionExcerciseId);
+    }
+  }
+
+  @Retryable(
+      value = {SurveyNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<SurveyDto> getSurveyById(String surveyId) throws SurveyNotFoundException {
+
+    Optional<SurveyDto> surveyOpt = surveyRepository.readSurveyUpdate(surveyId);
+
+    if (surveyOpt.isPresent()) {
+      return surveyOpt;
+    } else {
+      throw new SurveyNotFoundException("Survey Not found: " + surveyId);
+    }
+  }
 }
