@@ -89,33 +89,33 @@ class EqPayloadBuilderTest {
 
     // When
     Map<String, Object> eqPayload =
-            underTest.buildEqPayloadMap(
-                    ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO);
+        underTest.buildEqPayloadMap(
+            ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO);
 
     assertThat(secondsStringToDateTime((long) eqPayload.get("exp")))
-            .isCloseTo(OffsetDateTime.now().plusMinutes(5), within(5, ChronoUnit.SECONDS));
+        .isCloseTo(OffsetDateTime.now().plusMinutes(5), within(5, ChronoUnit.SECONDS));
     assertThat(secondsStringToDateTime((long) eqPayload.get("iat")))
-            .isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.SECONDS));
+        .isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.SECONDS));
 
     assertThat(UUID.fromString(eqPayload.get("jti").toString())).isNotNull();
     assertThat(UUID.fromString(eqPayload.get("tx_id").toString())).isNotNull();
     assertThat(UUID.fromString(eqPayload.get("tx_id").toString()))
-            .isNotEqualTo((UUID.fromString(eqPayload.get("jti").toString())));
+        .isNotEqualTo((UUID.fromString(eqPayload.get("jti").toString())));
 
     assertThat(eqPayload.get("account_service_url")).isEqualTo(ACCOUNT_SERVICE_URL);
 
     assertThat(eqPayload.get("case_id")).isEqualTo(caseUpdateDTO.getCaseId());
     assertThat(eqPayload.get("channel")).isEqualTo("RH");
     assertThat(eqPayload.get("collection_exercise_sid"))
-            .isEqualTo(caseUpdateDTO.getCollectionExerciseId());
+        .isEqualTo(caseUpdateDTO.getCollectionExerciseId());
     assertThat(eqPayload.get("language_code")).isEqualTo(LANGUAGE_CODE);
     assertThat(eqPayload.get("version")).isEqualTo("v2");
     assertThat(eqPayload.get("response_id").toString())
-            .isEqualTo(getExpectedEncryptedResponseId(uacUpdateDTO.getQid()));
+        .isEqualTo(getExpectedEncryptedResponseId(uacUpdateDTO.getQid()));
     assertThat(eqPayload.get("schema_name")).isEqualTo(uacUpdateDTO.getCollectionInstrumentUrl());
 
     Map<String, Object> actualSurveyMetaData =
-            (Map<String, Object>) eqPayload.get("survey_metadata");
+        (Map<String, Object>) eqPayload.get("survey_metadata");
     Map<String, Object> actualData = (Map<String, Object>) actualSurveyMetaData.get("data");
 
     assertThat(actualSurveyMetaData.get("receipting_keys")).isEqualTo(List.of("qid"));
@@ -217,8 +217,6 @@ class EqPayloadBuilderTest {
     caseUpdate.setCaseRef("CASE_REF");
     caseUpdate.setCreatedAt(new Date(System.currentTimeMillis()));
     caseUpdate.setLastUpdatedAt(null);
-
-
 
     return caseUpdate;
   }

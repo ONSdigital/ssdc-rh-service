@@ -1,8 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.model.dto;
 
-import lombok.Data;
-
 import java.util.Map;
+import lombok.Data;
 
 @Data
 public class UacUpdateDTO {
@@ -25,5 +24,5 @@ public class UacUpdateDTO {
 
   private boolean eqLaunched;
 
-  private Map<String,String> launchData;
+  private Map<String, String> launchData;
 }

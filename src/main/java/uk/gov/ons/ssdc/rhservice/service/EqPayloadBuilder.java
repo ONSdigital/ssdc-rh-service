@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.survey.specific.PhmSpecific;
 
 @Service
 public class EqPayloadBuilder {
@@ -70,7 +69,7 @@ public class EqPayloadBuilder {
     data.put("qid", uacUpdateDTO.getQid());
 
     // TODO: this might need generising, or just the launchData setup :|
-    if(uacUpdateDTO.getLaunchData() != null) {
+    if (uacUpdateDTO.getLaunchData() != null) {
       data.putAll(uacUpdateDTO.getLaunchData());
     }
 
