@@ -124,6 +124,7 @@ class LaunhDataFieldSetterTest {
 
     // idea for a nested set for Survey MetaData launchData - makes it's more flexible
     LaunchDataFieldDTO launchDataFieldDTO1 = new LaunchDataFieldDTO();
+    //    TODO: make it all a list of these LaunchDataFieldDTO, and not indexeded via the name
     launchDataFieldDTO1.setLaunchDataFieldName("participantId");
     launchDataFieldDTO1.setMandatory(true);
 
