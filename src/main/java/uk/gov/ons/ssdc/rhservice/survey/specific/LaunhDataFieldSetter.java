@@ -1,13 +1,15 @@
 package uk.gov.ons.ssdc.rhservice.survey.specific;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.LaunchDataFieldDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.SurveyDto;
+import uk.gov.ons.ssdc.rhservice.model.dto.SurveyUpdateDto;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
@@ -38,7 +40,7 @@ public class LaunhDataFieldSetter {
     }
 
     CaseUpdateDTO caze = cazeOpt.get();
-    SurveyDto survey = getSurveyFromCollexId(caze.getCollectionExerciseId());
+    SurveyUpdateDto survey = getSurveyFromCollexId(caze.getCollectionExerciseId());
 
     if (survey.getMetadata() == null) {
       return;
@@ -48,29 +50,33 @@ public class LaunhDataFieldSetter {
       return;
     }
 
-    Map<String, LaunchDataFieldDTO> launchDataSettings =
-        (Map<String, LaunchDataFieldDTO>) survey.getMetadata().get("launchDataSettings");
+    final ObjectMapper mapper = new ObjectMapper();
+    List<Map<String, String>> launchDataSettingsMap =
+        (List<Map<String, String>>) survey.getMetadata().get("launchDataSettings");
+
     Map<String, String> launchData = new HashMap<>();
 
-    for (Map.Entry<String, LaunchDataFieldDTO> entry : launchDataSettings.entrySet()) {
-      String sampleKey = entry.getKey();
-      LaunchDataFieldDTO launchDataFieldDTO = entry.getValue();
+    for (Map<String, String> launchDataField : launchDataSettingsMap) {
+      final LaunchDataFieldDTO launchDataFieldDTO =
+          mapper.convertValue(launchDataField, LaunchDataFieldDTO.class);
 
-      if (caze.getSample().containsKey(sampleKey)) {
+      if (caze.getSample().containsKey(launchDataFieldDTO.getSampleField())) {
         launchData.put(
-            launchDataFieldDTO.getLaunchDataFieldName(), caze.getSample().get(sampleKey));
-      } else {
-        if (launchDataFieldDTO.isMandatory()) {
-          throw new RuntimeException(
-              "Expected field: " + sampleKey + " missing on case id: " + caze.getCaseId());
-        }
+            launchDataFieldDTO.getLaunchDataFieldName(),
+            caze.getSample().get(launchDataFieldDTO.getSampleField()));
+      } else if (launchDataFieldDTO.isMandatory()) {
+        throw new RuntimeException(
+            "Expected field: "
+                + launchDataFieldDTO.getSampleField()
+                + " missing on case id: "
+                + caze.getCaseId());
       }
     }
 
     uacUpdateDTO.setLaunchData(launchData);
   }
 
-  private SurveyDto getSurveyFromCollexId(String collexId) {
+  private SurveyUpdateDto getSurveyFromCollexId(String collexId) {
 
     Optional<CollectionExerciseUpdateDTO> collex =
         collectionExerciseRepository.readCollectionExerciseUpdate(collexId);
@@ -78,7 +84,8 @@ public class LaunhDataFieldSetter {
       throw new RuntimeException("Not Found Collection Exercise: " + collexId);
     }
 
-    Optional<SurveyDto> survey = surveyRepository.readSurveyUpdate(collex.get().getSurveyId());
+    Optional<SurveyUpdateDto> survey =
+        surveyRepository.readSurveyUpdate(collex.get().getSurveyId());
     if (survey.isEmpty()) {
       throw new RuntimeException("Not Found Survey: " + collex.get().getSurveyId());
     }

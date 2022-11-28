@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.LaunchDataFieldDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.SurveyDto;
+import uk.gov.ons.ssdc.rhservice.model.dto.SurveyUpdateDto;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
@@ -49,8 +49,8 @@ class LaunhDataFieldSetterTest {
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
     collectionExerciseUpdateDTO.setSurveyId(SURVEY_ID);
 
-    SurveyDto surveyDto = new SurveyDto();
-    surveyDto.setId(SURVEY_ID);
+    SurveyUpdateDto surveyDto = new SurveyUpdateDto();
+    surveyDto.setSurveyId(SURVEY_ID);
 
     when(caseRepository.readCaseUpdate(any())).thenReturn(Optional.of(caseUpdateDTO));
     when(collectionExerciseRepository.readCollectionExerciseUpdate(any()))
@@ -80,8 +80,8 @@ class LaunhDataFieldSetterTest {
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
     collectionExerciseUpdateDTO.setSurveyId(SURVEY_ID);
 
-    SurveyDto surveyDto = new SurveyDto();
-    surveyDto.setId(SURVEY_ID);
+    SurveyUpdateDto surveyDto = new SurveyUpdateDto();
+    surveyDto.setSurveyId(SURVEY_ID);
 
     Map<String, Object> metaData = new HashMap<>();
     Map<String, String> notLaunchDataSettings = new HashMap<>();
@@ -139,8 +139,8 @@ class LaunhDataFieldSetterTest {
     Map<String, Object> metaData = new HashMap<>();
     metaData.put("launchDataSettings", launchDataSettings);
 
-    SurveyDto surveyDto = new SurveyDto();
-    surveyDto.setId(SURVEY_ID);
+    SurveyUpdateDto surveyDto = new SurveyUpdateDto();
+    surveyDto.setSurveyId(SURVEY_ID);
     surveyDto.setMetadata(metaData);
 
     when(caseRepository.readCaseUpdate(any())).thenReturn(Optional.of(caseUpdateDTO));

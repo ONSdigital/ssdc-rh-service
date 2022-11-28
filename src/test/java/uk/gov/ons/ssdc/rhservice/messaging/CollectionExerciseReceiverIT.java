@@ -2,7 +2,6 @@ package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +15,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ssdc.rhservice.exceptions.CollectionExerciseNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.CollectionInstrumentSelectionRule;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
 import uk.gov.ons.ssdc.rhservice.testutils.FireStorePoller;
@@ -40,14 +38,14 @@ class CollectionExerciseReceiverIT {
     // GIVEN
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
     collectionExerciseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
-//    CollectionInstrumentSelectionRule collectionInstrumentSelectionRule =
-//        new CollectionInstrumentSelectionRule();
-//    collectionInstrumentSelectionRule.setCollectionInstrumentUrl("EQ_URL");
-//    collectionExerciseUpdateDTO.setCollectionInstrumentSelectionRules(
-//        List.of(collectionInstrumentSelectionRule));
+    //    CollectionInstrumentSelectionRule collectionInstrumentSelectionRule =
+    //        new CollectionInstrumentSelectionRule();
+    //    collectionInstrumentSelectionRule.setCollectionInstrumentUrl("EQ_URL");
+    //    collectionExerciseUpdateDTO.setCollectionInstrumentSelectionRules(
+    //        List.of(collectionInstrumentSelectionRule));
 
     PayloadDTO payloadDTO = new PayloadDTO();
-    payloadDTO.setCollectionExerciseUpdateDTO(collectionExerciseUpdateDTO);
+    payloadDTO.setCollectionExerciseUpdate(collectionExerciseUpdateDTO);
 
     EventDTO event = new EventDTO();
     event.setPayload(payloadDTO);

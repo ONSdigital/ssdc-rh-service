@@ -17,7 +17,7 @@ import uk.gov.ons.ssdc.rhservice.exceptions.CollectionExerciseNotFoundException;
 import uk.gov.ons.ssdc.rhservice.exceptions.SurveyNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.SurveyDto;
+import uk.gov.ons.ssdc.rhservice.model.dto.SurveyUpdateDto;
 import uk.gov.ons.ssdc.rhservice.testutils.FireStorePoller;
 import uk.gov.ons.ssdc.rhservice.testutils.PubsubTestHelper;
 
@@ -55,13 +55,13 @@ class SurveyReceiverIT {
     //                build();
 
     //        normal way
-    SurveyDto surveyDto = new SurveyDto();
-    surveyDto.setId(UUID.randomUUID().toString());
+    SurveyUpdateDto surveyDto = new SurveyUpdateDto();
+    surveyDto.setSurveyId(UUID.randomUUID().toString());
     surveyDto.setName("Name");
     surveyDto.setMetadata(null);
     //        surveyDto.setMetadata(null);
     PayloadDTO payloadDTO = new PayloadDTO();
-    payloadDTO.setSurveyDto(surveyDto);
+    payloadDTO.setSurveyUpdate(surveyDto);
     EventDTO event = new EventDTO();
     event.setPayload(payloadDTO);
 
@@ -69,9 +69,9 @@ class SurveyReceiverIT {
     pubsubTestHelper.sendMessageToSharedProject(surveyTopic, event);
 
     // THEN
-    Optional<SurveyDto> surveyOpt = fireStorePoller.getSurveyById(surveyDto.getId().toString());
+    Optional<SurveyUpdateDto> surveyOpt = fireStorePoller.getSurveyById(surveyDto.getSurveyId());
 
     Assertions.assertTrue(surveyOpt.isPresent());
-    assertThat(surveyOpt.get()).isEqualTo(event.getPayload().getSurveyDto());
+    assertThat(surveyOpt.get()).isEqualTo(event.getPayload().getSurveyUpdate());
   }
 }

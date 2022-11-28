@@ -25,7 +25,7 @@ public class CollectionExerciseUpdateReceiver {
   public void receiveMessage(Message<byte[]> message) {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
-        event.getPayload().getCollectionExerciseUpdateDTO();
+        event.getPayload().getCollectionExerciseUpdate();
     collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
   }
 }

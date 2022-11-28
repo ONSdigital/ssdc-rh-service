@@ -21,6 +21,6 @@ public class SurveyUpdateReceiver {
   @ServiceActivator(inputChannel = "surveyUpdateChannel", adviceChain = "retryAdvice")
   public void receiveMessage(Message<byte[]> message) {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
-    surveyRepository.writeSurveyUpdate(event.getPayload().getSurveyDto());
+    surveyRepository.writeSurveyUpdate(event.getPayload().getSurveyUpdate());
   }
 }

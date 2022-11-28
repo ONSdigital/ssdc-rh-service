@@ -12,7 +12,7 @@ import uk.gov.ons.ssdc.rhservice.exceptions.SurveyNotFoundException;
 import uk.gov.ons.ssdc.rhservice.exceptions.UacNotFoundException;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.SurveyDto;
+import uk.gov.ons.ssdc.rhservice.model.dto.SurveyUpdateDto;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
@@ -127,9 +127,9 @@ public class FireStorePoller {
       value = {SurveyNotFoundException.class},
       maxAttempts = 5,
       backoff = @Backoff(delay = 1000))
-  public Optional<SurveyDto> getSurveyById(String surveyId) throws SurveyNotFoundException {
+  public Optional<SurveyUpdateDto> getSurveyById(String surveyId) throws SurveyNotFoundException {
 
-    Optional<SurveyDto> surveyOpt = surveyRepository.readSurveyUpdate(surveyId);
+    Optional<SurveyUpdateDto> surveyOpt = surveyRepository.readSurveyUpdate(surveyId);
 
     if (surveyOpt.isPresent()) {
       return surveyOpt;

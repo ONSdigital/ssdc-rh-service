@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class LaunchDataFieldDTO {
-  private String fromField;
+  private String sampleField;
   private String launchDataFieldName;
   private String defaultValue; // made up idea, perhaps useful
   private boolean mandatory;
