@@ -68,6 +68,11 @@ public class EqPayloadBuilder {
     Map<String, String> data = new HashMap<>();
     data.put("qid", uacUpdateDTO.getQid());
 
+    // TODO: this might need generising, or just the launchData setup :|
+    if (uacUpdateDTO.getLaunchData() != null) {
+      data.putAll(uacUpdateDTO.getLaunchData());
+    }
+
     Map<String, Object> surveyMetaData = new HashMap<>();
     surveyMetaData.put("data", data);
     surveyMetaData.put("receipting_keys", List.of("qid"));

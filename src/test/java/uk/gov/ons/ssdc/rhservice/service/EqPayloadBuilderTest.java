@@ -29,12 +29,12 @@ class EqPayloadBuilderTest {
   private static final String responseIdPepper = "TEST";
 
   @Test
-  void testBuildEqPayload() {
+  void testBuildEqPayloadWithoutUACLaunchData() {
     // Given
     EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     ReflectionTestUtils.setField(underTest, "responseIdPepper", responseIdPepper);
 
-    UacUpdateDTO uacUpdateDTO = getUacUpdate();
+    UacUpdateDTO uacUpdateDTO = getUacUpdate(null);
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
 
     // When
@@ -71,6 +71,60 @@ class EqPayloadBuilderTest {
     assertThat(actualSurveyMetaData.get("receipting_keys")).isEqualTo(List.of("qid"));
   }
 
+  @Test
+  void testBuildEqPayloadWithUacLaunchData() {
+    // Given
+    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
+    ReflectionTestUtils.setField(underTest, "responseIdPepper", responseIdPepper);
+
+    Map<String, String> launchData = new HashMap<>();
+    launchData.put("SWAB_BARCODE", "01234");
+    launchData.put("BLOOD_BARCODE", "98765");
+    launchData.put("PARTICIPANT_ID", "1111");
+    launchData.put("LONGITUDINAL_QUESTIONS", "AYE");
+    launchData.put("FIRST_NAME", "BOB");
+
+    UacUpdateDTO uacUpdateDTO = getUacUpdate(launchData);
+    CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
+
+    // When
+    Map<String, Object> eqPayload =
+        underTest.buildEqPayloadMap(
+            ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO);
+
+    assertThat(secondsStringToDateTime((long) eqPayload.get("exp")))
+        .isCloseTo(OffsetDateTime.now().plusMinutes(5), within(5, ChronoUnit.SECONDS));
+    assertThat(secondsStringToDateTime((long) eqPayload.get("iat")))
+        .isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.SECONDS));
+
+    assertThat(UUID.fromString(eqPayload.get("jti").toString())).isNotNull();
+    assertThat(UUID.fromString(eqPayload.get("tx_id").toString())).isNotNull();
+    assertThat(UUID.fromString(eqPayload.get("tx_id").toString()))
+        .isNotEqualTo((UUID.fromString(eqPayload.get("jti").toString())));
+
+    assertThat(eqPayload.get("account_service_url")).isEqualTo(ACCOUNT_SERVICE_URL);
+
+    assertThat(eqPayload.get("case_id")).isEqualTo(caseUpdateDTO.getCaseId());
+    assertThat(eqPayload.get("channel")).isEqualTo("RH");
+    assertThat(eqPayload.get("collection_exercise_sid"))
+        .isEqualTo(caseUpdateDTO.getCollectionExerciseId());
+    assertThat(eqPayload.get("language_code")).isEqualTo(LANGUAGE_CODE);
+    assertThat(eqPayload.get("version")).isEqualTo("v2");
+    assertThat(eqPayload.get("response_id").toString())
+        .isEqualTo(getExpectedEncryptedResponseId(uacUpdateDTO.getQid()));
+    assertThat(eqPayload.get("schema_name")).isEqualTo(uacUpdateDTO.getCollectionInstrumentUrl());
+
+    Map<String, Object> actualSurveyMetaData =
+        (Map<String, Object>) eqPayload.get("survey_metadata");
+    Map<String, Object> actualData = (Map<String, Object>) actualSurveyMetaData.get("data");
+
+    assertThat(actualSurveyMetaData.get("receipting_keys")).isEqualTo(List.of("qid"));
+
+    assertThat(actualData.get("qid")).isEqualTo(uacUpdateDTO.getQid());
+
+    assertThat(actualData).containsAllEntriesOf(launchData);
+  }
+
   private OffsetDateTime secondsStringToDateTime(long actualSeconds) {
     Date actualIatDate = new Date(TimeUnit.SECONDS.toMillis(actualSeconds));
     return actualIatDate.toInstant().atOffset(ZoneOffset.UTC);
@@ -81,7 +135,7 @@ class EqPayloadBuilderTest {
     EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
 
     // Given
-    UacUpdateDTO uacUpdateDTO = getUacUpdate();
+    UacUpdateDTO uacUpdateDTO = getUacUpdate(null);
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
     caseUpdateDTO.setCollectionExerciseId(null);
 
@@ -103,7 +157,7 @@ class EqPayloadBuilderTest {
   void testValidateEmptyQidFailure() {
     EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     // Given
-    UacUpdateDTO uacUpdateDTO = getUacUpdate();
+    UacUpdateDTO uacUpdateDTO = getUacUpdate(null);
     uacUpdateDTO.setQid(null);
 
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
@@ -127,7 +181,7 @@ class EqPayloadBuilderTest {
   void testValidateLanguageCodeFailure() {
     EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     // Given
-    UacUpdateDTO uacUpdateDTO = getUacUpdate();
+    UacUpdateDTO uacUpdateDTO = getUacUpdate(null);
 
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
 
@@ -167,7 +221,7 @@ class EqPayloadBuilderTest {
     return caseUpdate;
   }
 
-  private UacUpdateDTO getUacUpdate() {
+  private UacUpdateDTO getUacUpdate(Map<String, String> launchData) {
     UacUpdateDTO uacUpdate = new UacUpdateDTO();
 
     uacUpdate.setCaseId(UUID.randomUUID().toString());
@@ -179,6 +233,8 @@ class EqPayloadBuilderTest {
     uacUpdate.setQid("TEST_QID");
     uacUpdate.setReceiptReceived(false);
     uacUpdate.setEqLaunched(false);
+
+    uacUpdate.setLaunchData(launchData);
 
     return uacUpdate;
   }
