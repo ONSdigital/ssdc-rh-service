@@ -31,9 +31,6 @@ public class MessageConsumerConfig {
   @Value("${queueconfig.collection-exercise-update-subscription}")
   private String collectionExerciseSubscription;
 
-  @Value("${queueconfig.survey-update-subscription}")
-  private String surveySubscription;
-
   public MessageConsumerConfig(
       ManagedMessageRecoverer managedMessageRecoverer, PubSubTemplate pubSubTemplate) {
     this.managedMessageRecoverer = managedMessageRecoverer;
@@ -52,11 +49,6 @@ public class MessageConsumerConfig {
 
   @Bean
   public MessageChannel collectionExerciseUpdateChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
-  public MessageChannel surveyUpdateChannel() {
     return new DirectChannel();
   }
 
@@ -81,14 +73,6 @@ public class MessageConsumerConfig {
       @Qualifier("collectionExerciseUpdateChannel") MessageChannel channel) {
     String subscription =
         toProjectSubscriptionName(collectionExerciseSubscription, sharedPubsubProject).toString();
-    return makeAdapter(channel, subscription);
-  }
-
-  @Bean
-  public PubSubInboundChannelAdapter newsurveyinbound(
-      @Qualifier("surveyUpdateChannel") MessageChannel channel) {
-    String subscription =
-        toProjectSubscriptionName(surveySubscription, sharedPubsubProject).toString();
     return makeAdapter(channel, subscription);
   }
 

@@ -2,9 +2,6 @@ package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -17,16 +14,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ssdc.rhservice.exceptions.UacNotFoundException;
-import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.LaunchDataFieldDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.SurveyUpdateDto;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
-import uk.gov.ons.ssdc.rhservice.model.repository.SurveyRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 import uk.gov.ons.ssdc.rhservice.testutils.FireStorePoller;
 import uk.gov.ons.ssdc.rhservice.testutils.PubsubTestHelper;
@@ -43,7 +35,6 @@ class UacUpdateReceiverIT {
   @Autowired private FireStorePoller fireStorePoller;
   @Autowired private CaseRepository caseRepository;
   @Autowired private UacRepository uacRepository;
-  @Autowired private SurveyRepository surveyRepository;
   @Autowired private CollectionExerciseRepository collectionExerciseRepository;
 
   @Test
@@ -71,64 +62,65 @@ class UacUpdateReceiverIT {
     assertThat(uacOpt.get()).isEqualTo(uacUpdateDTO);
   }
 
-  @Test
-  void testUacUpdateReceivedPHMFields() throws UacNotFoundException {
-    // GIVEN
-    SurveyUpdateDto surveyUpdateDto = new SurveyUpdateDto();
-    surveyUpdateDto.setSurveyId(UUID.randomUUID().toString());
-
-    LaunchDataFieldDTO launchDataFieldDTO = new LaunchDataFieldDTO();
-    launchDataFieldDTO.setSampleField("PARTICIPANT_ID");
-    launchDataFieldDTO.setLaunchDataFieldName("participant_id");
-    Map<String, Object> launchData = new HashMap<>();
-    launchData.put("launchDataSettings", List.of(launchDataFieldDTO));
-    surveyUpdateDto.setMetadata(launchData);
-    surveyRepository.writeSurveyUpdate(surveyUpdateDto);
-
-    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
-    collectionExerciseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
-    collectionExerciseUpdateDTO.setSurveyId(surveyUpdateDto.getSurveyId());
-    collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
-
-    CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
-    caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
-    caseUpdateDTO.setCollectionExerciseId(collectionExerciseUpdateDTO.getCollectionExerciseId());
-
-    Map<String, String> sampleLaunchData = new HashMap<>();
-    sampleLaunchData.put("PARTICIPANT_ID", "1111");
-    caseUpdateDTO.setSample(sampleLaunchData);
-
-    caseRepository.writeCaseUpdate(caseUpdateDTO);
-
-    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
-    uacUpdateDTO.setCaseId(caseUpdateDTO.getCaseId());
-    uacUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
-    uacUpdateDTO.setQid("000000000001");
-    uacUpdateDTO.setUacHash(String.valueOf(Math.random()));
-    uacUpdateDTO.setActive(true);
-
-    PayloadDTO payloadDTO = new PayloadDTO();
-    payloadDTO.setUacUpdate(uacUpdateDTO);
-
-    EventDTO event = new EventDTO();
-    event.setPayload(payloadDTO);
-
-    // WHEN
-    pubsubTestHelper.sendMessageToSharedProject(uacUpdateTopic, event);
-
-    // THEN
-    Optional<UacUpdateDTO> uacOpt = fireStorePoller.getUacByHash(uacUpdateDTO.getUacHash());
-    Assertions.assertTrue(uacOpt.isPresent());
-
-    UacUpdateDTO actualUacUpdateDTO = uacOpt.get();
-
-    // add our expected fields on here
-    Map<String, String> expectedLaunchData = new HashMap<>();
-    expectedLaunchData.put("participant_id", "1111");
-    uacUpdateDTO.setLaunchData(expectedLaunchData);
-
-    assertThat(actualUacUpdateDTO).isEqualTo(uacUpdateDTO);
-  }
+  //  @Test
+  //  void testUacUpdateReceivedPHMFields() throws UacNotFoundException {
+  //    // GIVEN
+  //    SurveyUpdateDto surveyUpdateDto = new SurveyUpdateDto();
+  //    surveyUpdateDto.setSurveyId(UUID.randomUUID().toString());
+  //
+  //    LaunchDataFieldDTO launchDataFieldDTO = new LaunchDataFieldDTO();
+  //    launchDataFieldDTO.setSampleField("PARTICIPANT_ID");
+  //    launchDataFieldDTO.setLaunchDataFieldName("participant_id");
+  //    Map<String, Object> launchData = new HashMap<>();
+  //    launchData.put("launchDataSettings", List.of(launchDataFieldDTO));
+  //    surveyUpdateDto.setMetadata(launchData);
+  //    surveyRepository.writeSurveyUpdate(surveyUpdateDto);
+  //
+  //    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
+  //    collectionExerciseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
+  //    collectionExerciseUpdateDTO.setSurveyId(surveyUpdateDto.getSurveyId());
+  //    collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
+  //
+  //    CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
+  //    caseUpdateDTO.setCaseId(UUID.randomUUID().toString());
+  //
+  // caseUpdateDTO.setCollectionExerciseId(collectionExerciseUpdateDTO.getCollectionExerciseId());
+  //
+  //    Map<String, String> sampleLaunchData = new HashMap<>();
+  //    sampleLaunchData.put("PARTICIPANT_ID", "1111");
+  //    caseUpdateDTO.setSample(sampleLaunchData);
+  //
+  //    caseRepository.writeCaseUpdate(caseUpdateDTO);
+  //
+  //    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+  //    uacUpdateDTO.setCaseId(caseUpdateDTO.getCaseId());
+  //    uacUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
+  //    uacUpdateDTO.setQid("000000000001");
+  //    uacUpdateDTO.setUacHash(String.valueOf(Math.random()));
+  //    uacUpdateDTO.setActive(true);
+  //
+  //    PayloadDTO payloadDTO = new PayloadDTO();
+  //    payloadDTO.setUacUpdate(uacUpdateDTO);
+  //
+  //    EventDTO event = new EventDTO();
+  //    event.setPayload(payloadDTO);
+  //
+  //    // WHEN
+  //    pubsubTestHelper.sendMessageToSharedProject(uacUpdateTopic, event);
+  //
+  //    // THEN
+  //    Optional<UacUpdateDTO> uacOpt = fireStorePoller.getUacByHash(uacUpdateDTO.getUacHash());
+  //    Assertions.assertTrue(uacOpt.isPresent());
+  //
+  //    UacUpdateDTO actualUacUpdateDTO = uacOpt.get();
+  //
+  //    // add our expected fields on here
+  //    Map<String, String> expectedLaunchData = new HashMap<>();
+  //    expectedLaunchData.put("participant_id", "1111");
+  //    uacUpdateDTO.setLaunchData(expectedLaunchData);
+  //
+  //    assertThat(actualUacUpdateDTO).isEqualTo(uacUpdateDTO);
+  //  }
 
   //    @Test
   //    public void newCopyOfActiveUAacDoesNotOverwriteLaunchData() throws UacNotFoundException {

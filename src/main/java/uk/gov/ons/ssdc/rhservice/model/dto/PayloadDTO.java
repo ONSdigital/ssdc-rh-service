@@ -10,6 +10,5 @@ public class PayloadDTO {
   private CaseUpdateDTO caseUpdate;
   private UacUpdateDTO uacUpdate;
   private CollectionExerciseUpdateDTO collectionExerciseUpdate;
-  private SurveyUpdateDto surveyUpdate;
   private EqLaunchDTO eqLaunch;
 }
