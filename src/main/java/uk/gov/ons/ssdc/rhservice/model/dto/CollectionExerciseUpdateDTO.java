@@ -8,4 +8,5 @@ public class CollectionExerciseUpdateDTO {
   private String name;
   private String surveyId;
   private Object metadata;
+  private Object collectionInstrumentRules;
 }

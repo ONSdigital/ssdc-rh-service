@@ -8,14 +8,17 @@ import org.springframework.messaging.Message;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
+import uk.gov.ons.ssdc.rhservice.survey.specific.LaunchDataFieldSetter;
 
 @MessageEndpoint
 public class UacUpdateReceiver {
   private final UacRepository uacRepository;
+  private final LaunchDataFieldSetter launhDataFieldSetter;
 
-  public UacUpdateReceiver(UacRepository uacRepository) {
+  public UacUpdateReceiver(
+      UacRepository uacRepository, LaunchDataFieldSetter launhDataFieldSetter) {
     this.uacRepository = uacRepository;
-    //    this.launhDataFieldSetter = launhDataFieldSetter;
+    this.launhDataFieldSetter = launhDataFieldSetter;
   }
 
   @ServiceActivator(inputChannel = "uacUpdateInputChannel", adviceChain = "retryAdvice")
@@ -23,9 +26,9 @@ public class UacUpdateReceiver {
     EventDTO event = convertJsonBytesToEvent(message.getPayload());
     UacUpdateDTO uacUpdateDTO = event.getPayload().getUacUpdate();
 
-    //    if (uacUpdateDTO.isActive()) {
-    //      launhDataFieldSetter.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
-    //    }
+    if (uacUpdateDTO.isActive()) {
+      launhDataFieldSetter.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
+    }
 
     uacRepository.writeUAC(uacUpdateDTO);
   }
