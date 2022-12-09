@@ -201,22 +201,22 @@ class EqPayloadBuilderTest {
     CaseUpdateDTO caseUpdate = new CaseUpdateDTO();
 
     caseUpdate.setCaseId(uacUpdate.getCaseId());
-    caseUpdate.setSurveyId(uacUpdate.getSurveyId());
+//    caseUpdate.setSurveyId(uacUpdate.getSurveyId());
     caseUpdate.setCollectionExerciseId(uacUpdate.getCollectionExerciseId());
-    caseUpdate.setInvalid(false);
-    caseUpdate.setRefusalReceived(null);
+//    caseUpdate.setInvalid(false);
+//    caseUpdate.setRefusalReceived(null);
 
     Map<String, String> sample = new HashMap<>();
     sample.put("ADDRESS_LINE1", "123 Fake Street");
     caseUpdate.setSample(sample);
 
-    Map<String, String> sampleSensitive = new HashMap<>();
-    sampleSensitive.put("Telephone", "020712345");
-    caseUpdate.setSampleSensitive(sampleSensitive);
+//    Map<String, String> sampleSensitive = new HashMap<>();
+//    sampleSensitive.put("Telephone", "020712345");
+//    caseUpdate.setSampleSensitive(sampleSensitive);
 
-    caseUpdate.setCaseRef("CASE_REF");
-    caseUpdate.setCreatedAt(new Date(System.currentTimeMillis()));
-    caseUpdate.setLastUpdatedAt(null);
+//    caseUpdate.setCaseRef("CASE_REF");
+//    caseUpdate.setCreatedAt(new Date(System.currentTimeMillis()));
+//    caseUpdate.setLastUpdatedAt(null);
 
     return caseUpdate;
   }

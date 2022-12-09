@@ -1,86 +1,68 @@
 package uk.gov.ons.ssdc.rhservice.survey.specific;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.CollectionInstrumentSelectionRule;
+import uk.gov.ons.ssdc.rhservice.model.dto.LaunchDataFieldDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
+import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
 
 @Component
 public class LaunchDataFieldSetter {
-  private final CaseRepository caseRepository;
-  //  final ObjectMapper mapper = new ObjectMapper();
-  // Rules for each UAC check it's survey, get the rule, apply them
-  // One day rules may include overwrite etc
+    private final CaseRepository caseRepository;
+    private final CollectionExerciseRepository collectionExerciseRepository;
 
-  public LaunchDataFieldSetter(CaseRepository caseRepository) {
-
-    this.caseRepository = caseRepository;
-  }
-
-  public void stampLaunchDataFieldsOnUAC(UacUpdateDTO uacUpdateDTO) {
-    Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(uacUpdateDTO.getCaseId());
-    if (cazeOpt.isEmpty()) {
-      throw new RuntimeException("Not Found case ID: " + uacUpdateDTO.getCaseId());
+    public LaunchDataFieldSetter(CaseRepository caseRepository, CollectionExerciseRepository collectionExerciseRepository) {
+        this.caseRepository = caseRepository;
+        this.collectionExerciseRepository = collectionExerciseRepository;
     }
 
-    CaseUpdateDTO caze = cazeOpt.get();
-    //    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
-    //        getCollex(caze.getCollectionExerciseId());
+    public void stampLaunchDataFieldsOnUAC(UacUpdateDTO uacUpdateDTO) {
+        List<LaunchDataFieldDTO> eqLaunchDataSettings = getEqLaunchSettingsFromCollectionExercise(uacUpdateDTO.getCollectionExerciseId(), uacUpdateDTO.getCollectionInstrumentUrl());
+        CaseUpdateDTO caze = getCase(uacUpdateDTO.getCaseId());
 
-    if (!caze.getSample().containsKey("PARTICIPANT_ID")) {
-      return;
+        Map<String, String> launchData = new HashMap<>();
+        for (LaunchDataFieldDTO launchDataFieldDTO : eqLaunchDataSettings) {
+
+            if (caze.getSample().containsKey(launchDataFieldDTO.getSampleField())) {
+                launchData.put(
+                        launchDataFieldDTO.getLaunchDataFieldName(),
+                        caze.getSample().get(launchDataFieldDTO.getSampleField()));
+            } else if (launchDataFieldDTO.isMandatory()) {
+                throw new RuntimeException(
+                        "Expected field: "
+                                + launchDataFieldDTO.getSampleField()
+                                + " missing on case id: "
+                                + caze.getCaseId());
+            }
+        }
+
+        uacUpdateDTO.setLaunchData(launchData);
     }
 
-    Map<String, String> launchData = new HashMap<>();
-    launchData.put("participant_id", caze.getSample().get("PARTICIPANT_ID"));
-    launchData.put("first_name", caze.getSample().get("FIRST_NAME"));
-    uacUpdateDTO.setLaunchData(launchData);
+    private List<LaunchDataFieldDTO> getEqLaunchSettingsFromCollectionExercise(String collectionExerciseId, String collectionInstrumentUrl) {
+        return collectionExerciseRepository.readCollectionExerciseUpdate(collectionExerciseId)
+                .orElseThrow(() -> new RuntimeException("Collection Exercise not found: " + collectionExerciseId))
+                .getCollectionInstrumentRules()
+                .stream()
+                .filter(collexInstrumentRule -> collexInstrumentRule.getCollectionInstrumentUrl().equals(collectionInstrumentUrl))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Collection Instrument Url not matched: " + collectionInstrumentUrl))
+                .getEqLaunchSettings();
+    }
 
-    // have proper Java classes to map this JSON too
-    //        ArrayList<Object> collexRules = (ArrayList<Object>)
-    // collectionExerciseUpdateDTO.getCollectionInstrumentRules();
-    //        Map<String, Object> collexRule = (Map<String, Object>) collexRules.get(0);
-    //
-    //        //        TODO: nice way of if x do this etc?
-    //        if (!collexRule.containsKey("eqLaunchDataSettings")) {
-    //            return;
-    //        }
-    //
-    //        List<Map<String, String>> launchDataSettingsMap =
-    //                (List<Map<String, String>>) collexRule.get("eqLaunchDataSettings");
-    //
-    //        Map<String, String> launchData = new HashMap<>();
-    //
-    //        for (Map<String, String> launchDataField : launchDataSettingsMap) {
-    //            final LaunchDataFieldDTO launchDataFieldDTO =
-    //                    mapper.convertValue(launchDataField, LaunchDataFieldDTO.class);
-    //
-    //            if (caze.getSample().containsKey(launchDataFieldDTO.getSampleField())) {
-    //                launchData.put(
-    //                        launchDataFieldDTO.getLaunchDataFieldName(),
-    //                        caze.getSample().get(launchDataFieldDTO.getSampleField()));
-    //            } else if (launchDataFieldDTO.isMandatory()) {
-    //                throw new RuntimeException(
-    //                        "Expected field: "
-    //                                + launchDataFieldDTO.getSampleField()
-    //                                + " missing on case id: "
-    //                                + caze.getCaseId());
-    //            }
-    //        }
 
-  }
-
-  //  private CollectionExerciseUpdateDTO getCollex(String collexId) {
-  //
-  //    Optional<CollectionExerciseUpdateDTO> collex =
-  //        collectionExerciseRepository.readCollectionExerciseUpdate(collexId);
-  //    if (collex.isEmpty()) {
-  //      throw new RuntimeException("Not Found Collection Exercise: " + collexId);
-  //    }
-  //
-  //    return collex.get();
-  //  }
+    private CaseUpdateDTO getCase(String caseId) {
+        return caseRepository.readCaseUpdate(caseId).orElseThrow(
+                () -> new RuntimeException("Not Found case ID: " + caseId)
+        );
+    }
 }
