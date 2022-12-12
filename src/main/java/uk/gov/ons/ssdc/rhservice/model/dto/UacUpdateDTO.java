@@ -10,26 +10,25 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class UacUpdateDTO {
 
-  private String caseId;
+    private String caseId;
 
-  private String collectionExerciseId;
+    private String collectionExerciseId;
 
-  private String surveyId;
+    private String surveyId;
 
-  private String collectionInstrumentUrl;
+    private String collectionInstrumentUrl;
 
-  private boolean active;
+    private boolean active;
 
-  private String uacHash;
+    private String uacHash;
 
-  private String qid;
+    private String qid;
 
-  private boolean receiptReceived;
+    private boolean receiptReceived;
 
-  private boolean eqLaunched;
+    private boolean eqLaunched;
 
-  private Map<String, String> launchData;
+    private Map<String, String> launchData;
 }

@@ -53,24 +53,23 @@ class UacUpdateReceiverIT {
     @Test
     void testUacUpdateReceivedWithNoELaunchDataSettings() throws UacNotFoundException {
         // GIVEN
-        CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = CollectionExerciseUpdateDTO.builder()
-                .collectionExerciseId(UUID.randomUUID().toString())
-                .collectionInstrumentRules(List.of(new CollectionInstrumentSelectionRule("testUrl1", null)))
-                .build();
+        CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO(
+                (UUID.randomUUID().toString()
+                List.of(new CollectionInstrumentSelectionRule("testUrl1", null))
+        );
         collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
 
-        CaseUpdateDTO caseUpdateDTO = CaseUpdateDTO.builder()
-                .caseId(UUID.randomUUID().toString())
-                .collectionExerciseId(collectionExerciseUpdateDTO.getCollectionExerciseId())
-                .sample(Map.of("PARTICIPANT_ID", "1111", "FIRST_NAME", "Hugh"))
-                .build();
+        CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO(
+                UUID.randomUUID().toString(),
+                collectionExerciseUpdateDTO.getCollectionExerciseId(),
+                Map.of("PARTICIPANT_ID", "1111", "FIRST_NAME", "Hugh");
         caseRepository.writeCaseUpdate(caseUpdateDTO);
 
-        UacUpdateDTO uacUpdateDTO = UacUpdateDTO.builder()
-                .caseId(caseUpdateDTO.getCaseId())
-                .collectionExerciseId(collectionExerciseUpdateDTO.getCollectionExerciseId())
-                .qid("000000000001")
-                .uacHash(String.valueOf(Math.random()))
+        UacUpdateDTO uacUpdateDTO = new UacUpdateDTO(
+                caseUpdateDTO.getCaseId(),
+                collectionExerciseUpdateDTO.getCollectionExerciseId(),
+                "000000000001",
+                String.valueOf(Math.random()),
                 .active(true)
                 .collectionInstrumentUrl("testUrl1")
                 .build();
@@ -79,7 +78,7 @@ class UacUpdateReceiverIT {
                 .payload(PayloadDTO.builder().uacUpdate(uacUpdateDTO).build())
                 .build();
 
-        // WHEN
+         WHEN
         pubsubTestHelper.sendMessageToSharedProject(uacUpdateTopic, eventDTO);
 
         // THEN

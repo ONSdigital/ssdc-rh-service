@@ -2,6 +2,7 @@ package uk.gov.ons.ssdc.rhservice.model.dto;
 
 import java.io.Serializable;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CollectionInstrumentSelectionRule implements Serializable {
-  private String collectionInstrumentUrl;
-  private List<LaunchDataFieldDTO> eqLaunchSettings;
+    private String collectionInstrumentUrl;
+    private List<LaunchDataFieldDTO> eqLaunchSettings;
 }
