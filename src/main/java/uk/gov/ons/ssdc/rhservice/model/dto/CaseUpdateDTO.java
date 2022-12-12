@@ -1,17 +1,17 @@
 package uk.gov.ons.ssdc.rhservice.model.dto;
 
-import java.util.Date;
 import java.util.Map;
-
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CaseUpdateDTO {
-    private String caseId;
-    private String collectionExerciseId;
-    private Map<String, String> sample;
+  private String caseId;
+  private String collectionExerciseId;
+  private Map<String, String> sample;
 }
