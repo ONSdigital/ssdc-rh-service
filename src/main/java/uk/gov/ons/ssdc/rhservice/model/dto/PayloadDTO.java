@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 public class PayloadDTO {
-    private CaseUpdateDTO caseUpdate;
-    private UacUpdateDTO uacUpdate;
-    private CollectionExerciseUpdateDTO collectionExerciseUpdate;
-    private EqLaunchDTO eqLaunch;
+  private CaseUpdateDTO caseUpdate;
+  private UacUpdateDTO uacUpdate;
+  private CollectionExerciseUpdateDTO collectionExerciseUpdate;
+  private EqLaunchDTO eqLaunch;
 }
