@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.LaunchDataFieldDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.eqLaunchSettings;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
@@ -23,7 +23,7 @@ public class LaunchDataFieldSetter {
     }
 
     public void stampLaunchDataFieldsOnUAC(UacUpdateDTO uacUpdateDTO) {
-        List<LaunchDataFieldDTO> eqLaunchDataSettings =
+        List<eqLaunchSettings> eqLaunchDataSettings =
                 getEqLaunchSettingsFromCollectionExercise(
                         uacUpdateDTO.getCollectionExerciseId(), uacUpdateDTO.getCollectionInstrumentUrl());
 
@@ -34,16 +34,16 @@ public class LaunchDataFieldSetter {
         CaseUpdateDTO caze = getCase(uacUpdateDTO.getCaseId());
 
         Map<String, String> launchData = new HashMap<>();
-        for (LaunchDataFieldDTO launchDataFieldDTO : eqLaunchDataSettings) {
+        for (eqLaunchSettings eqLaunchSettings : eqLaunchDataSettings) {
 
-            if (caze.getSample().containsKey(launchDataFieldDTO.getSampleField())) {
+            if (caze.getSample().containsKey(eqLaunchSettings.getSampleField())) {
                 launchData.put(
-                        launchDataFieldDTO.getLaunchDataFieldName(),
-                        caze.getSample().get(launchDataFieldDTO.getSampleField()));
-            } else if (launchDataFieldDTO.isMandatory()) {
+                        eqLaunchSettings.getLaunchDataFieldName(),
+                        caze.getSample().get(eqLaunchSettings.getSampleField()));
+            } else if (eqLaunchSettings.isMandatory()) {
                 throw new RuntimeException(
                         "Expected field: "
-                                + launchDataFieldDTO.getSampleField()
+                                + eqLaunchSettings.getSampleField()
                                 + " missing on case id: "
                                 + caze.getCaseId());
             }
@@ -52,7 +52,7 @@ public class LaunchDataFieldSetter {
         uacUpdateDTO.setLaunchData(launchData);
     }
 
-    private List<LaunchDataFieldDTO> getEqLaunchSettingsFromCollectionExercise(
+    private List<eqLaunchSettings> getEqLaunchSettingsFromCollectionExercise(
             String collectionExerciseId, String collectionInstrumentUrl) {
         return collectionExerciseRepository.readCollectionExerciseUpdate(collectionExerciseId)
                 .orElseThrow(

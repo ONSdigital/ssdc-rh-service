@@ -22,7 +22,7 @@ import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CollectionInstrumentSelectionRule;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.LaunchDataFieldDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.eqLaunchSettings;
 import uk.gov.ons.ssdc.rhservice.model.dto.PayloadDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
@@ -96,8 +96,8 @@ class UacUpdateReceiverIT {
                                 new CollectionInstrumentSelectionRule(
                                         "testUrl1",
                                         List.of(
-                                                new LaunchDataFieldDTO("PARTICIPANT_ID", "participant_id", true),
-                                                new LaunchDataFieldDTO("FIRST_NAME", "first_name", true))),
+                                                new eqLaunchSettings("PARTICIPANT_ID", "participant_id", true),
+                                                new eqLaunchSettings("FIRST_NAME", "first_name", true))),
                                 new CollectionInstrumentSelectionRule("differentUrl1", null)));
         collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
 

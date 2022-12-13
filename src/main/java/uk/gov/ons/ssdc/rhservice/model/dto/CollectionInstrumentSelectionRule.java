@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CollectionInstrumentSelectionRule implements Serializable {
     private String collectionInstrumentUrl;
-    private List<LaunchDataFieldDTO> eqLaunchSettings;
+    private List<uk.gov.ons.ssdc.rhservice.model.dto.eqLaunchSettings> eqLaunchSettings;
 }

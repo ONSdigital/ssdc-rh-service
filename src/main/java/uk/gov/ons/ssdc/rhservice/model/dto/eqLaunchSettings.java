@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LaunchDataFieldDTO {
+public class eqLaunchSettings {
   private String sampleField;
   private String launchDataFieldName;
   private boolean mandatory;
