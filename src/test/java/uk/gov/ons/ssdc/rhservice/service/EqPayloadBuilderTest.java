@@ -202,7 +202,6 @@ class EqPayloadBuilderTest {
         CaseUpdateDTO caseUpdate = new CaseUpdateDTO();
 
         caseUpdate.setCaseId(uacUpdate.getCaseId());
-        caseUpdate.setSurveyId(uacUpdate.getSurveyId());
         caseUpdate.setCollectionExerciseId(uacUpdate.getCollectionExerciseId());
         caseUpdate.setInvalid(false);
         caseUpdate.setRefusalReceived(null);

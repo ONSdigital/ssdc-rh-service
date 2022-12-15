@@ -1,6 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,10 +38,26 @@ class LaunchDataFieldSetterTest {
     CaseRepository caseRepository;
 
     @InjectMocks
-    LaunchDataFieldSetter launchDataFieldSetter;
+    LaunchDataFieldSetter underTest;
+
 
     @Test
     public void testCollectionExerciseNotFound() {
+        when(collectionExerciseRepository.readCollectionExerciseUpdate(any())).thenReturn(Optional.empty());
+
+        UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+        uacUpdateDTO.setCollectionInstrumentUrl(TEST_URL);
+        uacUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
+
+        RuntimeException thrown =
+                assertThrows(RuntimeException.class, () -> underTest.stampLaunchDataFieldsOnUAC(uacUpdateDTO));
+
+        Assertions.assertThat(thrown.getMessage())
+                .isEqualTo("Collection Exercise not found: " + uacUpdateDTO.getCollectionExerciseId());
+    }
+
+    @Test
+    public void testCollectionInstrumentUrlNotFound() {
         CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
                 new CollectionExerciseUpdateDTO(
                         UUID.randomUUID().toString(),
@@ -48,13 +66,41 @@ class LaunchDataFieldSetterTest {
         when(collectionExerciseRepository.readCollectionExerciseUpdate(any())).thenReturn(Optional.of(collectionExerciseUpdateDTO));
 
         UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
-        uacUpdateDTO.setCollectionInstrumentUrl(TEST_URL);
-        uacUpdateDTO.setCollectionExerciseId(collectionExerciseUpdateDTO.getCollectionExerciseId());
-        launchDataFieldSetter.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
+        uacUpdateDTO.setCollectionInstrumentUrl("unMatchedUrl");
+        uacUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
 
-        assertThat(uacUpdateDTO.getLaunchData()).isNull();
+        RuntimeException thrown =
+                assertThrows(RuntimeException.class, () -> underTest.stampLaunchDataFieldsOnUAC(uacUpdateDTO));
+
+        Assertions.assertThat(thrown.getMessage()).isEqualTo("Collection Instrument Url not matched: unMatchedUrl");
     }
 
+    @Test
+    public void testCaseNotFound() {
+        CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
+                new CollectionExerciseUpdateDTO(
+                        UUID.randomUUID().toString(),
+                        List.of(new CollectionInstrumentSelectionRule(
+                                        TEST_URL,
+                                        List.of(new EqLaunchSettings("a", "b", true))
+                                )
+                        )
+                );
+
+        collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
+        when(collectionExerciseRepository.readCollectionExerciseUpdate(any())).thenReturn(Optional.of(collectionExerciseUpdateDTO));
+        when(caseRepository.readCaseUpdate(any())).thenReturn(Optional.empty());
+
+        UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+        uacUpdateDTO.setCollectionInstrumentUrl(TEST_URL);
+        uacUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
+        uacUpdateDTO.setCaseId(UUID.randomUUID().toString());
+
+        RuntimeException thrown =
+                assertThrows(RuntimeException.class, () -> underTest.stampLaunchDataFieldsOnUAC(uacUpdateDTO));
+
+        Assertions.assertThat(thrown.getMessage()).isEqualTo("Not Found case ID: " + uacUpdateDTO.getCaseId());
+    }
 
     @Test
     public void testNoLaunchSettings() {
@@ -68,7 +114,7 @@ class LaunchDataFieldSetterTest {
         UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
         uacUpdateDTO.setCollectionInstrumentUrl(TEST_URL);
         uacUpdateDTO.setCollectionExerciseId(collectionExerciseUpdateDTO.getCollectionExerciseId());
-        launchDataFieldSetter.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
+        underTest.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
 
         assertThat(uacUpdateDTO.getLaunchData()).isNull();
     }
@@ -85,7 +131,7 @@ class LaunchDataFieldSetterTest {
         UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
         uacUpdateDTO.setCollectionInstrumentUrl(TEST_URL);
         uacUpdateDTO.setCollectionExerciseId(collectionExerciseUpdateDTO.getCollectionExerciseId());
-        launchDataFieldSetter.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
+        underTest.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
 
         assertThat(uacUpdateDTO.getLaunchData()).isNull();
     }
