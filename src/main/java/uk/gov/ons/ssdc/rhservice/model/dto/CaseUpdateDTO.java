@@ -11,5 +11,8 @@ import lombok.NoArgsConstructor;
 public class CaseUpdateDTO {
   private String caseId;
   private String collectionExerciseId;
+  private String SurveyId;
   private Map<String, String> sample;
+  private 
+
 }

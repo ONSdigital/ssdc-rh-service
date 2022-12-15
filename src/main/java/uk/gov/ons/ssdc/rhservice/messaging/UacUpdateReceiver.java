@@ -8,7 +8,7 @@ import org.springframework.messaging.Message;
 import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
-import uk.gov.ons.ssdc.rhservice.survey.specific.LaunchDataFieldSetter;
+import uk.gov.ons.ssdc.rhservice.service.LaunchDataFieldSetter;
 
 @MessageEndpoint
 public class UacUpdateReceiver {

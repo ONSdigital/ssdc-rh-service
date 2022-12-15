@@ -1,4 +1,4 @@
-package uk.gov.ons.ssdc.rhservice.survey.specific;
+package uk.gov.ons.ssdc.rhservice.service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.eqLaunchSettings;
+import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchSettings;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
 
@@ -22,7 +22,7 @@ public class LaunchDataFieldSetter {
   }
 
   public void stampLaunchDataFieldsOnUAC(UacUpdateDTO uacUpdateDTO) {
-    List<eqLaunchSettings> eqLaunchDataSettings =
+    List<EqLaunchSettings> eqLaunchDataSettings =
         getEqLaunchSettingsFromCollectionExercise(
             uacUpdateDTO.getCollectionExerciseId(), uacUpdateDTO.getCollectionInstrumentUrl());
 
@@ -33,7 +33,7 @@ public class LaunchDataFieldSetter {
     CaseUpdateDTO caze = getCase(uacUpdateDTO.getCaseId());
 
     Map<String, String> launchData = new HashMap<>();
-    for (eqLaunchSettings eqLaunchSettings : eqLaunchDataSettings) {
+    for (EqLaunchSettings eqLaunchSettings : eqLaunchDataSettings) {
 
       if (caze.getSample().containsKey(eqLaunchSettings.getSampleField())) {
         launchData.put(
@@ -51,7 +51,7 @@ public class LaunchDataFieldSetter {
     uacUpdateDTO.setLaunchData(launchData);
   }
 
-  private List<eqLaunchSettings> getEqLaunchSettingsFromCollectionExercise(
+  private List<EqLaunchSettings> getEqLaunchSettingsFromCollectionExercise(
       String collectionExerciseId, String collectionInstrumentUrl) {
     return collectionExerciseRepository.readCollectionExerciseUpdate(collectionExerciseId)
         .orElseThrow(
