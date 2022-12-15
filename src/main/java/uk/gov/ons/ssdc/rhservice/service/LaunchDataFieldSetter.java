@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.EqLaunchSettings;
+import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
 

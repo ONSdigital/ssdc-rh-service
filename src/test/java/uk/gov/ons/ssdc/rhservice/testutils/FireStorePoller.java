@@ -1,7 +1,6 @@
 package uk.gov.ons.ssdc.rhservice.testutils;
 
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -20,109 +19,108 @@ import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 @Component
 @ActiveProfiles("test")
 public class FireStorePoller {
-    @Autowired
-    private CaseRepository caseRepository;
-    @Autowired
-    private UacRepository uacRepository;
-    @Autowired
-    private CollectionExerciseRepository collectionExerciseRepository;
+  @Autowired private CaseRepository caseRepository;
+  @Autowired private UacRepository uacRepository;
+  @Autowired private CollectionExerciseRepository collectionExerciseRepository;
 
-    @Retryable(
-            value = {CaseNotFoundException.class},
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 1000))
-    public Optional<CaseUpdateDTO> getCaseById(String caseId) throws CaseNotFoundException {
+  @Retryable(
+      value = {CaseNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<CaseUpdateDTO> getCaseById(String caseId) throws CaseNotFoundException {
 
-        Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(caseId);
+    Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(caseId);
 
-        if (cazeOpt.isPresent()) {
-            return cazeOpt;
-        }
-
-        throw new CaseNotFoundException("Case Not found: " + caseId);
+    if (cazeOpt.isPresent()) {
+      return cazeOpt;
     }
 
-    @Retryable(
-            value = {UacNotFoundException.class},
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 1000))
-    public Optional<UacUpdateDTO> getUacByHash(String hash, boolean expectedActive) throws UacNotFoundException {
-        Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
+    throw new CaseNotFoundException("Case Not found: " + caseId);
+  }
 
-        if (uacUpdateOpt.isPresent()) {
-            if (uacUpdateOpt.get().isActive() != expectedActive) {
-                throw new UacNotFoundException("UAC found but not in right active state, expected: " + expectedActive);
-            }
+  @Retryable(
+      value = {UacNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<UacUpdateDTO> getUacByHash(String hash, boolean expectedActive)
+      throws UacNotFoundException {
+    Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
 
-            return uacUpdateOpt;
-        }
+    if (uacUpdateOpt.isPresent()) {
+      if (uacUpdateOpt.get().isActive() != expectedActive) {
+        throw new UacNotFoundException(
+            "UAC found but not in right active state, expected: " + expectedActive);
+      }
 
-        throw new UacNotFoundException("Uac Not found: " + hash);
+      return uacUpdateOpt;
     }
 
-    @Retryable(
-            value = {UacNotFoundException.class},
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 1000))
-    public Optional<UacUpdateDTO> getUacByHashUacActiveValue(String hash, boolean expectedActiveValue)
-            throws UacNotFoundException {
+    throw new UacNotFoundException("Uac Not found: " + hash);
+  }
 
-        Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
+  @Retryable(
+      value = {UacNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<UacUpdateDTO> getUacByHashUacActiveValue(String hash, boolean expectedActiveValue)
+      throws UacNotFoundException {
 
-        if (uacUpdateOpt.isPresent() && uacUpdateOpt.get().isActive() == expectedActiveValue) {
-            return uacUpdateOpt;
-        }
+    Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
 
-        throw new UacNotFoundException("Updated Uac Not found: " + hash);
+    if (uacUpdateOpt.isPresent() && uacUpdateOpt.get().isActive() == expectedActiveValue) {
+      return uacUpdateOpt;
     }
 
-    @Retryable(
-            value = {UacNotFoundException.class},
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 1000))
-    public Optional<UacUpdateDTO> getUacByHashUacCheckSample(String hash, boolean expectedActiveValue)
-            throws UacNotFoundException {
+    throw new UacNotFoundException("Updated Uac Not found: " + hash);
+  }
 
-        Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
+  @Retryable(
+      value = {UacNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<UacUpdateDTO> getUacByHashUacCheckSample(String hash, boolean expectedActiveValue)
+      throws UacNotFoundException {
 
-        if (uacUpdateOpt.isPresent() && uacUpdateOpt.get().isActive() == expectedActiveValue) {
-            return uacUpdateOpt;
-        }
+    Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
 
-        throw new UacNotFoundException("Updated Uac Not found: " + hash);
+    if (uacUpdateOpt.isPresent() && uacUpdateOpt.get().isActive() == expectedActiveValue) {
+      return uacUpdateOpt;
     }
 
-    @Retryable(
-            value = {UacNotFoundException.class},
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 1000))
-    public Optional<UacUpdateDTO> getUACByHashAndQID(String hash, String expectedQID)
-            throws UacNotFoundException {
+    throw new UacNotFoundException("Updated Uac Not found: " + hash);
+  }
 
-        Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
+  @Retryable(
+      value = {UacNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<UacUpdateDTO> getUACByHashAndQID(String hash, String expectedQID)
+      throws UacNotFoundException {
 
-        if (uacUpdateOpt.isPresent() && uacUpdateOpt.get().getQid().equals(expectedQID)) {
-            return uacUpdateOpt;
-        }
+    Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
 
-        throw new UacNotFoundException("Updated Uac Not found: " + hash);
+    if (uacUpdateOpt.isPresent() && uacUpdateOpt.get().getQid().equals(expectedQID)) {
+      return uacUpdateOpt;
     }
 
-    @Retryable(
-            value = {CollectionExerciseNotFoundException.class},
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 1000))
-    public Optional<CollectionExerciseUpdateDTO> getCollectionExerciseById(
-            String collectionExcerciseId) throws CollectionExerciseNotFoundException {
+    throw new UacNotFoundException("Updated Uac Not found: " + hash);
+  }
 
-        Optional<CollectionExerciseUpdateDTO> collexOpt =
-                collectionExerciseRepository.readCollectionExerciseUpdate(collectionExcerciseId);
+  @Retryable(
+      value = {CollectionExerciseNotFoundException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000))
+  public Optional<CollectionExerciseUpdateDTO> getCollectionExerciseById(
+      String collectionExcerciseId) throws CollectionExerciseNotFoundException {
 
-        if (collexOpt.isPresent()) {
-            return collexOpt;
-        } else {
-            throw new CollectionExerciseNotFoundException(
-                    "Collection Exercise Not found: " + collectionExcerciseId);
-        }
+    Optional<CollectionExerciseUpdateDTO> collexOpt =
+        collectionExerciseRepository.readCollectionExerciseUpdate(collectionExcerciseId);
+
+    if (collexOpt.isPresent()) {
+      return collexOpt;
+    } else {
+      throw new CollectionExerciseNotFoundException(
+          "Collection Exercise Not found: " + collectionExcerciseId);
     }
+  }
 }
