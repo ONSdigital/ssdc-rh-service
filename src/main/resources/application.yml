@@ -65,8 +65,3 @@ logging:
     root: INFO
     com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter: ERROR
 
-#TODO: Remove
-jwt_keys: src/test/resources/eq-keys.json
-jwt_decrypt_keys: src/test/resources/eq-decrypt-keys.json
-eq:
-  response-id-pepper: SRM_PLACEHOLDER
