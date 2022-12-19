@@ -38,11 +38,6 @@ class CollectionExerciseReceiverIT {
     // GIVEN
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
     collectionExerciseUpdateDTO.setCollectionExerciseId(UUID.randomUUID().toString());
-    //    CollectionInstrumentSelectionRule collectionInstrumentSelectionRule =
-    //        new CollectionInstrumentSelectionRule();
-    //    collectionInstrumentSelectionRule.setCollectionInstrumentUrl("EQ_URL");
-    //    collectionExerciseUpdateDTO.setCollectionInstrumentSelectionRules(
-    //        List.of(collectionInstrumentSelectionRule));
 
     PayloadDTO payloadDTO = new PayloadDTO();
     payloadDTO.setCollectionExerciseUpdate(collectionExerciseUpdateDTO);
