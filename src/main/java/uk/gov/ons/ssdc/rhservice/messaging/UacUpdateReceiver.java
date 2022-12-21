@@ -13,12 +13,12 @@ import uk.gov.ons.ssdc.rhservice.service.LaunchDataFieldSetter;
 @MessageEndpoint
 public class UacUpdateReceiver {
   private final UacRepository uacRepository;
-  private final LaunchDataFieldSetter launhDataFieldSetter;
+  private final LaunchDataFieldSetter launchDataFieldSetter;
 
   public UacUpdateReceiver(
-      UacRepository uacRepository, LaunchDataFieldSetter launhDataFieldSetter) {
+      UacRepository uacRepository, LaunchDataFieldSetter launchDataFieldSetter) {
     this.uacRepository = uacRepository;
-    this.launhDataFieldSetter = launhDataFieldSetter;
+    this.launchDataFieldSetter = launchDataFieldSetter;
   }
 
   @ServiceActivator(inputChannel = "uacUpdateInputChannel", adviceChain = "retryAdvice")
@@ -27,7 +27,7 @@ public class UacUpdateReceiver {
     UacUpdateDTO uacUpdateDTO = event.getPayload().getUacUpdate();
 
     if (uacUpdateDTO.isActive()) {
-      launhDataFieldSetter.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
+      launchDataFieldSetter.stampLaunchDataFieldsOnUAC(uacUpdateDTO);
     }
 
     uacRepository.writeUAC(uacUpdateDTO);
