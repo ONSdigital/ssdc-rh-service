@@ -175,7 +175,6 @@ class UacUpdateReceiverIT {
     oldUacDTO.setLaunchData(Map.of("field", "value"));
     uacRepository.writeUAC(oldUacDTO);
 
-    //
     UacUpdateDTO deactivatedUAC = new UacUpdateDTO();
     deactivatedUAC.setCaseId(caseUpdateDTO.getCaseId());
     deactivatedUAC.setCollectionExerciseId(collectionExerciseUpdateDTO.getCollectionExerciseId());
