@@ -13,6 +13,7 @@ queueconfig:
   shared-pubsub-project: shared-project
   case-update-topic: event_case-update
   uac-update-topic: event_uac-update
+  collection-exercise-update-topic: event_collection-exercise-update
 
 cloud-storage:
   case-schema-name: case

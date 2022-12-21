@@ -28,6 +28,9 @@ public class MessageConsumerConfig {
   @Value("${queueconfig.uac-update-subscription}")
   private String uacUpdateSubscription;
 
+  @Value("${queueconfig.collection-exercise-update-subscription}")
+  private String collectionExerciseSubscription;
+
   public MessageConsumerConfig(
       ManagedMessageRecoverer managedMessageRecoverer, PubSubTemplate pubSubTemplate) {
     this.managedMessageRecoverer = managedMessageRecoverer;
@@ -45,6 +48,11 @@ public class MessageConsumerConfig {
   }
 
   @Bean
+  public MessageChannel collectionExerciseUpdateChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
   public PubSubInboundChannelAdapter newCaseInbound(
       @Qualifier("caseUpdateInputChannel") MessageChannel channel) {
     String subscription =
@@ -57,6 +65,14 @@ public class MessageConsumerConfig {
       @Qualifier("uacUpdateInputChannel") MessageChannel channel) {
     String subscription =
         toProjectSubscriptionName(uacUpdateSubscription, sharedPubsubProject).toString();
+    return makeAdapter(channel, subscription);
+  }
+
+  @Bean
+  public PubSubInboundChannelAdapter newCollectionExerciseInbound(
+      @Qualifier("collectionExerciseUpdateChannel") MessageChannel channel) {
+    String subscription =
+        toProjectSubscriptionName(collectionExerciseSubscription, sharedPubsubProject).toString();
     return makeAdapter(channel, subscription);
   }
 

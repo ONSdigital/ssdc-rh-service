@@ -1,8 +1,13 @@
 package uk.gov.ons.ssdc.rhservice.model.dto;
 
+import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UacUpdateDTO {
 
   private String caseId;
@@ -22,4 +27,6 @@ public class UacUpdateDTO {
   private boolean receiptReceived;
 
   private boolean eqLaunched;
+
+  private Map<String, String> launchData;
 }

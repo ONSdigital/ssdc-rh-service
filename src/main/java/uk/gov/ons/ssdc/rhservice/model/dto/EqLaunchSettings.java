@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventDTO {
-  private EventHeaderDTO header;
-  private PayloadDTO payload;
+public class EqLaunchSettings {
+  private String sampleField;
+  private String launchDataFieldName;
+  private boolean mandatory;
 }

@@ -1,6 +1,6 @@
 package uk.gov.ons.ssdc.rhservice.model.dto;
 
-import java.util.Map;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseUpdateDTO {
-  private String caseId;
+public class CollectionExerciseUpdateDTO {
   private String collectionExerciseId;
-  private boolean invalid;
-  private String refusalReceived;
-  private Map<String, String> sample;
+  private List<CollectionInstrumentSelectionRule> collectionInstrumentRules;
 }

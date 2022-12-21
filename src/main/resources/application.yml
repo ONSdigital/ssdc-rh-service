@@ -15,6 +15,7 @@ spring:
 queueconfig:
   case-update-subscription: event_case-update_rh
   uac-update-subscription: event_uac-update_rh
+  collection-exercise-update-subscription: event_collection-exercise-update_rh
   eq-launch-topic: event_eq-launch
   shared-pubsub-project: shared-project
 
@@ -22,6 +23,8 @@ queueconfig:
 cloud-storage:
   case-schema-name: case
   uac-schema-name: uac
+  collection-exercise-schema-name: collection-exercise
+  survey-schema-name: survey
   backoff:
     initial: 100
     multiplier: 1.2
@@ -33,7 +36,6 @@ exceptionmanager:
     scheme: http
     host: localhost
     port: 8666
-
 
 management:
   endpoints:
@@ -62,3 +64,4 @@ logging:
   level:
     root: INFO
     com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter: ERROR
+
