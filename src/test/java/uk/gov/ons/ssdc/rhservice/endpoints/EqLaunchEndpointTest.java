@@ -50,7 +50,6 @@ public class EqLaunchEndpointTest {
     String uacHash = "UAC_HASH";
     String languageCode = "LANGUAGE_CODE";
     String accountServiceUrl = "ACCOUNT_SERVICE_URL";
-    String accountServiceLogoutUrl = "ACCOUNT_SERVICE_LOGOUT_URL";
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
     uacUpdateDTO.setReceiptReceived(false);
     uacUpdateDTO.setActive(true);
@@ -88,7 +87,6 @@ public class EqLaunchEndpointTest {
     String uacHash = "UAC_HASH";
     String languageCode = "LANGUAGE_CODE";
     String accountServiceUrl = "ACCOUNT_SERVICE_URL";
-    String accountServiceLogoutUrl = "ACCOUNT_SERVICE_LOGOUT_URL";
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
     uacUpdateDTO.setReceiptReceived(true);
     uacUpdateDTO.setActive(false);
