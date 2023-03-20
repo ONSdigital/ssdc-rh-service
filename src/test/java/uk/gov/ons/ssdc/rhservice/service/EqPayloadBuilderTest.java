@@ -69,6 +69,14 @@ class EqPayloadBuilderTest {
     Map<String, Object> actualData = (Map<String, Object>) actualSurveyMetaData.get("data");
     assertThat(actualData.get("qid")).isEqualTo(uacUpdateDTO.getQid());
     assertThat(actualSurveyMetaData.get("receipting_keys")).isEqualTo(List.of("qid"));
+
+    // TODO test the workaround of setting response_expires_at to a year in the future
+    // As a quick way of testing it, check the value is greater than one year in the
+    // future, minus one minute
+    String actualResponseExpiresAtString = eqPayload.get("response_expires_at").toString();
+    OffsetDateTime actualResponseExpiresAt = OffsetDateTime.parse(actualResponseExpiresAtString);
+    OffsetDateTime oneYearInFuture = OffsetDateTime.now().plusYears(1).minusMinutes(1);
+    assertThat(actualResponseExpiresAt).isAfter(oneYearInFuture);
   }
 
   @Test

@@ -2,6 +2,8 @@ package uk.gov.ons.ssdc.rhservice.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,11 +57,18 @@ public class EqPayloadBuilder {
     eqTokenPayload.put("language_code", languageCode);
     eqTokenPayload.put("version", EQ_SCHEMA_VERSION);
     eqTokenPayload.put("response_id", encryptResponseId(uacUpdateDTO.getQid()));
-    // TODO: this is a tactical hack, we'd believed that the prefered schemaUrl field would be
+    // TODO: this is a tactical hack, we'd believed that the preferred schemaUrl field would be
     // populated
     // TODO: ticket to do this properly: https://trello.com/c/XEEIGcJW
     eqTokenPayload.put("schema_name", uacUpdateDTO.getCollectionInstrumentUrl());
     eqTokenPayload.put("survey_metadata", getSurveyMetaData(uacUpdateDTO));
+
+    // TODO: As a short term work around we are always setting response_expires_at to a year in the
+    // future. This is to prevent eQ from deleting the partial which is their default behaviour if
+    // no response_expires_at is set
+    OffsetDateTime oneYearInTheFuture = java.time.OffsetDateTime.now().plusYears(1);
+    eqTokenPayload.put(
+        "response_expires_at", oneYearInTheFuture.format(DateTimeFormatter.ISO_DATE_TIME));
 
     return eqTokenPayload;
   }
