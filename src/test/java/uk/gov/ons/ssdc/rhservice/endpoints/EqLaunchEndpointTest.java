@@ -27,7 +27,7 @@ import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
 import uk.gov.ons.ssdc.rhservice.service.UacService;
 
 @ExtendWith(MockitoExtension.class)
-public class EqLaunchEndpointTest {
+class EqLaunchEndpointTest {
 
   @Mock private UacService uacService;
 
@@ -42,7 +42,7 @@ public class EqLaunchEndpointTest {
   @InjectMocks private EqLaunchEndpoint underTest;
 
   @Test
-  public void testCallingEndpointGetsToken() {
+  void testCallingEndpointGetsToken() {
     // Given
     Map<String, Object> eqPayload = new HashMap<>();
     JWSObject jwsObject = Mockito.mock(JWSObject.class);
@@ -79,7 +79,7 @@ public class EqLaunchEndpointTest {
   }
 
   @Test
-  public void testCallingEndpointGetsResponseEntityReturned() {
+  void testCallingEndpointGetsResponseEntityReturned() {
     // Given
     Map<String, Object> payload = new HashMap<>();
     JWSObject jwsObject = Mockito.mock(JWSObject.class);
