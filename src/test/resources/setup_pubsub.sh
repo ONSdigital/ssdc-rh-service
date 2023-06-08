@@ -13,7 +13,6 @@ curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/topics/event_co
 curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/event_collection-exercise-update_rh -H 'Content-Type: application/json' -d '{"topic": "projects/shared-project/topics/event_collection-exercise-update"}'
 
 curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/topics/event_survey-update
-curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/event_survey-update_rh -H 'Content-Type: application/json' -d '{"topic": "projects/shared-project/topics/event_survey-update"}'
 
 curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/topics/event_eq-launch
 curl -X PUT http://$PUBSUB_SETUP_HOST/v1/projects/shared-project/subscriptions/event_eq-launch -H 'Content-Type: application/json' -d '{"topic": "projects/shared-project/topics/event_eq-launch"}'
