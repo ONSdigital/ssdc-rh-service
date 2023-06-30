@@ -5,10 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +52,13 @@ class LaunchDataFieldSetterTest {
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
         new CollectionExerciseUpdateDTO(
             UUID.randomUUID().toString(),
-            List.of(new CollectionInstrumentSelectionRule(TEST_URL, null)));
+            List.of(new CollectionInstrumentSelectionRule(TEST_URL, null)),
+            "collex1",
+            UUID.randomUUID().toString(),
+            "clx",
+            Date.from(Instant.now()),
+            Date.from(Instant.now()),
+            List.of());
     collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
     when(collectionExerciseRepository.readCollectionExerciseUpdate(any()))
         .thenReturn(Optional.of(collectionExerciseUpdateDTO));
@@ -78,7 +82,13 @@ class LaunchDataFieldSetterTest {
             UUID.randomUUID().toString(),
             List.of(
                 new CollectionInstrumentSelectionRule(
-                    TEST_URL, List.of(new EqLaunchSettings("a", "b", true)))));
+                    TEST_URL, List.of(new EqLaunchSettings("a", "b", true)))),
+            "collex1",
+            UUID.randomUUID().toString(),
+            "clx",
+            Date.from(Instant.now()),
+            Date.from(Instant.now()),
+            List.of());
 
     collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
     when(collectionExerciseRepository.readCollectionExerciseUpdate(any()))
@@ -103,7 +113,13 @@ class LaunchDataFieldSetterTest {
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
         new CollectionExerciseUpdateDTO(
             UUID.randomUUID().toString(),
-            List.of(new CollectionInstrumentSelectionRule(TEST_URL, null)));
+            List.of(new CollectionInstrumentSelectionRule(TEST_URL, null)),
+            "collex1",
+            UUID.randomUUID().toString(),
+            "clx",
+            Date.from(Instant.now()),
+            Date.from(Instant.now()),
+            List.of());
     collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
     when(collectionExerciseRepository.readCollectionExerciseUpdate(any()))
         .thenReturn(Optional.of(collectionExerciseUpdateDTO));
@@ -121,7 +137,13 @@ class LaunchDataFieldSetterTest {
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
         new CollectionExerciseUpdateDTO(
             UUID.randomUUID().toString(),
-            List.of(new CollectionInstrumentSelectionRule(TEST_URL, new ArrayList<>())));
+            List.of(new CollectionInstrumentSelectionRule(TEST_URL, new ArrayList<>())),
+            "collex1",
+            UUID.randomUUID().toString(),
+            "clx",
+            Date.from(Instant.now()),
+            Date.from(Instant.now()),
+            List.of());
     collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
     when(collectionExerciseRepository.readCollectionExerciseUpdate(any()))
         .thenReturn(Optional.of(collectionExerciseUpdateDTO));

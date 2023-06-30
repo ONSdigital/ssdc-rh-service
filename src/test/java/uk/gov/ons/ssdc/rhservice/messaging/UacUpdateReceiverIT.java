@@ -2,11 +2,8 @@ package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +47,13 @@ class UacUpdateReceiverIT {
     CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
         new CollectionExerciseUpdateDTO(
             UUID.randomUUID().toString(),
-            List.of(new CollectionInstrumentSelectionRule("testUrl1", null)));
+            List.of(new CollectionInstrumentSelectionRule("testUrl1", null)),
+            "collex1",
+            UUID.randomUUID().toString(),
+            "clx",
+            Date.from(Instant.now()),
+            Date.from(Instant.now()),
+            List.of());
     collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
 
     CaseUpdateDTO caseUpdateDTO =
@@ -96,7 +99,13 @@ class UacUpdateReceiverIT {
                     List.of(
                         new EqLaunchSettings("PARTICIPANT_ID", "participant_id", true),
                         new EqLaunchSettings("FIRST_NAME", "first_name", true))),
-                new CollectionInstrumentSelectionRule("differentUrl1", null)));
+                new CollectionInstrumentSelectionRule("differentUrl1", null)),
+            "collex1",
+            UUID.randomUUID().toString(),
+            "clx",
+            Date.from(Instant.now()),
+            Date.from(Instant.now()),
+            List.of());
     collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
 
     CaseUpdateDTO caseUpdateDTO =
@@ -152,7 +161,13 @@ class UacUpdateReceiverIT {
                     List.of(
                         new EqLaunchSettings("PARTICIPANT_ID", "participant_id", true),
                         new EqLaunchSettings("FIRST_NAME", "first_name", true))),
-                new CollectionInstrumentSelectionRule("differentUrl1", null)));
+                new CollectionInstrumentSelectionRule("differentUrl1", null)),
+            "collex1",
+            UUID.randomUUID().toString(),
+            "clx",
+            Date.from(Instant.now()),
+            Date.from(Instant.now()),
+            List.of());
     collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
 
     CaseUpdateDTO caseUpdateDTO =
