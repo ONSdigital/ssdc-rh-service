@@ -1,24 +1,39 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
+
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacOr4xxResponseEntity;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
+import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
+
+import static uk.gov.ons.ssdc.rhservice.utils.Constants.RESPONSE_EXPIRES_AT_WEEK_INCREMENT;
 
 @Service
 public class UacService {
   private final UacRepository uacRepository;
   private final CaseRepository caseRepository;
+  private final CollectionExerciseRepository collectionExerciseRepository;
 
-  public UacService(UacRepository uacRepository, CaseRepository caseRepository) {
+  private static final Logger log = LoggerFactory.getLogger(UacService.class);
+
+
+  public UacService(UacRepository uacRepository, CaseRepository caseRepository, CollectionExerciseRepository collectionExerciseRepository) {
     this.uacRepository = uacRepository;
     this.caseRepository = caseRepository;
+    this.collectionExerciseRepository = collectionExerciseRepository;
   }
 
   public UacOr4xxResponseEntity getUac(String uacHash) throws RuntimeException {
@@ -46,9 +61,46 @@ public class UacService {
     }
 
     uacOr4xxResponseEntity.setUacUpdateDTO(uacUpdateDTO);
-    uacOr4xxResponseEntity.setCaseUpdateDTO(getCaseFromUac(uacUpdateDTO));
+
+    CaseUpdateDTO caseUpdateDTO = getCaseFromUac(uacUpdateDTO);
+    uacOr4xxResponseEntity.setCaseUpdateDTO(caseUpdateDTO);
+
+    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = getCollectionExerciseFromCase(caseUpdateDTO);
+
+    if (collectionExerciseResponseExpiresAtDateHasPassed(collectionExerciseUpdateDTO, caseUpdateDTO)) {
+      uacOr4xxResponseEntity.setResponseEntityOptional(
+              Optional.of(new ResponseEntity<>("UAC_INVALID", HttpStatus.BAD_REQUEST)));
+      return uacOr4xxResponseEntity;
+    }
+
+    uacOr4xxResponseEntity.setCollectionExerciseUpdateDTO(collectionExerciseUpdateDTO);
+
     uacOr4xxResponseEntity.setResponseEntityOptional(Optional.empty());
     return uacOr4xxResponseEntity;
+  }
+
+  private CollectionExerciseUpdateDTO getCollectionExerciseFromCase(CaseUpdateDTO caseUpdateDTO) {
+    return collectionExerciseRepository.readCollectionExerciseUpdate(caseUpdateDTO.getCollectionExerciseId())
+            .orElseThrow(
+                    () -> new RuntimeException(
+                            String.format(
+                                    "collectionExerciseId '%s' not found for caseId '%s'", caseUpdateDTO.getCaseId(), caseUpdateDTO.getCollectionExerciseId())));
+  }
+
+  private boolean collectionExerciseResponseExpiresAtDateHasPassed(CollectionExerciseUpdateDTO collectionExerciseUpdateDTO, CaseUpdateDTO caseUpdateDTO) {
+    OffsetDateTime collectionExerciseResponseExpiresAtDate = collectionExerciseUpdateDTO.getEndDate().toInstant()
+            .atOffset(ZoneOffset.UTC).plusWeeks(RESPONSE_EXPIRES_AT_WEEK_INCREMENT);
+
+    if (collectionExerciseResponseExpiresAtDate.toInstant().isBefore(Instant.now())) {
+      log.with("collectionExerciseId", collectionExerciseUpdateDTO.getCollectionExerciseId())
+              .with("caseId", caseUpdateDTO.getCaseId())
+              .with("collectionExerciseEndDate", collectionExerciseUpdateDTO.getEndDate())
+              .with("collectionExerciseWeeksInFutureOffset", RESPONSE_EXPIRES_AT_WEEK_INCREMENT)
+              .with("collectionExerciseResponseExpiresAtDate", collectionExerciseResponseExpiresAtDate)
+              .warn("Collection exercise response expiry end date has already passed for case");
+      return true;
+    }
+    return false;
   }
 
   private CaseUpdateDTO getCaseFromUac(UacUpdateDTO uacUpdateDTO) {

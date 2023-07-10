@@ -2,8 +2,7 @@ package uk.gov.ons.ssdc.rhservice.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,10 @@ import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
+
+import static uk.gov.ons.ssdc.rhservice.utils.Constants.RESPONSE_EXPIRES_AT_WEEK_INCREMENT;
 
 @Service
 public class EqPayloadBuilder {
@@ -29,10 +31,11 @@ public class EqPayloadBuilder {
   }
 
   public Map<String, Object> buildEqPayloadMap(
-      String accountServiceUrl,
-      String languageCode,
-      UacUpdateDTO uacUpdateDTO,
-      CaseUpdateDTO caseUpdateDTO) {
+          String accountServiceUrl,
+          String languageCode,
+          UacUpdateDTO uacUpdateDTO,
+          CaseUpdateDTO caseUpdateDTO,
+          CollectionExerciseUpdateDTO collectionExerciseUpdateDTO) {
 
     validateData(caseUpdateDTO, uacUpdateDTO, languageCode);
 
@@ -63,12 +66,9 @@ public class EqPayloadBuilder {
     eqTokenPayload.put("schema_name", uacUpdateDTO.getCollectionInstrumentUrl());
     eqTokenPayload.put("survey_metadata", getSurveyMetaData(uacUpdateDTO));
 
-    // TODO: As a short term work around we are always setting response_expires_at to a year in the
-    // future. This is to prevent eQ from deleting the partial which is their default behaviour if
-    // no response_expires_at is set
-    OffsetDateTime oneYearInTheFuture = java.time.OffsetDateTime.now().plusYears(1);
-    eqTokenPayload.put(
-        "response_expires_at", oneYearInTheFuture.format(DateTimeFormatter.ISO_DATE_TIME));
+    String weeksInTheFutureFromEndDate = collectionExerciseUpdateDTO.getEndDate().toInstant()
+            .atOffset(ZoneOffset.UTC).plusWeeks(RESPONSE_EXPIRES_AT_WEEK_INCREMENT).toString();
+    eqTokenPayload.put("response_expires_at", weeksInTheFutureFromEndDate);
 
     return eqTokenPayload;
   }
@@ -90,14 +90,7 @@ public class EqPayloadBuilder {
 
   private void validateData(
       CaseUpdateDTO caseUpdateDTO, UacUpdateDTO uacUpdateDTO, String languageCode) {
-    String collectionExerciseId = caseUpdateDTO.getCollectionExerciseId();
     String caseId = caseUpdateDTO.getCaseId();
-
-    if (StringUtils.isEmpty(collectionExerciseId)) {
-      throw new RuntimeException(
-          String.format(
-              "collectionExerciseId '%s' not found for caseId '%s'", collectionExerciseId, caseId));
-    }
 
     String qid = uacUpdateDTO.getQid();
     if (StringUtils.isEmpty(qid)) {
