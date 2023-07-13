@@ -1,5 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
+import static uk.gov.ons.ssdc.rhservice.utils.Constants.RESPONSE_EXPIRES_AT_WEEK_INCREMENT;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
@@ -16,8 +18,6 @@ import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 
-import static uk.gov.ons.ssdc.rhservice.utils.Constants.RESPONSE_EXPIRES_AT_WEEK_INCREMENT;
-
 @Service
 public class EqPayloadBuilder {
 
@@ -31,11 +31,11 @@ public class EqPayloadBuilder {
   }
 
   public Map<String, Object> buildEqPayloadMap(
-          String accountServiceUrl,
-          String languageCode,
-          UacUpdateDTO uacUpdateDTO,
-          CaseUpdateDTO caseUpdateDTO,
-          CollectionExerciseUpdateDTO collectionExerciseUpdateDTO) {
+      String accountServiceUrl,
+      String languageCode,
+      UacUpdateDTO uacUpdateDTO,
+      CaseUpdateDTO caseUpdateDTO,
+      CollectionExerciseUpdateDTO collectionExerciseUpdateDTO) {
 
     validateData(caseUpdateDTO, uacUpdateDTO, languageCode);
 
@@ -66,8 +66,13 @@ public class EqPayloadBuilder {
     eqTokenPayload.put("schema_name", uacUpdateDTO.getCollectionInstrumentUrl());
     eqTokenPayload.put("survey_metadata", getSurveyMetaData(uacUpdateDTO));
 
-    String weeksInTheFutureFromEndDate = collectionExerciseUpdateDTO.getEndDate().toInstant()
-            .atOffset(ZoneOffset.UTC).plusWeeks(RESPONSE_EXPIRES_AT_WEEK_INCREMENT).toString();
+    String weeksInTheFutureFromEndDate =
+        collectionExerciseUpdateDTO
+            .getEndDate()
+            .toInstant()
+            .atOffset(ZoneOffset.UTC)
+            .plusWeeks(RESPONSE_EXPIRES_AT_WEEK_INCREMENT)
+            .toString();
     eqTokenPayload.put("response_expires_at", weeksInTheFutureFromEndDate);
 
     return eqTokenPayload;
