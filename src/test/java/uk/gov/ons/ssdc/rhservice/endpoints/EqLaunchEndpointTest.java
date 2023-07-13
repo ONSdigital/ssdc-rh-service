@@ -21,6 +21,7 @@ import uk.gov.ons.ssdc.rhservice.crypto.EncodeJws;
 import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
 import uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacOr4xxResponseEntity;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
@@ -50,16 +51,23 @@ class EqLaunchEndpointTest {
     String uacHash = "UAC_HASH";
     String languageCode = "LANGUAGE_CODE";
     String accountServiceUrl = "ACCOUNT_SERVICE_URL";
+
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
     uacUpdateDTO.setReceiptReceived(false);
     uacUpdateDTO.setActive(true);
+
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
+
+    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
+
     UacOr4xxResponseEntity uacOr4xxResponseEntity = new UacOr4xxResponseEntity();
     uacOr4xxResponseEntity.setUacUpdateDTO(uacUpdateDTO);
     uacOr4xxResponseEntity.setCaseUpdateDTO(caseUpdateDTO);
+    uacOr4xxResponseEntity.setCollectionExerciseUpdateDTO(collectionExerciseUpdateDTO);
     uacOr4xxResponseEntity.setResponseEntityOptional(Optional.empty());
 
-    when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any())).thenReturn(eqPayload);
+    when(eqPayloadBuilder.buildEqPayloadMap(any(), any(), any(), any(), any()))
+        .thenReturn(eqPayload);
     when(encodeJws.encode(any())).thenReturn(jwsObject);
     when(encryptJwe.encrypt(any())).thenReturn(expectedToken);
     when(uacService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
@@ -68,11 +76,17 @@ class EqLaunchEndpointTest {
     ResponseEntity<?> response =
         underTest.generateEqLaunchToken(uacHash, languageCode, accountServiceUrl);
 
+    // Then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEqualTo(expectedToken);
     verify(uacService).getUac(uacHash);
     verify(eqPayloadBuilder)
-        .buildEqPayloadMap(accountServiceUrl, languageCode, uacUpdateDTO, caseUpdateDTO);
+        .buildEqPayloadMap(
+            accountServiceUrl,
+            languageCode,
+            uacUpdateDTO,
+            caseUpdateDTO,
+            collectionExerciseUpdateDTO);
     verify(encodeJws).encode(eqPayload);
     verify(encryptJwe).encrypt(jwsObject);
     verify(eqLaunchSender).buildAndSendEqLaunchEvent(any(), any());

@@ -13,13 +13,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 
 class EqPayloadBuilderTest {
@@ -36,11 +36,17 @@ class EqPayloadBuilderTest {
 
     UacUpdateDTO uacUpdateDTO = getUacUpdate(null);
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
+    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
+        getCollectionExerciseUpdate(caseUpdateDTO);
 
     // When
     Map<String, Object> eqPayload =
         underTest.buildEqPayloadMap(
-            ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO);
+            ACCOUNT_SERVICE_URL,
+            LANGUAGE_CODE,
+            uacUpdateDTO,
+            caseUpdateDTO,
+            collectionExerciseUpdateDTO);
 
     assertThat(secondsStringToDateTime((long) eqPayload.get("exp")))
         .isCloseTo(OffsetDateTime.now().plusMinutes(5), within(5, ChronoUnit.SECONDS));
@@ -70,13 +76,13 @@ class EqPayloadBuilderTest {
     assertThat(actualData.get("qid")).isEqualTo(uacUpdateDTO.getQid());
     assertThat(actualSurveyMetaData.get("receipting_keys")).isEqualTo(List.of("qid"));
 
-    // TODO test the workaround of setting response_expires_at to a year in the future
-    // As a quick way of testing it, check the value is greater than one year in the
-    // future, minus one minute
+    // Check that the response_expires_at value is greater than 4 weeks in the future, minus one
+    // minute
     String actualResponseExpiresAtString = eqPayload.get("response_expires_at").toString();
     OffsetDateTime actualResponseExpiresAt = OffsetDateTime.parse(actualResponseExpiresAtString);
-    OffsetDateTime oneYearInFuture = OffsetDateTime.now().plusYears(1).minusMinutes(1);
-    assertThat(actualResponseExpiresAt).isAfter(oneYearInFuture);
+    OffsetDateTime fourWeeksInFuture =
+        OffsetDateTime.now(ZoneOffset.UTC).plusWeeks(4).minusMinutes(1);
+    assertThat(actualResponseExpiresAt).isAfter(fourWeeksInFuture);
   }
 
   @Test
@@ -94,11 +100,17 @@ class EqPayloadBuilderTest {
 
     UacUpdateDTO uacUpdateDTO = getUacUpdate(launchData);
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
+    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
+        getCollectionExerciseUpdate(caseUpdateDTO);
 
     // When
     Map<String, Object> eqPayload =
         underTest.buildEqPayloadMap(
-            ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO);
+            ACCOUNT_SERVICE_URL,
+            LANGUAGE_CODE,
+            uacUpdateDTO,
+            caseUpdateDTO,
+            collectionExerciseUpdateDTO);
 
     assertThat(secondsStringToDateTime((long) eqPayload.get("exp")))
         .isCloseTo(OffsetDateTime.now().plusMinutes(5), within(5, ChronoUnit.SECONDS));
@@ -139,29 +151,6 @@ class EqPayloadBuilderTest {
   }
 
   @Test
-  void testValidateEmptyCollectionExerciseIdFailure() {
-    EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
-
-    // Given
-    UacUpdateDTO uacUpdateDTO = getUacUpdate(null);
-    CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
-    caseUpdateDTO.setCollectionExerciseId(null);
-
-    // When, Then
-    RuntimeException thrownException =
-        assertThrows(
-            RuntimeException.class,
-            () ->
-                underTest.buildEqPayloadMap(
-                    ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO));
-    assertThat(thrownException.getMessage())
-        .isEqualTo(
-            String.format(
-                "collectionExerciseId '%s' not found for caseId '%s'",
-                caseUpdateDTO.getCollectionExerciseId(), uacUpdateDTO.getCaseId()));
-  }
-
-  @Test
   void testValidateEmptyQidFailure() {
     EqPayloadBuilder underTest = new EqPayloadBuilder("TEST_PEPPER");
     // Given
@@ -169,7 +158,9 @@ class EqPayloadBuilderTest {
     uacUpdateDTO.setQid(null);
 
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
-    Optional<CaseUpdateDTO> caseOpt = Optional.of(caseUpdateDTO);
+
+    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
+        getCollectionExerciseUpdate(caseUpdateDTO);
 
     // When, Then
     RuntimeException thrownException =
@@ -177,7 +168,11 @@ class EqPayloadBuilderTest {
             RuntimeException.class,
             () ->
                 underTest.buildEqPayloadMap(
-                    ACCOUNT_SERVICE_URL, LANGUAGE_CODE, uacUpdateDTO, caseUpdateDTO));
+                    ACCOUNT_SERVICE_URL,
+                    LANGUAGE_CODE,
+                    uacUpdateDTO,
+                    caseUpdateDTO,
+                    collectionExerciseUpdateDTO));
     assertThat(thrownException.getMessage())
         .isEqualTo(
             String.format(
@@ -193,6 +188,9 @@ class EqPayloadBuilderTest {
 
     CaseUpdateDTO caseUpdateDTO = getCaseUpdate(uacUpdateDTO);
 
+    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO =
+        getCollectionExerciseUpdate(caseUpdateDTO);
+
     // When, Then
     String invalidLanguageCode = "Invalid Language code";
     RuntimeException thrownException =
@@ -200,7 +198,11 @@ class EqPayloadBuilderTest {
             RuntimeException.class,
             () ->
                 underTest.buildEqPayloadMap(
-                    ACCOUNT_SERVICE_URL, invalidLanguageCode, uacUpdateDTO, caseUpdateDTO));
+                    ACCOUNT_SERVICE_URL,
+                    invalidLanguageCode,
+                    uacUpdateDTO,
+                    caseUpdateDTO,
+                    collectionExerciseUpdateDTO));
     assertThat(thrownException.getMessage())
         .isEqualTo(String.format("Invalid language code: '%s'", invalidLanguageCode));
   }
@@ -236,6 +238,16 @@ class EqPayloadBuilderTest {
     uacUpdate.setLaunchData(launchData);
 
     return uacUpdate;
+  }
+
+  private CollectionExerciseUpdateDTO getCollectionExerciseUpdate(CaseUpdateDTO caseUpdateDTO) {
+    CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
+
+    collectionExerciseUpdateDTO.setCollectionExerciseId(caseUpdateDTO.getCollectionExerciseId());
+    collectionExerciseUpdateDTO.setEndDate(
+        Date.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant()));
+
+    return collectionExerciseUpdateDTO;
   }
 
   private String getExpectedEncryptedResponseId(String qid) {

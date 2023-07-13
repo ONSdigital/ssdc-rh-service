@@ -10,6 +10,9 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.nimbusds.jose.JWSObject;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -23,11 +26,9 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.EventDTO;
-import uk.gov.ons.ssdc.rhservice.model.dto.JWTKeysDecrypt;
-import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
+import uk.gov.ons.ssdc.rhservice.model.dto.*;
 import uk.gov.ons.ssdc.rhservice.model.repository.CaseRepository;
+import uk.gov.ons.ssdc.rhservice.model.repository.CollectionExerciseRepository;
 import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 import uk.gov.ons.ssdc.rhservice.testutils.DecryptJwt;
 import uk.gov.ons.ssdc.rhservice.testutils.PubsubTestHelper;
@@ -51,6 +52,8 @@ class EqLaunchEndpointIT {
 
   @Autowired private UacRepository uacRepository;
 
+  @Autowired private CollectionExerciseRepository collectionExerciseRepository;
+
   @Value("${jwt_decrypt_keys}")
   private String jwtDecryptKeys;
 
@@ -73,6 +76,12 @@ class EqLaunchEndpointIT {
       uacUpdateDTO.setReceiptReceived(false);
       uacUpdateDTO.setActive(true);
       uacRepository.writeUAC(uacUpdateDTO);
+
+      CollectionExerciseUpdateDTO collectionExerciseUpdateDTO = new CollectionExerciseUpdateDTO();
+      collectionExerciseUpdateDTO.setCollectionExerciseId(COLLEX_ID);
+      collectionExerciseUpdateDTO.setEndDate(
+          Date.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant()));
+      collectionExerciseRepository.writeCollectionExerciseUpdate(collectionExerciseUpdateDTO);
 
       HttpResponse<String> response =
           Unirest.get(createUrl("http://localhost:%d/eqLaunch/%s", port, uacHash))
