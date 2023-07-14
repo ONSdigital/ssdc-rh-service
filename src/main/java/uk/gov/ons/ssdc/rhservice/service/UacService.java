@@ -94,19 +94,19 @@ public class UacService {
 
   private boolean collectionExerciseResponseExpiresAtDateHasPassed(
       CollectionExerciseUpdateDTO collectionExerciseUpdateDTO, CaseUpdateDTO caseUpdateDTO) {
-    OffsetDateTime collectionExerciseResponseExpiresAtDate =
+    OffsetDateTime collectionExerciseEndDateWithWeekIncrement =
         collectionExerciseUpdateDTO
             .getEndDate()
             .toInstant()
             .atOffset(ZoneOffset.UTC)
             .plusWeeks(RESPONSE_EXPIRES_AT_WEEK_INCREMENT);
 
-    if (collectionExerciseResponseExpiresAtDate.isBefore(OffsetDateTime.now(ZoneOffset.UTC))) {
+    if (collectionExerciseEndDateWithWeekIncrement.isBefore(OffsetDateTime.now(ZoneOffset.UTC))) {
       log.with("collectionExerciseId", collectionExerciseUpdateDTO.getCollectionExerciseId())
           .with("caseId", caseUpdateDTO.getCaseId())
           .with("collectionExerciseEndDate", collectionExerciseUpdateDTO.getEndDate())
           .with("collectionExerciseWeeksInFutureOffset", RESPONSE_EXPIRES_AT_WEEK_INCREMENT)
-          .with("collectionExerciseResponseExpiresAtDate", collectionExerciseResponseExpiresAtDate)
+          .with("collectionExerciseEndDateWithWeekIncrement", collectionExerciseEndDateWithWeekIncrement)
           .warn("Collection exercise response expiry end date has already passed for case");
       return true;
     }
