@@ -106,7 +106,9 @@ public class UacService {
           .with("caseId", caseUpdateDTO.getCaseId())
           .with("collectionExerciseEndDate", collectionExerciseUpdateDTO.getEndDate())
           .with("collectionExerciseWeeksInFutureOffset", RESPONSE_EXPIRES_AT_WEEK_INCREMENT)
-          .with("collectionExerciseEndDateWithWeekIncrement", collectionExerciseEndDateWithWeekIncrement)
+          .with(
+              "collectionExerciseEndDateWithWeekIncrement",
+              collectionExerciseEndDateWithWeekIncrement)
           .warn("Collection exercise response expiry end date has already passed for case");
       return true;
     }
