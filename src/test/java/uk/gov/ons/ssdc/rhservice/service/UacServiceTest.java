@@ -172,7 +172,7 @@ class UacServiceTest {
         .thenReturn(Optional.of(collectionExerciseUpdateDTO));
 
     Optional<ResponseEntity> responseEntity =
-        Optional.of(new ResponseEntity<>("UAC_INVALID", HttpStatus.BAD_REQUEST));
+        Optional.of(new ResponseEntity<>("UAC_INACTIVE", HttpStatus.BAD_REQUEST));
 
     // When
     UacOr4xxResponseEntity uacOr4xxResponseEntity = underTest.getUac(UAC_HASH);

@@ -71,7 +71,7 @@ public class UacService {
     if (collectionExerciseResponseExpiresAtDateHasPassed(
         collectionExerciseUpdateDTO, caseUpdateDTO)) {
       uacOr4xxResponseEntity.setResponseEntityOptional(
-          Optional.of(new ResponseEntity<>("UAC_INVALID", HttpStatus.BAD_REQUEST)));
+          Optional.of(new ResponseEntity<>("UAC_INACTIVE", HttpStatus.BAD_REQUEST)));
       return uacOr4xxResponseEntity;
     }
 
@@ -104,11 +104,17 @@ public class UacService {
     if (collectionExerciseEndDateWithWeekIncrement.isBefore(OffsetDateTime.now(ZoneOffset.UTC))) {
       log.with("collectionExerciseId", collectionExerciseUpdateDTO.getCollectionExerciseId())
           .with("caseId", caseUpdateDTO.getCaseId())
-          .with("collectionExerciseEndDate", collectionExerciseUpdateDTO.getEndDate())
-          .with("collectionExerciseWeeksInFutureOffset", RESPONSE_EXPIRES_AT_WEEK_INCREMENT)
+          .with(
+              "collectionExerciseEndDate",
+              collectionExerciseUpdateDTO
+                  .getEndDate()
+                  .toInstant()
+                  .atOffset(ZoneOffset.UTC)
+                  .toString())
+          .with("collectionExerciseWeeksInFutureIncrement", RESPONSE_EXPIRES_AT_WEEK_INCREMENT)
           .with(
               "collectionExerciseEndDateWithWeekIncrement",
-              collectionExerciseEndDateWithWeekIncrement)
+              collectionExerciseEndDateWithWeekIncrement.toString())
           .warn("Collection exercise response expiry end date has already passed for case");
       return true;
     }
