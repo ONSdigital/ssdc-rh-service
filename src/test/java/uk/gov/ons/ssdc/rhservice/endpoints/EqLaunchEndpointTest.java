@@ -25,12 +25,12 @@ import uk.gov.ons.ssdc.rhservice.model.dto.CollectionExerciseUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacOr4xxResponseEntity;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacUpdateDTO;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
-import uk.gov.ons.ssdc.rhservice.service.UacService;
+import uk.gov.ons.ssdc.rhservice.service.UacValidationService;
 
 @ExtendWith(MockitoExtension.class)
 class EqLaunchEndpointTest {
 
-  @Mock private UacService uacService;
+  @Mock private UacValidationService uacValidationService;
 
   @Mock private EqPayloadBuilder eqPayloadBuilder;
 
@@ -70,7 +70,7 @@ class EqLaunchEndpointTest {
         .thenReturn(eqPayload);
     when(encodeJws.encode(any())).thenReturn(jwsObject);
     when(encryptJwe.encrypt(any())).thenReturn(expectedToken);
-    when(uacService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
+    when(uacValidationService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
 
     // when
     ResponseEntity<?> response =
@@ -79,7 +79,7 @@ class EqLaunchEndpointTest {
     // Then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEqualTo(expectedToken);
-    verify(uacService).getUac(uacHash);
+    verify(uacValidationService).getUac(uacHash);
     verify(eqPayloadBuilder)
         .buildEqPayloadMap(
             accountServiceUrl,
@@ -111,7 +111,7 @@ class EqLaunchEndpointTest {
     uacOr4xxResponseEntity.setResponseEntityOptional(
         Optional.of(new ResponseEntity<>("UAC_RECEIPTED", HttpStatus.BAD_REQUEST)));
 
-    when(uacService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
+    when(uacValidationService.getUac(any())).thenReturn(uacOr4xxResponseEntity);
 
     // when
     ResponseEntity<?> response =
@@ -119,6 +119,6 @@ class EqLaunchEndpointTest {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isEqualTo("UAC_RECEIPTED");
-    verify(uacService).getUac(uacHash);
+    verify(uacValidationService).getUac(uacHash);
   }
 }

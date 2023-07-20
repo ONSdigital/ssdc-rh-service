@@ -15,25 +15,25 @@ import uk.gov.ons.ssdc.rhservice.crypto.EncryptJwe;
 import uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender;
 import uk.gov.ons.ssdc.rhservice.model.dto.UacOr4xxResponseEntity;
 import uk.gov.ons.ssdc.rhservice.service.EqPayloadBuilder;
-import uk.gov.ons.ssdc.rhservice.service.UacService;
+import uk.gov.ons.ssdc.rhservice.service.UacValidationService;
 
 @RestController
 @Timed
 @RequestMapping(value = "/eqLaunch", produces = "application/json")
 public class EqLaunchEndpoint {
-  private final UacService uacService;
+  private final UacValidationService uacValidationService;
   private final EqPayloadBuilder eqPayloadBuilder;
   private final EncodeJws encodeJws;
   private final EncryptJwe encryptJwe;
   private final EqLaunchSender eqLaunchSender;
 
   public EqLaunchEndpoint(
-      UacService uacService,
+      UacValidationService uacValidationService,
       EqPayloadBuilder eqPayloadBuilder,
       EncodeJws encodeJws,
       EncryptJwe encryptJwe,
       EqLaunchSender eqLaunchSender) {
-    this.uacService = uacService;
+    this.uacValidationService = uacValidationService;
     this.eqPayloadBuilder = eqPayloadBuilder;
     this.encodeJws = encodeJws;
     this.encryptJwe = encryptJwe;
@@ -46,7 +46,7 @@ public class EqLaunchEndpoint {
       @RequestParam String languageCode,
       @RequestParam String accountServiceUrl) {
 
-    UacOr4xxResponseEntity uacOr4xxResponseEntity = uacService.getUac(uacHash);
+    UacOr4xxResponseEntity uacOr4xxResponseEntity = uacValidationService.getUac(uacHash);
 
     if (uacOr4xxResponseEntity.getResponseEntityOptional().isPresent()) {
       return uacOr4xxResponseEntity.getResponseEntityOptional().get();

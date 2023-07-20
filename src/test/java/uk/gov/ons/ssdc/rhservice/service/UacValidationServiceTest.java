@@ -30,7 +30,7 @@ import uk.gov.ons.ssdc.rhservice.model.repository.UacRepository;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(OutputCaptureExtension.class)
-class UacServiceTest {
+class UacValidationServiceTest {
   public static final String UAC_HASH = "UAC_HASH";
 
   @Mock UacRepository uacRepository;
@@ -39,7 +39,7 @@ class UacServiceTest {
 
   @Mock CollectionExerciseRepository collectionExerciseRepository;
 
-  @InjectMocks UacService underTest;
+  @InjectMocks UacValidationService underTest;
 
   @Test
   public void testUacReturned() {
@@ -124,7 +124,44 @@ class UacServiceTest {
   }
 
   @Test
-  void testValidateEmptyCollectionExerciseIdFailure() {
+  void testUacHasNoCaseId() {
+    // Given
+    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    uacUpdateDTO.setReceiptReceived(false);
+    uacUpdateDTO.setActive(true);
+    uacUpdateDTO.setCaseId(null);
+
+    when(uacRepository.readUAC(any())).thenReturn(Optional.of(uacUpdateDTO));
+
+    // When, Then
+    RuntimeException thrownException =
+        assertThrows(RuntimeException.class, () -> underTest.getUac(UAC_HASH));
+
+    assertThat(thrownException.getMessage()).isEqualTo("UAC has no caseId");
+  }
+
+  @Test
+  void testCaseNotFound(CapturedOutput loggingOutput) {
+    // Given
+    UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
+    uacUpdateDTO.setReceiptReceived(false);
+    uacUpdateDTO.setActive(true);
+    uacUpdateDTO.setCaseId("NotFound");
+
+    when(uacRepository.readUAC(any())).thenReturn(Optional.of(uacUpdateDTO));
+    when(caseRepository.readCaseUpdate(any())).thenReturn(Optional.empty());
+
+    // When, Then
+    RuntimeException thrownException =
+        assertThrows(RuntimeException.class, () -> underTest.getUac(UAC_HASH));
+
+    assertThat(loggingOutput).contains("caseId not found for UAC", uacUpdateDTO.getCaseId());
+
+    assertThat(thrownException.getMessage()).isEqualTo("Case Not Found for UAC");
+  }
+
+  @Test
+  void testCollectionExerciseNotFound(CapturedOutput loggingOutput) {
     // Given
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
     uacUpdateDTO.setReceiptReceived(false);
@@ -133,7 +170,7 @@ class UacServiceTest {
 
     CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
     caseUpdateDTO.setCaseId("Test");
-    caseUpdateDTO.setCollectionExerciseId(null);
+    caseUpdateDTO.setCollectionExerciseId("NotFound");
 
     when(uacRepository.readUAC(any())).thenReturn(Optional.of(uacUpdateDTO));
     when(caseRepository.readCaseUpdate(any())).thenReturn(Optional.of(caseUpdateDTO));
@@ -144,15 +181,17 @@ class UacServiceTest {
     RuntimeException thrownException =
         assertThrows(RuntimeException.class, () -> underTest.getUac(UAC_HASH));
 
-    assertThat(thrownException.getMessage())
-        .isEqualTo(
-            String.format(
-                "collectionExerciseId '%s' not found for caseId '%s'",
-                caseUpdateDTO.getCollectionExerciseId(), uacUpdateDTO.getCaseId()));
+    assertThat(loggingOutput)
+        .contains(
+            "collectionExerciseId not found for caseId",
+            caseUpdateDTO.getCaseId(),
+            caseUpdateDTO.getCollectionExerciseId());
+
+    assertThat(thrownException.getMessage()).isEqualTo("Collection exercise not found for case");
   }
 
   @Test
-  void testUacCollectionExerciseResponseExpiresAtDateHasPassed(CapturedOutput loggingOutput) {
+  void testCollectionExerciseResponseExpiresAtDateHasPassed(CapturedOutput loggingOutput) {
     // Given
     UacUpdateDTO uacUpdateDTO = new UacUpdateDTO();
     uacUpdateDTO.setReceiptReceived(false);
