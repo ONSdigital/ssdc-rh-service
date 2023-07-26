@@ -9,4 +9,5 @@ public class UacOr4xxResponseEntity {
   Optional<ResponseEntity> responseEntityOptional;
   UacUpdateDTO uacUpdateDTO;
   CaseUpdateDTO caseUpdateDTO;
+  CollectionExerciseUpdateDTO collectionExerciseUpdateDTO;
 }
