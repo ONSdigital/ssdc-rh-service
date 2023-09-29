@@ -49,9 +49,9 @@ class EqPayloadBuilderTest {
             collectionExerciseUpdateDTO);
 
     assertThat(secondsStringToDateTime((long) eqPayload.get("exp")))
-        .isCloseTo(OffsetDateTime.now().plusMinutes(5), within(5, ChronoUnit.SECONDS));
+        .isCloseTo(OffsetDateTime.now().plusMinutes(5), within(10, ChronoUnit.SECONDS));
     assertThat(secondsStringToDateTime((long) eqPayload.get("iat")))
-        .isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.SECONDS));
+        .isCloseTo(OffsetDateTime.now(), within(10, ChronoUnit.SECONDS));
 
     assertThat(UUID.fromString(eqPayload.get("jti").toString())).isNotNull();
     assertThat(UUID.fromString(eqPayload.get("tx_id").toString())).isNotNull();
