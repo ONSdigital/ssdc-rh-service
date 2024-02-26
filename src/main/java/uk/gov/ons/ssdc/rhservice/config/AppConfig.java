@@ -16,14 +16,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-
-  @Value("${management.metrics.export.stackdriver.project-id}")
+  @Value("${management.stackdriver.metrics.export.project-id}")
   private String stackdriverProjectId;
 
-  @Value("${management.metrics.export.stackdriver.enabled}")
+  @Value("${management.stackdriver.metrics.export.enabled}")
   private boolean stackdriverEnabled;
 
-  @Value("${management.metrics.export.stackdriver.step}")
+  @Value("${management.stackdriver.metrics.export.step}")
   private String stackdriverStep;
 
   @Value("${logging.profile}")

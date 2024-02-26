@@ -50,11 +50,12 @@ management:
     tags:
       application: RespondentHomeService
       pod: ${HOSTNAME}
-    export:
-      stackdriver:
+  stackdriver:
+    metrics:
+      export:
         project-id: dummy-project-id
-        enabled: false
         step: PT1M
+        enabled: false
 
 messagelogging:
   logstacktraces: false
