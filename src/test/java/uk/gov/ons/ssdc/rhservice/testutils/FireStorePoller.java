@@ -26,7 +26,8 @@ public class FireStorePoller {
   @Retryable(
       value = {CaseNotFoundException.class},
       maxAttempts = 5,
-      backoff = @Backoff(delay = 1000))
+      backoff = @Backoff(delay = 1000),
+      listeners = {"retryListener"})
   public Optional<CaseUpdateDTO> getCaseById(String caseId) throws CaseNotFoundException {
 
     Optional<CaseUpdateDTO> cazeOpt = caseRepository.readCaseUpdate(caseId);
@@ -41,7 +42,8 @@ public class FireStorePoller {
   @Retryable(
       value = {UacNotFoundException.class},
       maxAttempts = 5,
-      backoff = @Backoff(delay = 1000))
+      backoff = @Backoff(delay = 1000),
+      listeners = {"retryListener"})
   public Optional<UacUpdateDTO> getUacByHash(String hash, boolean expectedActive)
       throws UacNotFoundException {
     Optional<UacUpdateDTO> uacUpdateOpt = uacRepository.readUAC(hash);
@@ -61,7 +63,8 @@ public class FireStorePoller {
   @Retryable(
       value = {UacNotFoundException.class},
       maxAttempts = 5,
-      backoff = @Backoff(delay = 1000))
+      backoff = @Backoff(delay = 1000),
+      listeners = {"retryListener"})
   public Optional<UacUpdateDTO> getUacByHashUacActiveValue(String hash, boolean expectedActiveValue)
       throws UacNotFoundException {
 
@@ -93,7 +96,8 @@ public class FireStorePoller {
   @Retryable(
       value = {UacNotFoundException.class},
       maxAttempts = 5,
-      backoff = @Backoff(delay = 1000))
+      backoff = @Backoff(delay = 1000),
+      listeners = {"retryListener"})
   public Optional<UacUpdateDTO> getUACByHashAndQID(String hash, String expectedQID)
       throws UacNotFoundException {
 
@@ -109,7 +113,8 @@ public class FireStorePoller {
   @Retryable(
       value = {CollectionExerciseNotFoundException.class},
       maxAttempts = 5,
-      backoff = @Backoff(delay = 1000))
+      backoff = @Backoff(delay = 1000),
+      listeners = {"retryListener"})
   public Optional<CollectionExerciseUpdateDTO> getCollectionExerciseById(
       String collectionExcerciseId) throws CollectionExerciseNotFoundException {
 

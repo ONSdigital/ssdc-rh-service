@@ -4,6 +4,7 @@ import static com.google.cloud.spring.pubsub.support.PubSubTopicUtils.toProjectT
 
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -12,7 +13,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
 
 @Component
 @EnableRetry
@@ -37,7 +37,7 @@ public class PubsubHelper {
       maxAttempts = 10,
       backoff = @Backoff(delay = 5000))
   public void sendMessage(String topicName, Object message) {
-    ListenableFuture<String> future = pubSubTemplate.publish(topicName, message);
+    CompletableFuture<String> future = pubSubTemplate.publish(topicName, message);
 
     try {
       future.get(30, TimeUnit.SECONDS);

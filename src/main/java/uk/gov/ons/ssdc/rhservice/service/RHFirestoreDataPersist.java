@@ -28,7 +28,7 @@ public class RHFirestoreDataPersist {
               multiplierExpression = "${cloud-storage.backoff.multiplier}",
               maxDelayExpression = "${cloud-storage.backoff.max}"),
       maxAttemptsExpression = "${cloud-storage.backoff.max-attempts}",
-      listeners = "cloudRetryListener")
+      listeners = {"retryListener"})
   public void storeObjectRetryable(final String schema, final String key, final Object value)
       throws RuntimeException, DataStoreContentionException {
 

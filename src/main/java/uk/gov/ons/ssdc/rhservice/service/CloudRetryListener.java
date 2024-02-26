@@ -4,11 +4,9 @@ import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
-import org.springframework.retry.listener.RetryListenerSupport;
-import org.springframework.stereotype.Component;
+import org.springframework.retry.RetryListener;
 
-@Component
-public class CloudRetryListener extends RetryListenerSupport {
+public class CloudRetryListener implements RetryListener {
 
   private static final Logger log = LoggerFactory.getLogger(CloudRetryListener.class);
 
@@ -35,5 +33,10 @@ public class CloudRetryListener extends RetryListenerSupport {
             String.format("%s Transaction failed after %s attempts", operationName, numAttempts));
       }
     }
+  }
+
+  @Override
+  public <T, E extends Throwable> boolean open(RetryContext context, RetryCallback<T, E> callback) {
+    return RetryListener.super.open(context, callback);
   }
 }
