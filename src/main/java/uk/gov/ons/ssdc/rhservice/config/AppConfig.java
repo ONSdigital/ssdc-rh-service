@@ -7,23 +7,22 @@ import com.google.cloud.spring.pubsub.support.SubscriberFactory;
 import com.google.cloud.spring.pubsub.support.converter.SimplePubSubMessageConverter;
 import io.micrometer.stackdriver.StackdriverConfig;
 import io.micrometer.stackdriver.StackdriverMeterRegistry;
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.TimeZone;
-import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-
-  @Value("${management.metrics.export.stackdriver.project-id}")
+  @Value("${management.stackdriver.metrics.export.project-id}")
   private String stackdriverProjectId;
 
-  @Value("${management.metrics.export.stackdriver.enabled}")
+  @Value("${management.stackdriver.metrics.export.enabled}")
   private boolean stackdriverEnabled;
 
-  @Value("${management.metrics.export.stackdriver.step}")
+  @Value("${management.stackdriver.metrics.export.step}")
   private String stackdriverStep;
 
   @Value("${logging.profile}")
