@@ -53,10 +53,12 @@ public class LaunchDataFieldSetter {
 
   private List<EqLaunchSettings> getEqLaunchSettingsFromCollectionExercise(
       String collectionExerciseId, String collectionInstrumentUrl) {
-    return collectionExerciseRepository.readCollectionExerciseUpdate(collectionExerciseId)
+    return collectionExerciseRepository
+        .readCollectionExerciseUpdate(collectionExerciseId)
         .orElseThrow(
             () -> new RuntimeException("Collection Exercise not found: " + collectionExerciseId))
-        .getCollectionInstrumentRules().stream()
+        .getCollectionInstrumentRules()
+        .stream()
         .filter(
             collexInstrumentRule ->
                 collexInstrumentRule.getCollectionInstrumentUrl().equals(collectionInstrumentUrl))
