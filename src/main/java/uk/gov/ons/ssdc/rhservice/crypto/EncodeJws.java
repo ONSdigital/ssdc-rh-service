@@ -8,7 +8,6 @@ import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.shaded.json.JSONObject;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ssdc.rhservice.model.dto.Key;
@@ -53,7 +52,6 @@ public class EncodeJws {
   }
 
   private Payload buildClaims(Map<String, Object> claims) {
-    JSONObject jsonObject = new JSONObject(claims);
-    return new Payload(jsonObject);
+    return new Payload(claims);
   }
 }
