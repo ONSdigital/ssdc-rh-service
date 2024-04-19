@@ -1,14 +1,12 @@
 package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender.OUTBOUND_EVENT_SCHEMA_VERSION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
