@@ -1,14 +1,12 @@
 package uk.gov.ons.ssdc.rhservice.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.gov.ons.ssdc.rhservice.messaging.EqLaunchSender.OUTBOUND_EVENT_SCHEMA_VERSION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -36,10 +34,11 @@ class EqLaunchSenderTest {
   @InjectMocks EqLaunchSender underTest;
 
   @Test
-  public void testMessageSent() throws JsonProcessingException {
+  void testMessageSent() throws JsonProcessingException {
     Map<String, Object> payload = new HashMap<>();
     payload.put("qid", TEST_QID);
     payload.put("tx_id", CORRELATION_ID);
+    OffsetDateTime testStart = OffsetDateTime.now();
 
     ReflectionTestUtils.setField(underTest, "eqLaunchTopic", TEST_TOPIC);
 
@@ -56,8 +55,7 @@ class EqLaunchSenderTest {
     assertThat(eventHeaderDTO.getTopic()).isEqualTo(TEST_TOPIC);
     assertThat(eventHeaderDTO.getSource()).isEqualTo("RESPONDENT HOME");
     assertThat(eventHeaderDTO.getChannel()).isEqualTo("RH");
-    assertThat(eventHeaderDTO.getDateTime())
-        .isCloseTo(OffsetDateTime.now(), within(5, ChronoUnit.SECONDS));
+    assertThat(eventHeaderDTO.getDateTime()).isBetween(testStart, OffsetDateTime.now());
     assertThat(eventHeaderDTO.getMessageId()).isNotNull();
     assertThat(eventHeaderDTO.getCorrelationId()).isEqualTo(CORRELATION_ID);
     assertThat(eventHeaderDTO.getOriginatingUser()).isEqualTo("RH");
