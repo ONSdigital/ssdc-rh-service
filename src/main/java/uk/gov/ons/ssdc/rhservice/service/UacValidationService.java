@@ -2,12 +2,12 @@ package uk.gov.ons.ssdc.rhservice.service;
 
 import static uk.gov.ons.ssdc.rhservice.utils.Constants.*;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -86,9 +86,11 @@ public class UacValidationService {
         .readCollectionExerciseUpdate(caseUpdateDTO.getCollectionExerciseId())
         .orElseThrow(
             () -> {
-              log.with("collectionExerciseId", caseUpdateDTO.getCollectionExerciseId())
-                  .with("caseId", caseUpdateDTO.getCaseId())
-                  .error("collectionExerciseId not found for caseId");
+              log.atError()
+                  .setMessage("collectionExerciseId not found for caseId")
+                  .addKeyValue("collectionExerciseId", caseUpdateDTO.getCollectionExerciseId())
+                  .addKeyValue("caseId", caseUpdateDTO.getCaseId())
+                  .log();
               return new RuntimeException("Collection exercise not found for case");
             });
   }
@@ -101,14 +103,18 @@ public class UacValidationService {
         collectionExerciseEndDate.plusWeeks(RESPONSE_EXPIRES_AT_WEEK_INCREMENT);
 
     if (collectionExerciseEndDateWithWeekIncrement.isBefore(OffsetDateTime.now(ZoneOffset.UTC))) {
-      log.with("collectionExerciseId", collectionExerciseUpdateDTO.getCollectionExerciseId())
-          .with("caseId", caseUpdateDTO.getCaseId())
-          .with("collectionExerciseEndDate", collectionExerciseEndDate.toString())
-          .with("collectionExerciseWeeksInFutureIncrement", RESPONSE_EXPIRES_AT_WEEK_INCREMENT)
-          .with(
+      log.atWarn()
+          .setMessage("Collection exercise response expiry end date has already passed for case")
+          .addKeyValue(
+              "collectionExerciseId", collectionExerciseUpdateDTO.getCollectionExerciseId())
+          .addKeyValue("caseId", caseUpdateDTO.getCaseId())
+          .addKeyValue("collectionExerciseEndDate", collectionExerciseEndDate.toString())
+          .addKeyValue(
+              "collectionExerciseWeeksInFutureIncrement", RESPONSE_EXPIRES_AT_WEEK_INCREMENT)
+          .addKeyValue(
               "collectionExerciseEndDateWithWeekIncrement",
               collectionExerciseEndDateWithWeekIncrement.toString())
-          .warn("Collection exercise response expiry end date has already passed for case");
+          .log();
       return true;
     }
     return false;
@@ -125,7 +131,10 @@ public class UacValidationService {
         .readCaseUpdate(caseId)
         .orElseThrow(
             () -> {
-              log.with("caseId", uacUpdateDTO.getCaseId()).error("caseId not found for UAC");
+              log.atError()
+                  .setMessage("caseId not found for UAC")
+                  .addKeyValue("caseId", uacUpdateDTO.getCaseId())
+                  .log();
               return new RuntimeException("Case Not Found for UAC");
             });
   }

@@ -1,7 +1,7 @@
 package uk.gov.ons.ssdc.rhservice.service;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryListener;
@@ -14,7 +14,7 @@ public class CloudRetryListener implements RetryListener {
   public <T, E extends Throwable> void onError(
       RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
     Object operationName = context.getAttribute(RetryContext.NAME);
-    log.warn("Retry failed: " + operationName);
+    log.atWarn().setMessage("Retry failed: " + operationName).log();
   }
 
   @Override
@@ -29,8 +29,11 @@ public class CloudRetryListener implements RetryListener {
 
         // On failure the retryCount actually holds the number of attempts
         int numAttempts = context.getRetryCount();
-        log.warn(
-            String.format("%s Transaction failed after %s attempts", operationName, numAttempts));
+        log.atWarn()
+            .setMessage(
+                String.format(
+                    "%s Transaction failed after %s attempts", operationName, numAttempts))
+            .log();
       }
     }
   }
