@@ -24,11 +24,11 @@ public class PubsubHelper {
     this.pubSubTemplate = pubSubTemplate;
   }
 
-  @Value("${queueconfig.shared-pubsub-project}")
-  private String sharedPubsubProject;
+  @Value("${spring.cloud.gcp.pubsub.project-id}")
+  private String pubsubProject;
 
-  public void sendMessageToSharedProject(String topicName, Object message) {
-    String fullyQualifiedTopic = toProjectTopicName(topicName, sharedPubsubProject).toString();
+  public void sendMessageToPubsubProject(String topicName, Object message) {
+    String fullyQualifiedTopic = toProjectTopicName(topicName, pubsubProject).toString();
     sendMessage(fullyQualifiedTopic, message);
   }
 

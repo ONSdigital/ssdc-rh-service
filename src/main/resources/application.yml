@@ -17,8 +17,6 @@ queueconfig:
   uac-update-subscription: event_uac-update_rh
   collection-exercise-update-subscription: event_collection-exercise-update_rh
   eq-launch-topic: event_eq-launch
-  shared-pubsub-project: shared-project
-
 
 cloud-storage:
   case-schema-name: case

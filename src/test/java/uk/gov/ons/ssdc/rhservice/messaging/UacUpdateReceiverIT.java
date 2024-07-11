@@ -80,7 +80,7 @@ class UacUpdateReceiverIT {
     EventDTO eventDTO = new EventDTO(null, payloadDTO);
 
     // WHEN
-    pubsubTestHelper.sendMessageToSharedProject(uacUpdateTopic, eventDTO);
+    pubsubTestHelper.sendMessageToPubsubProject(uacUpdateTopic, eventDTO);
 
     // THEN
     Optional<UacUpdateDTO> uacOpt = fireStorePoller.getUacByHash(uacUpdateDTO.getUacHash(), true);
@@ -133,7 +133,7 @@ class UacUpdateReceiverIT {
     event.setPayload(payloadDTO);
 
     // WHEN
-    pubsubTestHelper.sendMessageToSharedProject(uacUpdateTopic, event);
+    pubsubTestHelper.sendMessageToPubsubProject(uacUpdateTopic, event);
 
     // THEN
     Optional<UacUpdateDTO> uacOpt = fireStorePoller.getUacByHash(uacUpdateDTO.getUacHash(), true);
@@ -205,7 +205,7 @@ class UacUpdateReceiverIT {
     event.setPayload(payloadDTO);
 
     // WHEN
-    pubsubTestHelper.sendMessageToSharedProject(uacUpdateTopic, event);
+    pubsubTestHelper.sendMessageToPubsubProject(uacUpdateTopic, event);
 
     // THEN
     Optional<UacUpdateDTO> uacOpt = fireStorePoller.getUacByHash(oldUacDTO.getUacHash(), false);

@@ -21,8 +21,8 @@ public class MessageConsumerConfig {
   private final ManagedMessageRecoverer managedMessageRecoverer;
   private final PubSubTemplate pubSubTemplate;
 
-  @Value("${queueconfig.shared-pubsub-project}")
-  private String sharedPubsubProject;
+  @Value("${spring.cloud.gcp.pubsub.project-id}")
+  private String pubsubProject;
 
   @Value("${queueconfig.case-update-subscription}")
   private String caseUpdateSubscription;
@@ -58,7 +58,7 @@ public class MessageConsumerConfig {
   public PubSubInboundChannelAdapter newCaseInbound(
       @Qualifier("caseUpdateInputChannel") MessageChannel channel) {
     String subscription =
-        toProjectSubscriptionName(caseUpdateSubscription, sharedPubsubProject).toString();
+        toProjectSubscriptionName(caseUpdateSubscription, pubsubProject).toString();
     return makeAdapter(channel, subscription);
   }
 
@@ -66,7 +66,7 @@ public class MessageConsumerConfig {
   public PubSubInboundChannelAdapter newUacInbound(
       @Qualifier("uacUpdateInputChannel") MessageChannel channel) {
     String subscription =
-        toProjectSubscriptionName(uacUpdateSubscription, sharedPubsubProject).toString();
+        toProjectSubscriptionName(uacUpdateSubscription, pubsubProject).toString();
     return makeAdapter(channel, subscription);
   }
 
@@ -74,7 +74,7 @@ public class MessageConsumerConfig {
   public PubSubInboundChannelAdapter newCollectionExerciseInbound(
       @Qualifier("collectionExerciseUpdateChannel") MessageChannel channel) {
     String subscription =
-        toProjectSubscriptionName(collectionExerciseSubscription, sharedPubsubProject).toString();
+        toProjectSubscriptionName(collectionExerciseSubscription, pubsubProject).toString();
     return makeAdapter(channel, subscription);
   }
 

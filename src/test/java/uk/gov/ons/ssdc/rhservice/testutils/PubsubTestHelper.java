@@ -36,13 +36,13 @@ public class PubsubTestHelper {
 
   @Autowired private GcpPubSubProperties gcpPubSubProperties;
 
-  @Value("${queueconfig.shared-pubsub-project}")
-  private String sharedPubsubProject;
+  @Value("${spring.cloud.gcp.pubsub.project-id}")
+  private String pubsubProject;
 
   private static final ObjectMapper objectMapper = ObjectMapperFactory.objectMapper();
 
-  public void sendMessageToSharedProject(String topicName, Object message) {
-    String fullyQualifiedTopic = toProjectTopicName(topicName, sharedPubsubProject).toString();
+  public void sendMessageToPubsubProject(String topicName, Object message) {
+    String fullyQualifiedTopic = toProjectTopicName(topicName, pubsubProject).toString();
     sendMessage(fullyQualifiedTopic, message);
   }
 
@@ -60,9 +60,9 @@ public class PubsubTestHelper {
     }
   }
 
-  public <T> QueueSpy sharedProjectListen(String subscription, Class<T> contentClass) {
+  public <T> QueueSpy pubsubProjectListen(String subscription, Class<T> contentClass) {
     String fullyQualifiedSubscription =
-        toProjectSubscriptionName(subscription, sharedPubsubProject).toString();
+        toProjectSubscriptionName(subscription, pubsubProject).toString();
     return listen(fullyQualifiedSubscription, contentClass);
   }
 
