@@ -63,7 +63,7 @@ class EqLaunchEndpointIT {
     String uacHash = RandomStringUtils.randomAlphabetic(10);
 
     try (QueueSpy<EventDTO> outboundCaseQueueSpy =
-        pubsubTestHelper.sharedProjectListen(OUTBOUND_EQ_LAUNCH_SUBSCRIPTION, EventDTO.class)) {
+        pubsubTestHelper.pubsubProjectListen(OUTBOUND_EQ_LAUNCH_SUBSCRIPTION, EventDTO.class)) {
       CaseUpdateDTO caseUpdateDTO = new CaseUpdateDTO();
       caseUpdateDTO.setCaseId(CASE_ID);
       caseUpdateDTO.setCollectionExerciseId(COLLEX_ID);

@@ -49,7 +49,7 @@ class CaseUpdateReceiverIT {
     event.setPayload(payloadDTO);
 
     // WHEN
-    pubsubTestHelper.sendMessageToSharedProject(caseUpdateTopic, event);
+    pubsubTestHelper.sendMessageToPubsubProject(caseUpdateTopic, event);
 
     // THEN
     Optional<CaseUpdateDTO> cazeOpt = fireStorePoller.getCaseById(caseUpdateDTO.getCaseId());

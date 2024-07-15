@@ -7,7 +7,7 @@
       <env name="firestore.project-id" value="our-project" />
       <env name="FIRESTORE_EMULATOR_HOST" value="localhost:8542" />
       <env name="spring.cloud.gcp.pubsub.emulator-host" value="localhost:8538" />
-      <env name="spring.cloud.gcp.pubsub.project-id" value="shared-project" />
+      <env name="spring.cloud.gcp.pubsub.project-id" value="our-project" />
     </envs>
     <module name="ssdc-rh-service" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.ons.ssdc.rhservice.Application" />

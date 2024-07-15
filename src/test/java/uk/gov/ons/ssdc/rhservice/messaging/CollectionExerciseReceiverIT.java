@@ -46,7 +46,7 @@ class CollectionExerciseReceiverIT {
     event.setPayload(payloadDTO);
 
     // WHEN
-    pubsubTestHelper.sendMessageToSharedProject(collectionExerciseTopic, event);
+    pubsubTestHelper.sendMessageToPubsubProject(collectionExerciseTopic, event);
 
     // THEN
     Optional<CollectionExerciseUpdateDTO> collexOpt =

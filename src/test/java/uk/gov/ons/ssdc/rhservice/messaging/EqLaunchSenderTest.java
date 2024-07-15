@@ -45,7 +45,7 @@ class EqLaunchSenderTest {
     underTest.buildAndSendEqLaunchEvent(payload, TEST_QID);
 
     ArgumentCaptor<String> eventArgCaptor = ArgumentCaptor.forClass(String.class);
-    verify(pubsubHelper).sendMessageToSharedProject(eq(TEST_TOPIC), eventArgCaptor.capture());
+    verify(pubsubHelper).sendMessageToPubsubProject(eq(TEST_TOPIC), eventArgCaptor.capture());
 
     EventDTO eventDTO =
         ObjectMapperFactory.objectMapper().readValue(eventArgCaptor.getValue(), EventDTO.class);

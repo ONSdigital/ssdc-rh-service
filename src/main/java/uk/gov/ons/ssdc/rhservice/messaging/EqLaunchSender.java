@@ -46,6 +46,6 @@ public class EqLaunchSender {
     eqLaunchEvent.setPayload(payloadDTO);
 
     String messageJson = convertObjectToJson(eqLaunchEvent);
-    pubsubHelper.sendMessageToSharedProject(eqLaunchTopic, messageJson);
+    pubsubHelper.sendMessageToPubsubProject(eqLaunchTopic, messageJson);
   }
 }

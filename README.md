@@ -54,5 +54,5 @@ EXCEPTIONMANAGER_CONNECTION_PORT=8666
 FIRESTORE_EMULATOR_HOST=localhost:8542
 firestore.project-id=our-project
 spring.cloud.gcp.pubsub.emulator-host=localhost:8538
-spring.cloud.gcp.pubsub.project-id=shared-project
+spring.cloud.gcp.pubsub.project-id=our-project
 ```
