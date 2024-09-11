@@ -9,6 +9,7 @@ APPLY_FIXES: none
 # If you use ENABLE_LINTERS variable, all other linters will be disabled by
 # default
 ENABLE_LINTERS:
+  - BASH_SHELLCHECK
   - MARKDOWN_MARKDOWNLINT
 
 # Ignore the pull request template

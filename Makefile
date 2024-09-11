@@ -39,4 +39,4 @@ megalint-fix:  ## Run the mega-linter and attempt to auto fix any issues.
 clean-megalint: ## Clean the temporary files.
 	rm -rf megalinter-reports
 
-lint-check: clean_megalint megalint
+lint-check: clean-megalint megalint
