@@ -30,7 +30,7 @@ make format
 ## Locally Running and Debugging
 
 The easiest way to run the RH service is dockerised, with our full stack services locally by following the README
-in [ssdc-rm-docker-dev](#TODO).
+in [ssdc-rm-docker-dev](https://github.com/ONSdigital/ssdc-rm-docker-dev).
 
 If you need to run the service locally in the IDE or from the command line (e.g. with local code changes or to debug),
 use docker-dev to start the RM services, and
