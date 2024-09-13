@@ -17,6 +17,7 @@ queueconfig:
   uac-update-subscription: event_uac-update_rh
   collection-exercise-update-subscription: event_collection-exercise-update_rh
   eq-launch-topic: event_eq-launch
+  remove-personal-data-subscription: event_remove_personal_data
 
 cloud-storage:
   case-schema-name: case

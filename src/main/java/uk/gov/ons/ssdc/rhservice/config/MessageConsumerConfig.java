@@ -33,6 +33,9 @@ public class MessageConsumerConfig {
   @Value("${queueconfig.collection-exercise-update-subscription}")
   private String collectionExerciseSubscription;
 
+  @Value("${queueconfig.remove-personal-data-subscription}")
+  private String removePersonalDataSubscription;
+
   public MessageConsumerConfig(
       ManagedMessageRecoverer managedMessageRecoverer, PubSubTemplate pubSubTemplate) {
     this.managedMessageRecoverer = managedMessageRecoverer;
@@ -52,6 +55,19 @@ public class MessageConsumerConfig {
   @Bean
   public MessageChannel collectionExerciseUpdateChannel() {
     return new DirectChannel();
+  }
+
+  @Bean
+  public MessageChannel removePersonalDataUpdateChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
+  public PubSubInboundChannelAdapter removePersonalDataUpdateInbound(
+      @Qualifier("removePersonalDataUpdateChannel") MessageChannel channel) {
+    String subscription =
+        toProjectSubscriptionName(removePersonalDataSubscription, pubsubProject).toString();
+    return makeAdapter(channel, subscription);
   }
 
   @Bean
