@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.3</version>
+        <version>3.5.7</version>
     </parent>
 
     <dependencyManagement>
@@ -163,6 +163,11 @@
             <artifactId>unirest-java</artifactId>
             <version>3.14.5</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.22.1</version>
         </dependency>
     </dependencies>
 
