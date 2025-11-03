@@ -152,6 +152,12 @@
             <version>1.79</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.24</version>
+        </dependency>
+
         <!-- Test Dependencies below this point -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -163,11 +169,6 @@
             <artifactId>unirest-java</artifactId>
             <version>3.14.5</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>1.9.22.1</version>
         </dependency>
     </dependencies>
 
