@@ -9,6 +9,14 @@ The firestore allows it to be 'super fast' at reading data out for fast launchin
 
 ## Building
 
+Podman and Docker are both supported for building and running the application.
+By default the Makefile will use `docker` unless you are on an `arm64` architecture (e.g. M1/M2 Mac) in which case it will use `podman`.
+You can override this by setting the `DOCKER` environment variable to either `docker` or `podman`.
+For example, to force using `docker` on an M1/M2 Mac:
+```shell
+DOCKER=docker make <command>
+```
+
 To run all the tests, checks, formatting, and build the image:
 
 ```shell
@@ -30,7 +38,7 @@ make format
 ## Locally Running and Debugging
 
 The easiest way to run the RH service is dockerised, with our full stack services locally by following the README
-in [ssdc-rm-docker-dev](#TODO).
+in [ssdc-rm-docker-dev](https://github.com/ONSdigital/ssdc-rm-docker-dev).
 
 If you need to run the service locally in the IDE or from the command line (e.g. with local code changes or to debug),
 use docker-dev to start the RM services, and

@@ -10,12 +10,30 @@
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
+        <container.cli>docker</container.cli>
     </properties>
+
+    <profiles>
+        <!-- Podman profile activated when env CONTAINER_CLI is set to "podman" -->
+        <!-- This is so podman will be used to run docker commands -->
+        <profile>
+            <id>podman</id>
+            <activation>
+                <property>
+                    <name>env.CONTAINER_CLI</name>
+                    <value>podman</value>
+                </property>
+            </activation>
+            <properties>
+                <container.cli>podman</container.cli>
+            </properties>
+        </profile>
+    </profiles>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.3</version>
+        <version>3.5.13</version>
     </parent>
 
     <dependencyManagement>
@@ -117,7 +135,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.3</version>
+            <version>1.5.25</version>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
@@ -127,12 +145,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.5.3</version>
+            <version>1.5.25</version>
         </dependency>
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-            <version>9.37.3</version>
+            <version>10.0.2</version>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -143,13 +161,19 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.78</version>
+            <version>1.84</version>
         </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.78</version>
+            <version>1.84</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.24</version>
         </dependency>
 
         <!-- Test Dependencies below this point -->
@@ -225,7 +249,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>docker</executable>
+                            <executable>${container.cli}</executable>
                             <commandlineArgs>compose -f src/test/resources/docker-compose.yml up -d</commandlineArgs>
                         </configuration>
                     </execution>
@@ -236,7 +260,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>docker</executable>
+                            <executable>${container.cli}</executable>
                             <commandlineArgs>compose -f src/test/resources/docker-compose.yml down -v</commandlineArgs>
                         </configuration>
                     </execution>

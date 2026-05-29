@@ -38,7 +38,8 @@ exceptionmanager:
 
 management:
   endpoints:
-    enabled-by-default: false
+    access:
+      default: none
   endpoint:
     health:
       enabled: true

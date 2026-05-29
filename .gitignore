@@ -3,3 +3,6 @@
 target/*
 .java-version
 .DS_Store
+megalinter-reports/
+# Podman secrets
+podman-build-secret*

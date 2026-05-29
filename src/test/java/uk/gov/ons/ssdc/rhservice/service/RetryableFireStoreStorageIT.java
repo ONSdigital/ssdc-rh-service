@@ -14,9 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ssdc.rhservice.model.dto.CaseUpdateDTO;
 
@@ -31,9 +31,9 @@ class RetryableFireStoreStorageIT {
   this is difficult or impossible to do without mocking out the actual firestore
   */
 
-  @MockBean RHFirestoreProvider RHFirestoreProvider;
+  @MockitoBean RHFirestoreProvider RHFirestoreProvider;
 
-  @MockBean Firestore firestore;
+  @MockitoBean Firestore firestore;
 
   @Autowired private RHFirestoreClient rhFirestoreClient;
 
