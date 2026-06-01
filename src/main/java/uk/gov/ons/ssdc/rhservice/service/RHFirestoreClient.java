@@ -46,6 +46,14 @@ public class RHFirestoreClient {
     }
   }
 
+  public void deleteData(final String schema, final String id) {
+    try {
+      rhFirestoreDataPersist.deleteBatchRetryable(schema, id);
+    } catch (DataStoreContentionException e) {
+      throw new RuntimeException("Data Contention Error", e);
+    }
+  }
+
   private <T> List<T> runSearch(
       Class<T> targetClass, final String schema, FieldPath fieldPathForId, String searchValue)
       throws RuntimeException {

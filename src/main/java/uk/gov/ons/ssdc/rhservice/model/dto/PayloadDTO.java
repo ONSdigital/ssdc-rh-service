@@ -15,4 +15,5 @@ public class PayloadDTO {
   private UacUpdateDTO uacUpdate;
   private CollectionExerciseUpdateDTO collectionExerciseUpdate;
   private EqLaunchDTO eqLaunch;
+  private RemoveDataDTO removeData;
 }

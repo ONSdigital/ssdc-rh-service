@@ -25,4 +25,8 @@ public class CaseRepository {
   public Optional<CaseUpdateDTO> readCaseUpdate(String caseId) {
     return rhFirestoreClient.retrieveObject(CaseUpdateDTO.class, caseSchemaName, caseId);
   }
+
+  public void deleteCaseBatchUpdate(final String collex_id) {
+    rhFirestoreClient.deleteData(caseSchemaName, collex_id);
+  }
 }

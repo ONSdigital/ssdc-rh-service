@@ -28,4 +28,8 @@ public class UacRepository {
     return rhFirestoreClient.retrieveObject(
         UacUpdateDTO.class, uacSchemaName, universalAccessCodeHash);
   }
+
+  public void deleteCaseBatchUpdate(final String collex_id) {
+    rhFirestoreClient.deleteData(uacSchemaName, collex_id);
+  }
 }
