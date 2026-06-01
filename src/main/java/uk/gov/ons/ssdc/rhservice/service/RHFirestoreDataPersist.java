@@ -52,6 +52,7 @@ public class RHFirestoreDataPersist {
     }
   }
 
+  // The retryable probably isn't needed if we use BulkWriter, but I'm leaving it in for the prototype
   @Retryable(
       label = "deleteBatchRetryable",
       include = DataStoreContentionException.class,
