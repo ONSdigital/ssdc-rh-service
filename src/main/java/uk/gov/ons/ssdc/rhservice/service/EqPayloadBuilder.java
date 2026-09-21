@@ -2,6 +2,7 @@ package uk.gov.ons.ssdc.rhservice.service;
 
 import static uk.gov.ons.ssdc.rhservice.utils.Constants.RESPONSE_EXPIRES_AT_WEEK_INCREMENT;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
@@ -112,9 +113,9 @@ public class EqPayloadBuilder {
   private String encryptResponseId(String qid) {
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
-      md.update(responseIdPepper.getBytes());
-      byte[] bytes = md.digest(qid.getBytes());
-      return qid + "_" + new String(Hex.encode(bytes), 0, 16);
+      md.update(responseIdPepper.getBytes(StandardCharsets.UTF_8));
+      byte[] bytes = md.digest(qid.getBytes(StandardCharsets.UTF_8));
+      return qid + "_" + new String(Hex.encode(bytes), 0, 16, StandardCharsets.UTF_8);
     } catch (NoSuchAlgorithmException ex) {
       throw new RuntimeException("No SHA-256 algorithm while encrypting qid", ex);
     }
